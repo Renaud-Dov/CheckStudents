@@ -1,5 +1,5 @@
 # CheckStudents
-
+Pour rajouter ce bot à ce serveur, cliquez sur le lien suivant : https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot
 ## Fonctionnement
 
 
@@ -24,6 +24,8 @@ Une fois l'appel terminé, le bit retournera la liste des élèves présents (so
 
 Pour initialiser le bot, vous devez écrire `.Check init @roleBot @admin` -> @roleBot correspond au role du bot CheckStudents et @admin le rôle de privilège.
 <img src="img/img5.png" alt="Capture d'écran d'une recherche">
+​
+5
 
 ## Ajouter/Supprimer des privilèges à un rôle
 

@@ -1,3 +1,5 @@
+![Version](https://img.shields.io/badge/version-1.00-green)
+![Github](https://img.shields.io/badge/license-GNU3-orange)
 # CheckStudents
 Pour rajouter ce bot à ce serveur, cliquez sur le lien suivant : https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot
 ## Fonctionnement

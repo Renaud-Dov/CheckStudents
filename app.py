@@ -5,10 +5,9 @@ from discord.ext import commands
 import sys
 # import time
 commandes="""
-.Check  appel ***@classe***-> lance l'appel, **remplacer par la classe correspondante**
+.Check appel ***@classe***-> lance l'appel, **remplacer par la classe correspondante**
 .Check addRole @role1 @role2,... -> rajoute les privilèges à un ou plusieurs rôles
 .Check rmRole  @role1 @role2,... -> retire les privilèges à un ou plusieurs rôles
-.Check init  @roleofTheBot -> initialise le bot pour la première sur un serveur : **Préciser le rôle du bot !**
 """
 
 
@@ -22,6 +21,8 @@ client = commands.Bot(command_prefix= '.Check ')
 token=sys.argv[1]
 
 liste_eleves=dict()
+
+
 def isInit(guild):
     return str(guild.id) in liste_eleves.keys()
 
@@ -43,6 +44,7 @@ def returnPresent(message):
         for i in liste:
             message+="• *{}* <@{}>\n".format(i[0],i[1])  #[user.display_name,user.id]
         return message
+
 def convert(id):
     return int(id.replace(" ","").lstrip("<@&").rstrip(">"))
 
@@ -50,6 +52,16 @@ async def on_ready():
     """Initilisation du bot"""
     print('Bot started')
 
+@client.event
+async def on_guild_join(guild):
+    global liste_eleves
+    rolebot=discord.utils.get(guild.roles, name="CheckStudents").id
+    liste_eleves[str(guild.id)]={str(guild.id):{"botID":rolebot,"admin":[],"appels":{}}}
+
+@client.event
+async def on_guild_remove(guild):
+    global liste_eleves
+    del liste_eleves[str(guild.id)]
 @client.command()
 async def send(message,channel):
     await channel.send(message)
@@ -110,8 +122,6 @@ async def appel(context,*args):
     if not str(context.guild.id) in liste_eleves.keys():
         await send("<@{}> : **Il faut instancier le bot: voir .Check init**".format(context.author.id),context.channel)
         raise
-    print(context.author,context.channel)
-    # await context.send('{} arguments: {}'.format(len(args), ', '.join(args)))
     classe=convert(args[0])
 
     if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
@@ -125,33 +135,32 @@ async def appel(context,*args):
 @client.command()
 async def addRole(context,*args):
     global liste_eleves
-    if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
+    if len(liste_eleves[str(context.guild.id)]['admin'])>0:
+        if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
+            for i in args:
+                liste_eleves[str(context.guild.id)]['admin'].append(convert(i))
+                await send('*Nouvel admin :*{}'.format(i),context.channel)
+        else:
+            await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
+    else:
         for i in args:
             liste_eleves[str(context.guild.id)]['admin'].append(convert(i))
             await send('*Nouvel admin :*{}'.format(i),context.channel)
-    print(liste_eleves)
 
 
 @client.command()
 async def rmRole(context,*args):
     global liste_eleves
-    if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
-        for i in args:
-            del liste_eleves[str(context.guild.id)]['admin'][i]
-            await send('*Admin retiré :*{}'.format(i),context.channel)
-    print(liste_eleves)
-
-@client.command()
-async def init(context,*args):
-    global liste_eleves
-    if len(args)>2:
-        await send("Vous devez mettre deux arguments, le rôle exclusif @ du bot et un rôle admin",context.channel)
-        raise
-    if not str(context.guild.id) in liste_eleves.keys():
-        liste_eleves[str(context.guild.id)]={"botID":convert(args[0]),"admin":[convert(args[1])],"appels":{}}
-        await send("Bot instancié :\n•Bot : <@&{}>\n• Admin : <@&{}>".format(convert(args[0]),convert(args[1])),context.channel)
+    if len(liste_eleves[str(context.guild.id)]['admin'])>0:
+        if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
+            for i in args:
+                del liste_eleves[str(context.guild.id)]['admin'][i]
+                await send('*Admin retiré :*{}'.format(i),context.channel)
+        else:
+            await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
     else:
-        await send("Bot déjà défini",context.channel)
+        await send("**Il n'y a aucun rôle ayant les privilèges!**".format(context.author.id),context.channel)
+
 
 
 @client.event

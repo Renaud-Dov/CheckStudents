@@ -11,17 +11,20 @@ commandes="""
 """
 
 
-def jsonWrite(path,data):
-    with open(path, 'w') as outfile:
-        outfile.write(data)
 
 client = commands.Bot(command_prefix= '.Check ')
 
 
 token=sys.argv[1]
+def jsonread():
+    with open('guild.json', 'r') as outfile:
+        return json.load(outfile)
 
-liste_eleves=dict()
+liste_eleves=jsonread()
 
+def jsonWrite():
+    with open('guild.json', 'w') as outfile:
+        outfile.write(liste_eleves)
 
 def isInit(guild):
     return str(guild.id) in liste_eleves.keys()
@@ -57,11 +60,14 @@ async def on_guild_join(guild):
     global liste_eleves
     rolebot=discord.utils.get(guild.roles, name="CheckStudents").id
     liste_eleves[str(guild.id)]={str(guild.id):{"botID":rolebot,"admin":[],"appels":{}}}
+    jsonWrite()
 
 @client.event
 async def on_guild_remove(guild):
     global liste_eleves
     del liste_eleves[str(guild.id)]
+    jsonWrite()
+
 @client.command()
 async def send(message,channel):
     await channel.send(message)
@@ -135,27 +141,31 @@ async def appel(context,*args):
 @client.command()
 async def addRole(context,*args):
     global liste_eleves
-    if len(liste_eleves[str(context.guild.id)]['admin'])>0:
+    if liste_eleves[str(context.guild.id)]['admin']!=[]:
         if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
             for i in args:
                 liste_eleves[str(context.guild.id)]['admin'].append(convert(i))
                 await send('*Nouvel admin :*{}'.format(i),context.channel)
+            jsonread()
         else:
             await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
     else:
         for i in args:
             liste_eleves[str(context.guild.id)]['admin'].append(convert(i))
+            
             await send('*Nouvel admin :*{}'.format(i),context.channel)
+        jsonread()
 
 
 @client.command()
 async def rmRole(context,*args):
     global liste_eleves
-    if len(liste_eleves[str(context.guild.id)]['admin'])>0:
+    if liste_eleves[str(context.guild.id)]['admin']!=[]:
         if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
             for i in args:
                 del liste_eleves[str(context.guild.id)]['admin'][i]
                 await send('*Admin retiré :*{}'.format(i),context.channel)
+            jsonread()
         else:
             await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
     else:
@@ -168,8 +178,6 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandNotFound):
         await send("Commande inconnue :\n"+commandes,ctx.message.channel)
     raise error
-
-
 
 client.run(token)
 client.add_command(appel)

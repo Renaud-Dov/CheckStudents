@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-1.00-green)
+![Version](https://img.shields.io/badge/version-1.0-green)
 ![Github](https://img.shields.io/badge/license-GNU3-orange)
 # CheckStudents
 Pour rajouter ce bot à ce serveur, cliquez sur le lien suivant : https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot
@@ -22,12 +22,6 @@ Le professeur, ou n'importe quelle personne ayant les droits pourra finir l'appe
 Une fois l'appel terminé, le bit retournera la liste des élèves présents (sortira les élèves non présent dans une MAJ).
 <img src="img/img4.png" alt="Capture d'écran d'une recherche">
 
-## Initialisation
-
-Pour initialiser le bot, vous devez écrire `.Check init @roleBot @admin` -> @roleBot correspond au role du bot CheckStudents et @admin le rôle de privilège.
-<img src="img/img5.png" alt="Capture d'écran d'une recherche">
-​
-5
 
 ## Ajouter/Supprimer des privilèges à un rôle
 
@@ -37,5 +31,8 @@ Seul un utilisateur ayant les privilèges peut rajouter/supprimer des rôles.
 * Supprimer : `.Check rmRole @role1 @role2,...`
 >Note : Vous pouvez rajouter/supprimer autant de role que vous vouler à la fois.
 
+A noter que que les droits d'admin ne seront pas vérifiés si aucun admin n'a été au préalable enregistré.
+
+**Pour voir la liste des admins,** tapez dans le chat  `.Check ListRoles`
 
 Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>

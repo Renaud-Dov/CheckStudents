@@ -24,7 +24,7 @@ liste_eleves=jsonread()
 
 def jsonWrite():
     with open('guild.json', 'w') as outfile:
-        outfile.write(liste_eleves)
+        json.dump(liste_eleves, outfile)
 
 def isInit(guild):
     return str(guild.id) in liste_eleves.keys()
@@ -117,7 +117,7 @@ async def on_reaction_add(reaction, user):
 
         else: # autre emoji
             await remove_reaction(reactionContent,reaction.message,user)
-            await send("<@{}> : **Emoji inconnu.\nLes élèves doivent cliquer sur ✅ pour se notifier présent.**".format(user.id),reaction.message.channel)
+            await send("<@{}> : **Emoji inconnu:{}\nLes élèves doivent cliquer sur ✅ pour se notifier présent.**".format(user.id,reactionContent),reaction.message.channel)
 
 
 @client.command()

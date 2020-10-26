@@ -1,7 +1,10 @@
+from typing import List
 import discord
 import json
 from discord.ext import commands
 # from CONSTANT import *
+#python3 app.py NzYwMTU3MDY1OTk3MzIwMTky.X3H9bw.qqSdVvKxyJgmgdgHlV0IHvaF-fY
+
 import sys
 # import time
 commandes="""
@@ -59,7 +62,9 @@ async def on_ready():
 async def on_guild_join(guild):
     global liste_eleves
     rolebot=discord.utils.get(guild.roles, name="CheckStudents").id
-    liste_eleves[str(guild.id)]={str(guild.id):{"botID":rolebot,"admin":[],"appels":{}}}
+    print()
+    print(rolebot)
+    liste_eleves[str(guild.id)]={"botID":rolebot,"admin":[],"appels":{}}
     jsonWrite()
 
 @client.event
@@ -103,7 +108,7 @@ async def on_reaction_add(reaction, user):
 
 
         elif reactionContent=="🆗": #si l'utilisateur a coché OK
-            if got_the_role(liste_eleves[idGuild]['admin'],user.roles): # est prof
+            if got_the_role(liste_eleves[idGuild]["admin"],user.roles): # est prof
 
                 await send("<@{}> : A fini l'appel des <@&{}>".format(user.id,liste_eleves[idGuild]['appels'][idMessage]['ClasseRoleID']),reaction.message.channel)
                 await clear_reaction("✅",reaction.message)
@@ -121,16 +126,15 @@ async def on_reaction_add(reaction, user):
 
 
 @client.command()
-async def appel(context,*args):
+async def appel(context,args):
     global liste_eleves
-    if len(args)>1:
-        raise commands.errors.CommandNotFound
-    if not str(context.guild.id) in liste_eleves.keys():
-        await send("<@{}> : **Il faut instancier le bot: voir .Check init**".format(context.author.id),context.channel)
-        raise
-    classe=convert(args[0])
+    print(liste_eleves[str(context.guild.id)])
 
-    if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
+    # if len(args)>1:
+    #     raise commands.errors.CommandNotFound
+    classe=convert(args)
+
+    if got_the_role(liste_eleves[str(context.guild.id)]["admin"],context.author.roles):
         liste_eleves[str(context.guild.id)]['appels'][str(context.message.id)]={'ClasseRoleID':classe,'listStudents':[]}
         await send("*Début de l'appel:*\n**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel**",context.channel)
         await add_reaction("✅",context.message) #on rajoute les réactions ✅ & 🆗
@@ -139,37 +143,46 @@ async def appel(context,*args):
         await send("<@{}> : **Vous n'êtes pas professeur ! Vous ne pouvez démarrer l'appel.**".format(context.author.id),context.channel)
 
 @client.command()
+async def ListRoles(context):
+    for i in liste_eleves[str(context.guild.id)]["admin"]:
+        await send("<@&{}> : {}".format(i,discord.utils.get(context.guild.roles, id=i)),context.channel)
+
+@client.command()
 async def addRole(context,*args):
     global liste_eleves
-    if liste_eleves[str(context.guild.id)]['admin']!=[]:
-        if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
+
+    guild=str(context.guild.id)
+
+    if len(liste_eleves[guild]["admin"])>0:
+        if got_the_role(liste_eleves[guild]["admin"],context.author.roles):
             for i in args:
-                liste_eleves[str(context.guild.id)]['admin'].append(convert(i))
+                liste_eleves[guild]["admin"].append(convert(i))
                 await send('*Nouvel admin :*{}'.format(i),context.channel)
-            jsonread()
+            jsonWrite()
         else:
-            await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
+            await send("<@{}> : **Vous n'avez pas les privilèges!**\n*Tapez `.Check ListRoles` pour voir les rôles d'admin*".format(context.author.id),context.channel)
     else:
         for i in args:
-            liste_eleves[str(context.guild.id)]['admin'].append(convert(i))
+            liste_eleves[guild]["admin"].append(convert(i))
             
-            await send('*Nouvel admin :*{}'.format(i),context.channel)
-        jsonread()
+            await send('*Nouvel admin : *{}'.format(i),context.channel)
+        jsonWrite()
 
 
 @client.command()
 async def rmRole(context,*args):
     global liste_eleves
-    if liste_eleves[str(context.guild.id)]['admin']!=[]:
-        if got_the_role(liste_eleves[str(context.guild.id)]['admin'],context.author.roles):
+    guild=str(context.guild.id)
+    if liste_eleves[guild]["admin"]!=[]:
+        if got_the_role(liste_eleves[guild]["admin"],context.author.roles):
             for i in args:
-                del liste_eleves[str(context.guild.id)]['admin'][i]
+                del liste_eleves[guild]["admin"][i]
                 await send('*Admin retiré :*{}'.format(i),context.channel)
-            jsonread()
+            jsonWrite()
         else:
             await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
     else:
-        await send("**Il n'y a aucun rôle ayant les privilèges!**".format(context.author.id),context.channel)
+        await send("**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : .Check addRole @role1 @role2, etc...**".format(context.author.id),context.channel)
 
 
 
@@ -183,3 +196,4 @@ client.run(token)
 client.add_command(appel)
 client.add_command(addRole)
 client.add_command(rmRole)
+client.add_command(ListRoles)

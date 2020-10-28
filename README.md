@@ -1,7 +1,8 @@
 ![Version](https://img.shields.io/badge/version-1.0-green)
 ![Github](https://img.shields.io/badge/license-GNU3-orange)
+![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 # CheckStudents
-Pour rajouter ce bot à ce serveur, cliquez sur le lien suivant : https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot
+Pour rajouter ce bot à ce serveur, cliquez sur le lien suivant : [Cliquer ici](https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot)
 ## Fonctionnement
 
 
@@ -17,7 +18,6 @@ Le professeur, ou n'importe quelle personne ayant les droits pourra finir l'appe
 >Note : Les utilisateurs ne peuvent notifier leur présence que si ils font partie du groupe (les élèves extérieurs ne seront pas comptabilisés.)
 >De même, quelqu'un qui n'a pas les privilèges ne peut fermet l'appel
 <img src="img/img3.png" alt="Capture d'écran d'une recherche">
-
 
 Une fois l'appel terminé, le bit retournera la liste des élèves présents (sortira les élèves non présent dans une MAJ).
 <img src="img/img4.png" alt="Capture d'écran d'une recherche">
@@ -35,4 +35,4 @@ A noter que que les droits d'admin ne seront pas vérifiés si aucun admin n'a �
 
 **Pour voir la liste des admins,** tapez dans le chat  `.Check ListRoles`
 
-Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+Icons made by [Freepik](http://www.freepik.com/) from [Flaticon](https://www.flaticon.com/)

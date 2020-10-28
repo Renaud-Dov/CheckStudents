@@ -173,11 +173,15 @@ async def addRole(context,*args):
 async def rmRole(context,*args):
     global liste_eleves
     guild=str(context.guild.id)
-    if liste_eleves[guild]["admin"]!=[]:
+    if len(liste_eleves[guild]["admin"])>0:
         if got_the_role(liste_eleves[guild]["admin"],context.author.roles):
             for i in args:
-                del liste_eleves[guild]["admin"][i]
-                await send('*Admin retiré :*{}'.format(i),context.channel)
+                i=convert(i)
+                if i in liste_eleves[guild]["admin"]:
+                    liste_eleves[guild]["admin"].remove(i)
+                    await send('*Admin retiré :*<@&{}>'.format(i),context.channel)
+                else:
+                    await send("*<@&{}> n'est pas admin*".format(i),context.channel)
             jsonWrite()
         else:
             await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)

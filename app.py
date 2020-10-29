@@ -3,7 +3,6 @@ import discord
 import json
 from discord.ext import commands
 # from CONSTANT import *
-#python3 app.py NzYwMTU3MDY1OTk3MzIwMTky.X3H9bw.qqSdVvKxyJgmgdgHlV0IHvaF-fY
 
 import sys
 # import time

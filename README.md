@@ -4,7 +4,6 @@
 
 # CheckStudents
 To add this bot to your Discord Server : [Click Here](https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot) You need the corresponding privileges to add the bot on a server.
-### ***Important  : This bot is in fully french for the moment but will be translated soon.***
 
 ## How it works ?
 
@@ -36,6 +35,12 @@ The teacher, or anyone with privileges, can end the call by clicking 🆗.
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
 **To see the list of admins,** write in the chat `.Check ListRoles`
+
+## Translation
+
+You can also use the bot in different languages (French and English only for the moment)
+Use `.Check language {fr or en}`. The language is applied to all the server.
+If you want to add another language, please check json prototypes and pull-request your translation !
 
 ## Data pravicy
 

@@ -1,0 +1,17 @@
+{
+    "changeLanguage":"The language is now set to **english**",
+    "commands":"Unknown command: .Check call ***@class*** -> start the call, **replace by the corresponding class**\n.Check addRole @role1 @role2, -> add privileges to one or more roles \n.Check rmRole @role1 @role2, -> remove privileges from one or more roles",
+    "NoStudents":"⚠ **No student present** ⚠",
+    "Studentsnotify":"**List of students present:**\n",
+    "FinishCall":"finished the call of",
+    "NoRightEnd":"**You do not have the rights to close the call!**",
+    "unknowEmoji":"**Unknown emoji.\nStudents must click ✅ to notify themselves present.**",
+    "cantNotify":"You cannot notify yourself present",
+    "startCall":"*Start of call:*\n**Students: Click on ✅ to notify you present\nTeacher: Click on 🆗 to validate the call**",
+    "notTeacher":"**You are not a teacher! You cannot start the call.**",
+    "NoPrivileges":"**You don't have privileges!** \n *Type `.Check ListRoles` to see admin roles*",
+    "zeroPrivileges":"**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",
+    "removeAdmin":"Admin removed",
+    "notAdmin":"is not admin",
+    "newAdmin":"New Admin"
+}

@@ -167,7 +167,7 @@ async def language(context,langue):
         else:
             await send("<@{}> : {}".format(context.author.id,returnLanguage(data["language"],"NoPrivileges")),context.channel)
     else:
-        await send("Unknow language:\nLanguages :\nEnglish: en\nFrench: fr",context.channel)
+        await send("Unknow language:\n**Languages :**\n• English: en\n• French: fr",context.channel)
 
 
 

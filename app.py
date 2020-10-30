@@ -134,7 +134,7 @@ async def addRole(context,*args):
         await send("<@{}> : {}".format(context.author.id,returnLanguage(data["language"],"NoPrivileges")),context.channel)
     else:
         for i in args:
-            data["admin"]+=convert(i)
+            data["admin"].append(convert(i))
             await send('*{} :*{}'.format(returnLanguage(data["language"],"newAdmin"),i),context.channel)
         editGuild(guild,data)
 
@@ -167,7 +167,7 @@ async def language(context,langue):
         await send(returnLanguage(langue,"changeLanguage"),context.channel)
         editGuild(context.guild.id,data)
     else:
-        await send("Unknow language",context.channel)
+        await send("Unknow language:\nLanguages :\nEnglish: en\nFrench: fr",context.channel)
 
 
 

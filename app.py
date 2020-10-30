@@ -78,11 +78,9 @@ async def on_reaction_add(reaction, user):
 
     if entry in appelList: #si c'est un message d'appel lancé par un professeur
         reactionContent=str(reaction).strip(" ")
-        print("hello")
         if reactionContent=="✅": #si l'utilisateur a coché présent
             if  got_the_role(appelList[entry]['ClasseRoleID'],user.roles): #si user a le role de la classe correspondante
                 appelList[entry]['listStudents'].append([user.display_name,user.id]) #on le rajoute à la liste d'appel
-                print("eleve",appelList)
             elif not got_the_role(readGuild(idGuild)['botID'],user.roles):
                 await remove_reaction("✅",reaction.message,user)
                 await send("<@{}> : {}".format(user.id,returnLanguage(readGuild(idGuild)["language"],"cantNotify")),reaction.message.channel)
@@ -90,7 +88,6 @@ async def on_reaction_add(reaction, user):
 
         elif reactionContent=="🆗": #si l'utilisateur a coché OK
             if got_the_role(readGuild(idGuild)["admin"],user.roles): # est prof
-                print("prof",appelList)
                 await send("<@{}> :{} <@&{}>".format(user.id,returnLanguage(readGuild(idGuild)["language"],"FinishCall"),appelList[entry]['ClasseRoleID']),reaction.message.channel)
                 await clear_reaction("✅",reaction.message)
                 await clear_reaction("🆗",reaction.message)
@@ -114,7 +111,6 @@ async def appel(context,args):
 
     if got_the_role(data["admin"],context.author.roles):
         appelList["{}-{}".format(context.guild.id,context.message.id)]={'ClasseRoleID':classe,'listStudents':[]}
-        print("start",appelList)
         await send(returnLanguage(data["language"],"startCall"),context.channel)
         await add_reaction("✅",context.message) #on rajoute les réactions ✅ & 🆗
         await add_reaction("🆗",context.message)
@@ -164,9 +160,12 @@ async def rmRole(context,*args):
 async def language(context,langue):
     if langue in ["fr","en"]:
         data=readGuild(context.guild.id)
-        data["language"]=langue
-        await send(returnLanguage(langue,"changeLanguage"),context.channel)
-        editGuild(context.guild.id,data)
+        if got_the_role(data["admin"],context.author.roles):
+            data["language"]=langue
+            await send(returnLanguage(langue,"changeLanguage"),context.channel)
+            editGuild(context.guild.id,data)
+        else:
+            await send("<@{}> : {}".format(context.author.id,returnLanguage(data["language"],"NoPrivileges")),context.channel)
     else:
         await send("Unknow language:\nLanguages :\nEnglish: en\nFrench: fr",context.channel)
 

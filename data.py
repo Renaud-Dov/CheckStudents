@@ -8,7 +8,7 @@ def returnLanguage(lg,stat):
 
 def createGuild(guildID,rolebot):
     with open("database/{}.json".format(guildID),"x") as outfile:
-        json.dump({"botID":rolebot,"language":"fr","admin":[]},outfile)
+        json.dump({"botID":rolebot,"language":"en","admin":[]},outfile)
 
 def removeGuild(guildID):
     os.remove("database/{}.json".format(guildID))

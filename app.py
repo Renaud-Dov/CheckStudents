@@ -158,7 +158,7 @@ async def rmRole(context,*args):
 
 @client.command()
 async def language(context,langue):
-    if langue in ["fr","en"]:
+    if langue in ["fr","en","de"]:
         data=readGuild(context.guild.id)
         if got_the_role(data["admin"],context.author.roles):
             data["language"]=langue
@@ -167,7 +167,7 @@ async def language(context,langue):
         else:
             await send("<@{}> : {}".format(context.author.id,returnLanguage(data["language"],"NoPrivileges")),context.channel)
     else:
-        await send("Unknow language:\n**Languages :**\n• English: en\n• French: fr",context.channel)
+        await send("Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de",context.channel)
 
 
 

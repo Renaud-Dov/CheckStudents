@@ -38,13 +38,13 @@ Note that the admin rights will not be checked if no admin has been registered b
 
 ## Translation
 
-You can also use the bot in different languages (French and English only for the moment)
-Use `.Check language {fr or en}`. The language is applied to all the server.
+You can also use the bot in different languages (French,English,German only for the moment)
+Use `.Check language {fr|en|de}`. The language is applied to all the server.
 If you want to add another language, please check json prototypes and pull-request your translation !
 
 ## Data pravicy
 
-The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and theirs IDs users.
+The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and theirs users IDs.
 
 We also analyse every discord reaction on every servers to see if it correspond to a call message.
 

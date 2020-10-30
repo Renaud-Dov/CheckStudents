@@ -11,7 +11,7 @@ import sys
 
 client = commands.Bot(command_prefix= '.Check ')
 
-appelList={"154884587124578-265584451892":{'ClasseRoleID':152158632214833056,'listStudents':[]}}
+appelList={}
 token=sys.argv[1]
 # liste_eleves=readGuild()
 
@@ -27,12 +27,12 @@ def got_the_role(role,authorRoles:list):
     elif isinstance(role,int):
         return role in [y.id for y in authorRoles]
 
-def returnPresent(message):
-    liste=readGuild(message.guild.id)['appels'][str(message.id)]['listStudents']
+def returnPresent(message:str,idGuild):
+    liste=appelList[message]['listStudents']
     if liste==[]:
-        return returnLanguage(readGuild(message.guild.id)["language"],"NoStudents")
+        return returnLanguage(readGuild(idGuild)["language"],"NoStudents")
     else:
-        message=returnLanguage(readGuild(message.guild.id)["language"],"Studentsnotify")
+        message=returnLanguage(readGuild(idGuild)["language"],"Studentsnotify")
         for i in liste:
             message+="• *{}* <@{}>\n".format(i[0],i[1])  #[user.display_name,user.id]
         return message
@@ -76,13 +76,13 @@ async def on_reaction_add(reaction, user):
     idGuild=str(reaction.message.guild.id)
     entry=idGuild+"-"+idMessage
 
-    if idMessage in appelList[entry]: #si c'est un message d'appel lancé par un professeur
+    if entry in appelList: #si c'est un message d'appel lancé par un professeur
         reactionContent=str(reaction).strip(" ")
-
+        print("hello")
         if reactionContent=="✅": #si l'utilisateur a coché présent
             if  got_the_role(appelList[entry]['ClasseRoleID'],user.roles): #si user a le role de la classe correspondante
                 appelList[entry]['listStudents'].append([user.display_name,user.id]) #on le rajoute à la liste d'appel
-
+                print("eleve",appelList)
             elif not got_the_role(readGuild(idGuild)['botID'],user.roles):
                 await remove_reaction("✅",reaction.message,user)
                 await send("<@{}> : {}".format(user.id,returnLanguage(readGuild(idGuild)["language"],"cantNotify")),reaction.message.channel)
@@ -90,11 +90,11 @@ async def on_reaction_add(reaction, user):
 
         elif reactionContent=="🆗": #si l'utilisateur a coché OK
             if got_the_role(readGuild(idGuild)["admin"],user.roles): # est prof
-
+                print("prof",appelList)
                 await send("<@{}> :{} <@&{}>".format(user.id,returnLanguage(readGuild(idGuild)["language"],"FinishCall"),appelList[entry]['ClasseRoleID']),reaction.message.channel)
                 await clear_reaction("✅",reaction.message)
                 await clear_reaction("🆗",reaction.message)
-                await send(returnPresent(reaction.message),reaction.message.channel)
+                await send(returnPresent(idGuild+"-"+idMessage,idGuild),reaction.message.channel)
                 del appelList[entry]
 
             elif not got_the_role(readGuild(idGuild)['botID'],user.roles): #pas le bot
@@ -114,6 +114,7 @@ async def appel(context,args):
 
     if got_the_role(data["admin"],context.author.roles):
         appelList["{}-{}".format(context.guild.id,context.message.id)]={'ClasseRoleID':classe,'listStudents':[]}
+        print("start",appelList)
         await send(returnLanguage(data["language"],"startCall"),context.channel)
         await add_reaction("✅",context.message) #on rajoute les réactions ✅ & 🆗
         await add_reaction("🆗",context.message)

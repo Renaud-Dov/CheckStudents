@@ -1,8 +1,8 @@
 {
     "changeLanguage":"Ie Sprache des Bots ist jetzt in **deutsch**",
     "commands":"uUnbekannte Bestellung:`.Check appel @classe`-> anruf tätigen, **vertretet mit die Klasse sie wollen**\n`.Check addRole @role1 @role2` -> streicht den Privilegien von einer oder mehrere Rollen",
-    "NoStudents":"⚠ **Liste der Schüler die da sind :** ⚠",
-    "Studentsnotify":"**Liste des élèves présents :**\n",
+    "NoStudents":"⚠ **Kein Student ist da** ⚠",
+    "Studentsnotify":"**Liste der Schüler die da sind :**\n",
     "FinishCall":"Anruf beendet",
     "NoRightEnd":"**Sie haben keine Rechten um den Anruf zu enden**",
     "unknowEmoji":"**Unbekanntes Emoji.\nDie Schüler müssen au ✅ klicken um sich zu benachrichtigen.**",

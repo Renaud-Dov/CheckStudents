@@ -6,18 +6,13 @@ from data import *
 
 import sys
 # import time
+token=sys.argv[1]
 
 
 
 client = commands.Bot(command_prefix= '.Check ')
 
 appelList={}
-token=sys.argv[1]
-# liste_eleves=readGuild()
-
-# def jsonWrite(guild,data):
-#     with open('database/{}.json'.format(guild), 'w') as outfile:
-#         json.dump(data, outfile)
 
 def got_the_role(role,authorRoles:list):
     if isinstance(role,list):
@@ -28,6 +23,9 @@ def got_the_role(role,authorRoles:list):
         return role in [y.id for y in authorRoles]
 
 def returnPresent(message:str,idGuild):
+    """
+    Retourne la liste des élèves ayant notifié leur présence sur un message.
+    """
     liste=appelList[message]['listStudents']
     if liste==[]:
         return returnLanguage(readGuild(idGuild)["language"],"NoStudents")
@@ -37,8 +35,8 @@ def returnPresent(message:str,idGuild):
             message+="• *{}* <@{}>\n".format(i[0],i[1])  #[user.display_name,user.id]
         return message
 
-def convert(id):
-    return int(id.replace(" ","").lstrip("<@&").rstrip(">"))
+def convert(idRole):
+    return int(idRole.replace(" ","").lstrip("<@&").rstrip(">"))
 
 async def on_ready():
     """Initilisation du bot"""

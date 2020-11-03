@@ -3,7 +3,11 @@
 ![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 
 # CheckStudents
-To add this bot to your Discord Server : [Click Here](https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot) You need the corresponding privileges to add the bot on a server.
+To add this bot to your Discord Server :
+
+![Click Here](https://img.shields.io/badge/Discord-Invite%20to%20a%20server-blue?style=for-the-badge&logo=discord&link=https://bit.ly/3mI4tWI)
+
+>**Note : You need the corresponding privileges to add the bot on a server.**
 
 ## How it works ?
 

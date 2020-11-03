@@ -26,7 +26,7 @@ def returnPresent(message:str,idGuild):
     """
     Retourne la liste des élèves ayant notifié leur présence sur un message.
     """
-    liste=set(appelList[message]['listStudents'])
+    liste=appelList[message]['listStudents']
     if liste==[]:
         return returnLanguage(readGuild(idGuild)["language"],"NoStudents")
     else:
@@ -78,7 +78,7 @@ async def on_reaction_add(reaction, user):
         reactionContent=str(reaction).strip(" ")
         if reactionContent=="✅": #si l'utilisateur a coché présent
             if  got_the_role(appelList[entry]['ClasseRoleID'],user.roles): #si user a le role de la classe correspondante
-                appelList[entry]['listStudents'].append([user.display_name,user.id]) #on le rajoute à la liste d'appel
+                appelList[entry]['listStudents'].add([user.display_name,user.id]) #on le rajoute à la liste d'appel
             elif not got_the_role(readGuild(idGuild)['botID'],user.roles):
                 await remove_reaction("✅",reaction.message,user)
                 await send("<@{}> : {}".format(user.id,returnLanguage(readGuild(idGuild)["language"],"cantNotify")),reaction.message.channel)
@@ -108,7 +108,7 @@ async def appel(context,args):
     data=readGuild(context.guild.id)
 
     if got_the_role(data["admin"],context.author.roles):
-        appelList["{}-{}".format(context.guild.id,context.message.id)]={'ClasseRoleID':classe,'listStudents':[]}
+        appelList["{}-{}".format(context.guild.id,context.message.id)]={'ClasseRoleID':classe,'listStudents':set()}
         await send(returnLanguage(data["language"],"startCall"),context.channel)
         await add_reaction("✅",context.message) #on rajoute les réactions ✅ & 🆗
         await add_reaction("🆗",context.message)

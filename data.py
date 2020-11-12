@@ -1,21 +1,25 @@
-import json,os
+import json, os
 
 
-def returnLanguage(lg,stat):
+def returnLanguage(lg, stat):
     with open('language/{}.json'.format(lg)) as outfile:
-        var=json.load(outfile)
+        var = json.load(outfile)
     return var[stat]
 
-def createGuild(guildID,rolebot):
-    with open("database/{}.json".format(guildID),"x") as outfile:
-        json.dump({"botID":rolebot,"language":"en","admin":[]},outfile)
+
+def createGuild(guildID, rolebot):
+    with open("database/{}.json".format(guildID), "x") as outfile:
+        json.dump({"botID": rolebot, "language": "en", "admin": []}, outfile)
+
 
 def removeGuild(guildID):
     os.remove("database/{}.json".format(guildID))
 
-def editGuild(guildID,data):
-    with open("database/{}.json".format(guildID),"w") as outfile:
-        json.dump(data,outfile)
+
+def editGuild(guildID, data):
+    with open("database/{}.json".format(guildID), "w") as outfile:
+        json.dump(data, outfile)
+
 
 def readGuild(guild):
     with open('database/{}.json'.format(guild), 'r') as outfile:

@@ -1,6 +1,6 @@
 {
     "changeLanguage":"La langue du bot est maintenant en **français**",
-    "commands":"Commande inconnue :`.Check appel @classe`-> lance l'appel, **remplacer par la classe correspondante**\n`.Check addRole @role1 @role2` -> rajoute les privilèges à un ou plusieurs rôles\n`.Check rmRole  @role1 @role2`-> retire les privilèges à un ou plusieurs rôles",
+    "commands":"Commande inconnue : Commandes envoyées en message privé",
     "NoStudents":"⚠ **Aucun élève présent** ⚠",
     "Studentsnotify":"**Liste des élèves présents :**\n",
     "FinishCall":"A fini l'appel des",
@@ -13,5 +13,6 @@
     "zeroPrivileges":"**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : `.Check addRole @role1 @role2, etc...`**",
     "removeAdmin":"Admin retiré",
     "notAdmin":"n'est pas admin",
-    "newAdmin":"Nouvel Admin"
+    "newAdmin":"Nouvel Admin",
+    "missing":"Elèves non présents"
 }

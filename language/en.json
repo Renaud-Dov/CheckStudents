@@ -1,6 +1,6 @@
 {
     "changeLanguage":"The language is now set to **english**",
-    "commands":"Unknown command: .Check call ***@class*** -> start the call, **replace by the corresponding class**\n.Check addRole @role1 @role2, -> add privileges to one or more roles \n.Check rmRole @role1 @role2, -> remove privileges from one or more roles",
+    "commands":"Unknown command: I sent you commands tips in private message",
     "NoStudents":"⚠ **No student present** ⚠",
     "Studentsnotify":"**List of students present:**\n",
     "FinishCall":"finished the call of",
@@ -13,5 +13,6 @@
     "zeroPrivileges":"**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",
     "removeAdmin":"Admin removed",
     "notAdmin":"is not admin",
-    "newAdmin":"New Admin"
+    "newAdmin":"New Admin",
+    "missing":"Missing students"
 }

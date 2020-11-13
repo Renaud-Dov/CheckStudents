@@ -27,6 +27,7 @@ def returnPresent(idmessage: str, guildID: int,rolelist):
     Retourne la liste des élèves ayant notifié leur présence sur un message.
     """
     liste = appelList[idmessage]['listStudents']
+    print(liste)
     messages=returnLanguage(readGuild(guildID)["language"], "endcall")
     if liste == []:
         return returnLanguage(readGuild(guildID)["language"], "NoStudents")

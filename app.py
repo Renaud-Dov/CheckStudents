@@ -22,12 +22,11 @@ def got_the_role(role, author:list):
         return role in [y.id for y in author]
 
 
-def returnPresent(idmessage: str, guildID: int,rolelist):
+def returnPresent(idmessage: str, guildID: int,rolelist :list):
     """
     Retourne la liste des élèves ayant notifié leur présence sur un message.
     """
     liste = appelList[idmessage]['listStudents']
-    print(liste)
     messages=returnLanguage(readGuild(guildID)["language"], "endcall")
     if liste == []:
         return returnLanguage(readGuild(guildID)["language"], "NoStudents")
@@ -107,6 +106,7 @@ async def on_reaction_add(reaction, user):
                                               appelList[entry]['ClasseRoleID']), reaction.message.channel)
                 await clear_reaction("✅", reaction.message)
                 await clear_reaction("🆗", reaction.message)
+                print(reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
                 presents=returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
                 
                 await send(presents, reaction.message.channel)

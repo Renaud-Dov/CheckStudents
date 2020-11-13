@@ -31,6 +31,7 @@ def returnPresent(idmessage: str, guildID: int,rolelist):
     if liste == []:
         return returnLanguage(readGuild(guildID)["language"], "NoStudents")
     else:
+        print(rolelist)
         message = messages[0]
         eleve = []
         for member in liste:

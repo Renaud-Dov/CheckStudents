@@ -11,8 +11,8 @@
     ],
     "NoStudents": "⚠ **Kein Student ist da** ⚠",
     "endcall": [
-        "**Anwesende Schüler:**\n",
-        "**Vermisste Schüler:\n**",
+        "**Anwesende Schülern:**\n",
+        "**Vermisste Schülern:\n**",
         "\n ✅ **Alle Schüler sind anwesend** ✅"
     ],
     "FinishCall": "Anruf beendet",

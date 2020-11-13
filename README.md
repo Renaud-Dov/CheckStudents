@@ -14,7 +14,7 @@ To add this bot to your Discord Server :
 
 To see the students present in a course, a teacher (or any other user with an authorized role : See `addRole` command)
 
->To start a call, `.Check appel @class` (appel mean call in french)
+>To start a call, `.Check call @class`
 <img src="img/img1.png" alt="Capture d'écran d'une recherche">
 
 >Emojis will appear below your message, the students belonging to the `@class` role would be able to click on the ✅ to notify their presence.

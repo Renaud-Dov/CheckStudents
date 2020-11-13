@@ -1,4 +1,3 @@
-from typing import List
 import discord
 import json
 from discord.ext import commands
@@ -23,36 +22,33 @@ def got_the_role(role, author:list):
         return role in [y.id for y in author]
 
 
-def returnPresent(idmessage: str, guild: int,rolelist):
+def returnPresent(idmessage: str, guildID: int,rolelist):
     """
     Retourne la liste des élèves ayant notifié leur présence sur un message.
     """
     liste = appelList[idmessage]['listStudents']
-    print(rolelist)
+    messages=returnLanguage(readGuild(guildID)["language"], "endcall")
     if liste == []:
-        return returnLanguage(readGuild(guild)["language"], "NoStudents")
+        return returnLanguage(readGuild(guildID)["language"], "NoStudents")
     else:
-        message = returnLanguage(readGuild(guild)["language"], "Studentsnotify")
+        message = messages[0]
         eleve = []
-        for i in liste:
-            if not i[1] in eleve:
-                message += "• *{}* <@{}>\n".format(i[0], i[1])  # [user.display_name,user.id]
-                eleve.append(i[1])
-                rolelist.remove(i[1])
+        for member in liste:
+            if not member.id in eleve:
+                message += "• *{}* <@{}>\n".format(member.name, member.id)  # [user.display_name,user.id]
+                eleve.append(member.id)
+                rolelist.remove(member)
         if rolelist !=[]:
-            message+="\n"+returnLanguage(readGuild(guild)["language"], "missing")
-            for i in rolelist:
-                message += "• *{}* <@{}>\n".format(i)
+            message+="\n"+messages[1]
+            for member in rolelist:
+                message += "• *{}* <@{}>\n".format(member.name,member.id)
+        else:
+            message+=messages[2]
         return message
 
 
 def convert(role: str):
     return int(role.replace(" ", "").lstrip("<@&").rstrip(">"))
-
-
-async def on_ready():
-    """Initilisation du bot"""
-    print('Bot started')
 
 
 @client.event
@@ -65,16 +61,13 @@ async def on_guild_join(guild):  # readGuild(message.guild.id)
 async def on_guild_remove(guild):
     removeGuild(guild.id)
 
-
 @client.command()
 async def send(message, channel):
     await channel.send(message)
 
-
 @client.command()
 async def add_reaction(emoji, message):
     await message.add_reaction(emoji)
-
 
 @client.command()
 async def remove_reaction(emoji, message, user):
@@ -98,8 +91,7 @@ async def on_reaction_add(reaction, user):
         if reactionContent == "✅":  # si l'utilisateur a coché présent
             if got_the_role(appelList[entry]['ClasseRoleID'],
                             user.roles):  # si user a le role de la classe correspondante
-                appelList[entry]['listStudents'].append(
-                    [user.display_name, user.id])  # on le rajoute à la liste d'appel
+                appelList[entry]['listStudents'].append(user)  # on le rajoute à la liste d'appel
             elif not got_the_role(readGuild(idGuild)['botID'], user.roles):
                 await remove_reaction("✅", reaction.message, user)
                 await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "cantNotify")),
@@ -113,7 +105,9 @@ async def on_reaction_add(reaction, user):
                                               appelList[entry]['ClasseRoleID']), reaction.message.channel)
                 await clear_reaction("✅", reaction.message)
                 await clear_reaction("🆗", reaction.message)
-                await send(returnPresent(idGuild + "-" + idMessage, idGuild,allUser(reaction.message.guild,appelList[entry]['ClasseRoleID'])), reaction.message.channel)
+                presents=returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+                
+                await send(presents, reaction.message.channel)
                 del appelList[entry]
 
             elif not got_the_role(readGuild(idGuild)['botID'], user.roles):  # pas le bot
@@ -132,7 +126,6 @@ async def appel(context, args):
     global appelList
     classe = convert(args)
     data = readGuild(context.guild.id)
-
     if got_the_role(data["admin"], context.author.roles):
         appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe, 'listStudents': []}
         await send(returnLanguage(data["language"], "startCall"), context.channel)
@@ -143,13 +136,13 @@ async def appel(context, args):
                    context.channel)
 
 
-@client.command()
+@client.command(aliases= ['listroles','roles','Roles'])
 async def ListRoles(context):
     for i in readGuild(context.guild.id)["admin"]:
         await send("<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i)), context.channel)
 
 
-@client.command()
+@client.command(aliases= ['add'])
 async def addRole(context, *args):
     guild = str(context.guild.id)
     data = readGuild(guild)
@@ -163,7 +156,7 @@ async def addRole(context, *args):
         editGuild(guild, data)
 
 
-@client.command()
+@client.command(aliases= ['rm','del','remove'])
 async def rmRole(context, *args):
     guild = str(context.guild.id)
     data = readGuild(guild)
@@ -203,31 +196,31 @@ async def language(context, langue):
 @client.event
 async def on_command_error(context, error):
     if isinstance(error, commands.errors.CommandNotFound):
-        await send(returnLanguage(readGuild(context.guild.id)["language"], "commands"), context.message.channel)
+        await send(returnLanguage(readGuild(context.guild.id)["language"], "unknowCommand"), context.message.channel)
         await help(context)
     raise error
 
 
-def allUser(guild,role:int):
-    rolelist=list()
-    print(len(guild.members),guild.members)
-    for member in guild.members:
-        print(member.name,member.roles)
-        if got_the_role(role,member.roles):
-            rolelist.append(member.id)
-    return rolelist
+def allUser(guild,roleID:int):
+    role=guild.get_role(roleID)
+    print(role.members)
+
 
 client.remove_command('help')
 @client.command()
 async def help(ctx):
     
+    message=returnLanguage(readGuild(ctx.guild.id)["language"], "commands")
+    
     embed=discord.Embed(color=discord.Colour.green(),title="Help Commands")
     embed.set_author(name="CheckStudents",url="https://github.com/Renaud-Dov/CheckStudents",icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    embed.add_field(name=".Check appel",value=".Check appel ***@class*** -> start the call, *replace by the corresponding class*")
-    embed.add_field(name=".Check addRole",value=".Check addRole ***@role1 @role2***, -> add privileges to one or more roles")
-    embed.add_field(name=".Check rmRole",value=".Check rmRole ***@role1 @role2***, -> remove privileges from one or more roles")
-    embed.add_field(name=".Check language",value=".Check language en|fr|de -> Change bot language in the following languages : English, French or German")
-    await ctx.message.author.send("**Here the list of commands you can use with this bot**")
+    embed.add_field(name=".Check call",value=message[1])
+    embed.add_field(name=".Check addRole",value=message[2])
+    embed.add_field(name=".Check rmRole",value=message[3])
+    embed.add_field(name=".Check language",value=message[4])
+    embed.add_field(name=".Check ListRoles",value=message[5])
+
+    await ctx.message.author.send(message[0])
     await ctx.message.author.send(embed=embed)
 
 

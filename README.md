@@ -25,7 +25,7 @@ The teacher, or anyone with privileges, can end the call by clicking 🆗.
 >Also, someone who does not have privileges cannot close the call.
 <img src="img/img3.png" alt="Capture d'écran d'une recherche">
 
->Once the call is finished, the bot will return the list of students present (will output the students not present in an update).
+>Once the call is finished, the bot will return the list of present and missing students.
 <img src="img/img4.png" alt="Capture d'écran d'une recherche">
 
 

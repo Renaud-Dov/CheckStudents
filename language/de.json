@@ -1,17 +1,29 @@
 {
-    "changeLanguage":"Ie Sprache des Bots ist jetzt in **deutsch**",
-    "commands":"uUnbekannte Bestellung:`.Check appel @classe`-> anruf tätigen, **vertretet mit die Klasse sie wollen**\n`.Check addRole @role1 @role2` -> streicht den Privilegien von einer oder mehrere Rollen",
-    "NoStudents":"⚠ **Kein Student ist da** ⚠",
-    "Studentsnotify":"**Liste der Schüler die da sind :**\n",
-    "FinishCall":"Anruf beendet",
-    "NoRightEnd":"**Sie haben keine Rechten um den Anruf zu enden**",
-    "unknowEmoji":"**Unbekanntes Emoji.\nDie Schüler müssen au ✅ klicken um sich zu benachrichtigen.**",
-    "cantNotify":"Sie können sich nicht als anwesend melden",
-    "startCall":"* Anfang des Anrufs:*\n**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen**",
-    "notTeacher":"**Sie sind keinen Lehrer. Sie können nicht anrufen.***",
-    "NoPrivileges":"**Sie haben keine Privilegien!**\n*Schreiben `.Check ListRoles` um den Administrator Rollen zu sehen*",
-    "zeroPrivileges":"**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",
-    "removeAdmin":"Administrator gestreicht",
-    "notAdmin":"Ist kein Administrator",
-    "newAdmin":"Neuer Administrator"
+    "changeLanguage": "Ie Sprache des Bots ist jetzt in **deutsch**",
+    "unknowCommand": "Unbekannte Bestellung",
+    "commands": [
+        "**Here the list of commands you can use with this bot**",
+        ".Check appel @classe`-> anruf tätigen, **vertretet mit die Klasse sie wollen**",
+        ".Check addRole @role1 @role2` -> streicht den Privilegien von einer oder mehrere Rollen",
+        ".Check rmRole ***@role1 @role2***, -> remove privileges from one or more roles",
+        ".Check language en|fr|de -> Change bot language in the following languages : English, French or German",
+        ".Check ListRoles -> Return roles with privileges"
+    ],
+    "NoStudents": "⚠ **Kein Student ist da** ⚠",
+    "endcall": [
+        "**Anwesende Schüler:**\n",
+        "**Vermisste Schüler:\n**",
+        "\n ✅ **Alle Schüler sind anwesend** ✅"
+    ],
+    "FinishCall": "Anruf beendet",
+    "NoRightEnd": "**Sie haben keine Rechten um den Anruf zu enden**",
+    "unknowEmoji": "**Unbekanntes Emoji.\nDie Schüler müssen au ✅ klicken um sich zu benachrichtigen.**",
+    "cantNotify": "Sie können sich nicht als anwesend melden",
+    "startCall": "*Anfang des Anrufs:*\n**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen**",
+    "notTeacher": "**Sie sind keinen Lehrer. Sie können nicht anrufen.***",
+    "NoPrivileges": "**Sie haben keine Privilegien!**\n*Schreiben `.Check ListRoles` um den Administrator Rollen zu sehen*",
+    "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",
+    "removeAdmin": "Administrator gestreicht",
+    "notAdmin": "ist kein Administrator",
+    "newAdmin": "Neuer Administrator"
 }

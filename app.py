@@ -8,9 +8,7 @@ import sys
 # import time
 token = sys.argv[1]
 
-intents = discord.Intents.default(messages=True, guilds=True)
-intents.members = True
-client = commands.Bot(command_prefix='.Check ',intents=intents)
+client = commands.Bot(command_prefix='.Check ')
 
 appelList = {}
 
@@ -40,7 +38,7 @@ def returnPresent(idmessage: str, guildID: int,rolelist :list):
             if not member.id in eleve:
                 message += "• *{}* <@{}>\n".format(member.name, member.id)  # [user.display_name,user.id]
                 eleve.append(member.id)
-                rolelist.remove(member)
+                if rolelist is not None :rolelist.remove(member)
         if rolelist !=[]:
             message+="\n"+messages[1]
             for member in rolelist:
@@ -119,7 +117,7 @@ async def on_reaction_add(reaction, user):
                 await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "NoRightEnd")),
                            reaction.message.channel)
 
-        else:  # autre emoji
+        else:  #autre emoji
             await remove_reaction(reactionContent, reaction.message, user)
             await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "unknowEmoji")),
                        reaction.message.channel)

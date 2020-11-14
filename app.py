@@ -175,13 +175,13 @@ async def addRole(context, *args):
         await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
                    context.channel)
     else:
-        message=returnLanguage(data["language"], "newAdmin")
+        message=str()
         for i in args:
             role = convert(i)
             if role is not None:
                 if not role in data["admin"]:
                     data["admin"].append(role)
-                    message+='\n'+i
+                    message+='\n'+returnLanguage(data["language"], "newAdmin")+i
                 else:
                     message+="\n **{}** role already added".format(i)
             else :
@@ -196,15 +196,16 @@ async def rmRole(context, *args):
     data = readGuild(guild)
     if len(data["admin"]) > 0:
         if got_the_role(data["admin"], context.author.roles):
+            message=str()
             for i in args:
-                i = convert(i)
-                if i in data["admin"]:
-                    data["admin"].remove(i)
-                    await send('*{}:*<@&{}>'.format(returnLanguage(data["language"], "removeAdmin"), i),
-                               context.channel)
+                role = convert(i)
+                if role in data["admin"]:
+                    data["admin"].remove(role)
+                    message+='\n*{}:* <@&{}>'.format(returnLanguage(data["language"], "removeAdmin"),role)
                 else:
-                    await send("*<@&{}> {}*".format(i, returnLanguage(data["language"], "notAdmin")), context.channel)
+                    message+="\n*<@&{}> {}*".format(role, returnLanguage(data["language"], "notAdmin"))
             editGuild(guild, data)
+            await send(message,context.channel)
         else:
             await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
                        context.channel)

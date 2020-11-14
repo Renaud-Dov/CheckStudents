@@ -3,11 +3,11 @@
     "unknowCommand": "Unbekannte Bestellung",
     "commands": [
         "**Here the list of commands you can use with this bot**",
-        ".Check appel @classe`-> anruf tätigen, **vertretet mit die Klasse sie wollen**",
-        ".Check addRole @role1 @role2` -> streicht den Privilegien von einer oder mehrere Rollen",
-        ".Check rmRole ***@role1 @role2***, -> remove privileges from one or more roles",
+        ".Check call @classe`-> anruf tätigen, **vertretet mit die Klasse sie wollen**",
+        ".Check addRole (oder add) @role1 @role2` -> streicht den Privilegien von einer oder mehrere Rollen",
+        ".Check remove (oder rm) ***@role1 @role2***, -> remove privileges from one or more roles",
         ".Check language en|fr|de -> Change bot language in the following languages : English, French or German",
-        ".Check ListRoles -> Return roles with privileges"
+        ".Check list (oder roles) -> Return roles with privileges"
     ],
     "NoStudents": "⚠ **Kein Student ist da** ⚠",
     "endcall": [
@@ -26,6 +26,6 @@
     "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",
     "removeAdmin": "Administrator gestreicht",
     "notAdmin": "ist kein Administrator",
-    "newAdmin": "Neuer Administrator",
+    "newAdmin": "Neuer Administrator :",
     "rolenotValid":"Invalid role : For more information : `.Check help`"
 }

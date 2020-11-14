@@ -4,10 +4,10 @@
     "commands": [
         "**Here the list of commands you can use with this bot**",
         ".Check call ***@class*** -> start the call, *replace by the corresponding class*",
-        ".Check addRole ***@role1 @role2***, -> add privileges to one or more roles",
-        ".Check rmRole ***@role1 @role2***, -> remove privileges from one or more roles",
+        ".Check addRole (or add) ***@role1 @role2***, -> add privileges to one or more roles",
+        ".Check remove (or rm) ***@role1 @role2***, -> remove privileges from one or more roles",
         ".Check language en|fr|de -> Change bot language in the following languages : English, French or German",
-        ".Check ListRoles -> Return roles with privileges"
+        ".Check list (or roles) -> Return roles with privileges"
     ],
     "NoStudents": "⚠ **No student present** ⚠",
     "endcall": [
@@ -26,6 +26,6 @@
     "zeroPrivileges": "**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",
     "removeAdmin": "Admin removed",
     "notAdmin": "is not admin",
-    "newAdmin": "New Admin",
+    "newAdmin": "New Admin :",
     "rolenotValid":"Invalid role : For more information : `.Check help`"
 }

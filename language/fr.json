@@ -3,11 +3,11 @@
     "unknowCommand": "Commande inconnue : Commandes envoyées en message privé",
     "commands": [
         "**Voici la liste des commandes que vous pouvez utiliser**",
-        ".Check appel ***@classe*** -> lance l'appel, *remplacer par la classe correspondante*",
-        ".Check addRole ***@role1 @role2***, -> Ajoute les privilèges à un rôle ou plus",
-        ".Check rmRole ***@role1 @role2***, -> Retire les privilèges à un ou plusieurs rôles",
+        ".Check appel (ou call) ***@classe*** -> lance l'appel, *remplacer par la classe correspondante*",
+        ".Check addRole (ou add) ***@role1 @role2***, -> Ajoute les privilèges à un rôle ou plus",
+        ".Check remove (ou rm) ***@role1 @role2***, -> Retire les privilèges à un ou plusieurs rôles",
         ".Check language en|fr|de -> Change le language du bot dans les langues suivantes : English, French or German",
-        ".Check ListRoles -> Retourne les rôles ayant un privilège"
+        ".Check list (ou roles) -> Retourne les rôles ayant un privilège"
     ],
     "NoStudents": "⚠ **Aucun élève présent** ⚠",
     "endcall": [
@@ -26,6 +26,6 @@
     "zeroPrivileges": "**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : `.Check addRole @role1 @role2, etc...`**",
     "removeAdmin": "Admin retiré",
     "notAdmin": "n'est pas admin",
-    "newAdmin": "Nouvel Admin",
+    "newAdmin": "Nouvel Admin :",
     "rolenotValid":"Rôle non valide : Pour plus d'information : `.Check help`"
 }

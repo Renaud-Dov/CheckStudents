@@ -7,7 +7,7 @@ import sys
 
 # import time
 token = sys.argv[1]
-intents=discord.Intents.all()
+intents=discord.Intents(messages=True, guilds=True, reactions = True, members=True,dm_messages=True)
 client = commands.Bot(command_prefix='.Check ',intents=intents)
 
 appelList = {}

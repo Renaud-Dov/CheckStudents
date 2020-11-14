@@ -7,7 +7,7 @@ import sys
 
 # import time
 token = sys.argv[1]
-intents=discord.Intents(messages=True, guilds=True, reactions = True, members=True,dm_messages=True)
+intents=discord.Intents(messages=True, guilds=True, reactions = True, members=True,dm_messages=True,guild_reactions=True)
 client = commands.Bot(command_prefix='.Check ',intents=intents)
 
 appelList = {}
@@ -31,7 +31,6 @@ def returnPresent(idmessage: str, guildID: int,rolelist :list):
     if liste == []:
         return returnLanguage(readGuild(guildID)["language"], "NoStudents")
     else:
-        print(rolelist)
         message = messages[0]
         eleve = []
         for member in liste:
@@ -106,7 +105,6 @@ async def on_reaction_add(reaction, user):
                                               appelList[entry]['ClasseRoleID']), reaction.message.channel)
                 await clear_reaction("✅", reaction.message)
                 await clear_reaction("🆗", reaction.message)
-                print(reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
                 presents=returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
                 
                 await send(presents, reaction.message.channel)
@@ -222,8 +220,8 @@ async def help(ctx):
     embed.add_field(name=".Check language",value=message[4])
     embed.add_field(name=".Check ListRoles",value=message[5])
 
-    await ctx.message.author.send(message[0])
-    await ctx.message.author.send(embed=embed)
+    await ctx.message.author.send(message[0],embed=embed)
+    # await ctx.message.author.send()
 
 
 

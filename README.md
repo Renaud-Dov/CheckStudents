@@ -12,9 +12,8 @@ To add this bot to your Discord Server :
 ## How it works ?
 
 
-To see the students present in a course, a teacher (or any other user with an authorized role : See `addRole` command)
 
->To start a call, `.Check call @class`
+>For make a call, a teacher (or any other user with an authorized role : See `.Check list` command), `.Check call @class`
 <img src="img/img1.png" alt="Capture d'écran d'une recherche">
 
 >Emojis will appear below your message, the students belonging to the `@class` role would be able to click on the ✅ to notify their presence.
@@ -32,13 +31,13 @@ The teacher, or anyone with privileges, can end the call by clicking 🆗.
 ## Add/Remove privileges from a role
 
 >Only a user with privileges can add/remove roles.
-* Add : `.Check addRole @role1 @role2,...` 
-* Remove : `.Check rmRole @role1 @role2,...`
+* Add : `.Check add @role1 @role2,...` 
+* Remove : `.Check remove @role1 @role2,...`
 >Note: You can add / remove as many roles as you want at the same time.
 
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
-**To see the list of admins,** write in the chat `.Check ListRoles`
+**To see the list of admins,** write in the chat `.Check list` or `.Check roles` 
 
 ## Translation
 

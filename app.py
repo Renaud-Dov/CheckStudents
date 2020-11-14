@@ -160,10 +160,14 @@ async def appel(context, args):
 
 
 @client.command(aliases= ['listroles','roles','Roles','list'])
-async def ListRoles(context):
+async def ListRoles(context,args):
     message="**Admins :**"
+    quiet= args=='-q'
     for i in readGuild(context.guild.id)["admin"]:
-        message+="\n<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i))
+        if quiet:
+            message+="\n{}".format(discord.utils.get(context.guild.roles, id=i))
+        else:
+            message+="\n<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i))
     await send(message, context.channel)
 
 

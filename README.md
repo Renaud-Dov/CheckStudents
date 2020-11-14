@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-1.2-green)
+![Version](https://img.shields.io/badge/version-1.3-green)
 ![Github](https://img.shields.io/badge/license-GNU3-orange)
 ![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 

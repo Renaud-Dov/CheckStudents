@@ -1,4 +1,5 @@
-/CONSTANT.py
-/language
 test.py
 guild.json
+.idea
+/__pycache__
+/database

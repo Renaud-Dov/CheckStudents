@@ -1,199 +1,236 @@
-from typing import List
 import discord
 import json
 from discord.ext import commands
-# from CONSTANT import *
-#python3 app.py NzYwMTU3MDY1OTk3MzIwMTky.X3H9bw.qqSdVvKxyJgmgdgHlV0IHvaF-fY
+from data import *
 
 import sys
+
 # import time
-commandes="""
-.Check appel ***@classe***-> lance l'appel, **remplacer par la classe correspondante**
-.Check addRole @role1 @role2,... -> rajoute les privilèges à un ou plusieurs rôles
-.Check rmRole  @role1 @role2,... -> retire les privilèges à un ou plusieurs rôles
-"""
+token = sys.argv[1]
+
+client = commands.Bot(command_prefix='.Check ')
+
+appelList = {}
 
 
-
-client = commands.Bot(command_prefix= '.Check ')
-
-
-token=sys.argv[1]
-def jsonread():
-    with open('guild.json', 'r') as outfile:
-        return json.load(outfile)
-
-liste_eleves=jsonread()
-
-def jsonWrite():
-    with open('guild.json', 'w') as outfile:
-        json.dump(liste_eleves, outfile)
-
-def isInit(guild):
-    return str(guild.id) in liste_eleves.keys()
-
-def got_the_role(role,authorRoles:list):
-    if isinstance(role,list):
+def got_the_role(role, author:list):
+    if isinstance(role, list):
         for i in role:
-            if i in [y.id for y in authorRoles]:
+            if i in [y.id for y in author]:
                 return True
-    elif isinstance(role,int):
-        return role in [y.id for y in authorRoles]
+    elif isinstance(role, int):
+        return role in [y.id for y in author]
 
-def returnPresent(message):
-    print(liste_eleves)
-    liste=liste_eleves[str(message.guild.id)]['appels'][str(message.id)]['listStudents']
-    if liste==[]:
-        return "⚠ **Aucun élève présent** ⚠"
+
+def returnPresent(idmessage: str, guildID: int,rolelist :list):
+    """
+    Retourne la liste des élèves ayant notifié leur présence sur un message.
+    """
+    liste = appelList[idmessage]['listStudents']
+    messages=returnLanguage(readGuild(guildID)["language"], "endcall")
+    if liste == []:
+        return returnLanguage(readGuild(guildID)["language"], "NoStudents")
     else:
-        message="**Liste des élèves présents :**\n"
-        for i in liste:
-            message+="• *{}* <@{}>\n".format(i[0],i[1])  #[user.display_name,user.id]
+        print(rolelist)
+        message = messages[0]
+        eleve = []
+        for member in liste:
+            if not member.id in eleve:
+                message += "• *{}* <@{}>\n".format(member.name, member.id)  # [user.display_name,user.id]
+                eleve.append(member.id)
+                if rolelist is not None :rolelist.remove(member)
+        if rolelist !=[]:
+            message+="\n"+messages[1]
+            for member in rolelist:
+                message += "• *{}* <@{}>\n".format(member.name,member.id)
+        else:
+            message+=messages[2]
         return message
 
-def convert(id):
-    return int(id.replace(" ","").lstrip("<@&").rstrip(">"))
 
-async def on_ready():
-    """Initilisation du bot"""
-    print('Bot started')
+def convert(role: str):
+    return int(role.replace(" ", "").lstrip("<@&").rstrip(">"))
+
 
 @client.event
-async def on_guild_join(guild):
-    global liste_eleves
-    rolebot=discord.utils.get(guild.roles, name="CheckStudents").id
-    print()
-    print(rolebot)
-    liste_eleves[str(guild.id)]={"botID":rolebot,"admin":[],"appels":{}}
-    jsonWrite()
+async def on_guild_join(guild):  # readGuild(message.guild.id)
+    rolebot = discord.utils.get(guild.roles, name="CheckStudents").id
+    createGuild(guild.id, rolebot)
+
 
 @client.event
 async def on_guild_remove(guild):
-    global liste_eleves
-    del liste_eleves[str(guild.id)]
-    jsonWrite()
+    removeGuild(guild.id)
 
 @client.command()
-async def send(message,channel):
+async def send(message, channel):
     await channel.send(message)
 
 @client.command()
-async def add_reaction(emoji,message):
+async def add_reaction(emoji, message):
     await message.add_reaction(emoji)
 
 @client.command()
-async def remove_reaction(emoji,message,user):
-    await message.remove_reaction(emoji,user)
+async def remove_reaction(emoji, message, user):
+    await message.remove_reaction(emoji, user)
+
 
 @client.command()
-async def clear_reaction(emoji,message):
+async def clear_reaction(emoji, message):
     await message.clear_reaction(emoji)
+
 
 @client.event
 async def on_reaction_add(reaction, user):
-    global liste_eleves
-    idMessage=str(reaction.message.id)
-    idGuild=str(reaction.message.guild.id)
+    global appelList
+    idMessage = str(reaction.message.id)
+    idGuild = str(reaction.message.guild.id)
+    entry = idGuild + "-" + idMessage
 
-    if idMessage in liste_eleves[idGuild]['appels']: #si c'est un message d'appel lancé par un professeur
-        reactionContent=str(reaction).strip(" ")
-
-        if reactionContent=="✅": #si l'utilisateur a coché présent
-            if  got_the_role(liste_eleves[idGuild]['appels'][idMessage]['ClasseRoleID'],user.roles): #si user a le role de la classe correspondante
-                liste_eleves[idGuild]['appels'][idMessage]['listStudents'].append([user.display_name,user.id]) #on le rajoute à la liste d'appel
-
-            elif not got_the_role(liste_eleves[idGuild]['botID'],user.roles):
-                await remove_reaction("✅",reaction.message,user)
-                await send("<@{}> : Vous ne pouvez pas vous notifier présent".format(user.id,liste_eleves[idGuild]['appels'][idMessage]['ClasseRoleID']),reaction.message.channel)
-
-
-        elif reactionContent=="🆗": #si l'utilisateur a coché OK
-            if got_the_role(liste_eleves[idGuild]["admin"],user.roles): # est prof
-
-                await send("<@{}> : A fini l'appel des <@&{}>".format(user.id,liste_eleves[idGuild]['appels'][idMessage]['ClasseRoleID']),reaction.message.channel)
-                await clear_reaction("✅",reaction.message)
-                await clear_reaction("🆗",reaction.message)
-                await send(returnPresent(reaction.message),reaction.message.channel)
-                del liste_eleves[idGuild]['appels'][idMessage]
-
-            elif not got_the_role(liste_eleves[idGuild]['botID'],user.roles): #pas le bot
-                await remove_reaction("🆗",reaction.message,user)
-                await send("<@{}> : **Vous n'avez pas les droits pour fermer l'appel !**".format(user.id),reaction.message.channel)
-
-        else: # autre emoji
-            await remove_reaction(reactionContent,reaction.message,user)
-            await send("<@{}> : **Emoji inconnu:{}\nLes élèves doivent cliquer sur ✅ pour se notifier présent.**".format(user.id,reactionContent),reaction.message.channel)
+    if entry in appelList:  # si c'est un message d'appel lancé par un professeur
+        reactionContent = str(reaction).strip(" ")
+        if reactionContent == "✅":  # si l'utilisateur a coché présent
+            if got_the_role(appelList[entry]['ClasseRoleID'],
+                            user.roles):  # si user a le role de la classe correspondante
+                appelList[entry]['listStudents'].append(user)  # on le rajoute à la liste d'appel
+            elif not got_the_role(readGuild(idGuild)['botID'], user.roles):
+                await remove_reaction("✅", reaction.message, user)
+                await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "cantNotify")),
+                           reaction.message.channel)
 
 
-@client.command()
-async def appel(context,args):
-    global liste_eleves
-    print(liste_eleves[str(context.guild.id)])
+        elif reactionContent == "🆗":  # si l'utilisateur a coché OK
+            if got_the_role(readGuild(idGuild)["admin"], user.roles):  # est prof
+                await send(
+                    "<@{}> :{} <@&{}>".format(user.id, returnLanguage(readGuild(idGuild)["language"], "FinishCall"),
+                                              appelList[entry]['ClasseRoleID']), reaction.message.channel)
+                await clear_reaction("✅", reaction.message)
+                await clear_reaction("🆗", reaction.message)
+                print(reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+                presents=returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+                
+                await send(presents, reaction.message.channel)
+                del appelList[entry]
 
-    # if len(args)>1:
-    #     raise commands.errors.CommandNotFound
-    classe=convert(args)
+            elif not got_the_role(readGuild(idGuild)['botID'], user.roles):  # pas le bot
+                await remove_reaction("🆗", reaction.message, user)
+                await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "NoRightEnd")),
+                           reaction.message.channel)
 
-    if got_the_role(liste_eleves[str(context.guild.id)]["admin"],context.author.roles):
-        liste_eleves[str(context.guild.id)]['appels'][str(context.message.id)]={'ClasseRoleID':classe,'listStudents':[]}
-        await send("*Début de l'appel:*\n**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel**",context.channel)
-        await add_reaction("✅",context.message) #on rajoute les réactions ✅ & 🆗
-        await add_reaction("🆗",context.message)
+        else:  #autre emoji
+            await remove_reaction(reactionContent, reaction.message, user)
+            await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "unknowEmoji")),
+                       reaction.message.channel)
+
+
+@client.command(aliases= ['call'])
+async def appel(context, args):
+    global appelList
+    classe = convert(args)
+    data = readGuild(context.guild.id)
+    if got_the_role(data["admin"], context.author.roles):
+        appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe, 'listStudents': []}
+        await send(returnLanguage(data["language"], "startCall"), context.channel)
+        await add_reaction("✅", context.message)  # on rajoute les réactions ✅ & 🆗
+        await add_reaction("🆗", context.message)
     else:
-        await send("<@{}> : **Vous n'êtes pas professeur ! Vous ne pouvez démarrer l'appel.**".format(context.author.id),context.channel)
+        await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")),
+                   context.channel)
 
-@client.command()
+
+@client.command(aliases= ['listroles','roles','Roles'])
 async def ListRoles(context):
-    for i in liste_eleves[str(context.guild.id)]["admin"]:
-        await send("<@&{}> : {}".format(i,discord.utils.get(context.guild.roles, id=i)),context.channel)
+    for i in readGuild(context.guild.id)["admin"]:
+        await send("<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i)), context.channel)
 
-@client.command()
-async def addRole(context,*args):
-    global liste_eleves
 
-    guild=str(context.guild.id)
-
-    if len(liste_eleves[guild]["admin"])>0:
-        if got_the_role(liste_eleves[guild]["admin"],context.author.roles):
-            for i in args:
-                liste_eleves[guild]["admin"].append(convert(i))
-                await send('*Nouvel admin :*{}'.format(i),context.channel)
-            jsonWrite()
-        else:
-            await send("<@{}> : **Vous n'avez pas les privilèges!**\n*Tapez `.Check ListRoles` pour voir les rôles d'admin*".format(context.author.id),context.channel)
+@client.command(aliases= ['add'])
+async def addRole(context, *args):
+    guild = str(context.guild.id)
+    data = readGuild(guild)
+    if len(data["admin"]) > 0 and not got_the_role(data["admin"], context.author.roles):
+        await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
+                   context.channel)
     else:
         for i in args:
-            liste_eleves[guild]["admin"].append(convert(i))
-            
-            await send('*Nouvel admin : *{}'.format(i),context.channel)
-        jsonWrite()
+            data["admin"].append(convert(i))
+            await send('*{} :*{}'.format(returnLanguage(data["language"], "newAdmin"), i), context.channel)
+        editGuild(guild, data)
+
+
+@client.command(aliases= ['rm','del','remove'])
+async def rmRole(context, *args):
+    guild = str(context.guild.id)
+    data = readGuild(guild)
+    if len(data["admin"]) > 0:
+        if got_the_role(data["admin"], context.author.roles):
+            for i in args:
+                i = convert(i)
+                if i in data["admin"]:
+                    data["admin"].remove(i)
+                    await send('*{}:*<@&{}>'.format(returnLanguage(data["language"], "removeAdmin"), i),
+                               context.channel)
+                else:
+                    await send("*<@&{}> {}*".format(i, returnLanguage(data["language"], "notAdmin")), context.channel)
+            editGuild(guild, data)
+        else:
+            await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
+                       context.channel)
+    else:
+        await send(returnLanguage(data["language"], "zeroPrivileges"), context.channel)
 
 
 @client.command()
-async def rmRole(context,*args):
-    global liste_eleves
-    guild=str(context.guild.id)
-    if liste_eleves[guild]["admin"]!=[]:
-        if got_the_role(liste_eleves[guild]["admin"],context.author.roles):
-            for i in args:
-                del liste_eleves[guild]["admin"][i]
-                await send('*Admin retiré :*{}'.format(i),context.channel)
-            jsonWrite()
+async def language(context, langue):
+    if langue in ["fr", "en", "de"]:
+        data = readGuild(context.guild.id)
+        if got_the_role(data["admin"], context.author.roles):
+            data["language"] = langue
+            await send(returnLanguage(langue, "changeLanguage"), context.channel)
+            editGuild(context.guild.id, data)
         else:
-            await send("<@{}> : **Vous n'avez pas les privilèges!**".format(context.author.id),context.channel)
+            await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
+                       context.channel)
     else:
-        await send("**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : .Check addRole @role1 @role2, etc...**".format(context.author.id),context.channel)
-
+        await send("Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de", context.channel)
 
 
 @client.event
-async def on_command_error(ctx, error):
+async def on_command_error(context, error):
     if isinstance(error, commands.errors.CommandNotFound):
-        await send("Commande inconnue :\n"+commandes,ctx.message.channel)
+        await send(returnLanguage(readGuild(context.guild.id)["language"], "unknowCommand"), context.message.channel)
+        await help(context)
     raise error
+
+
+def allUser(guild,roleID:int):
+    role=guild.get_role(roleID)
+    print(role.members)
+
+
+client.remove_command('help')
+@client.command()
+async def help(ctx):
+    
+    message=returnLanguage(readGuild(ctx.guild.id)["language"], "commands")
+    
+    embed=discord.Embed(color=discord.Colour.green(),title="Help Commands")
+    embed.set_author(name="CheckStudents",url="https://github.com/Renaud-Dov/CheckStudents",icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    embed.add_field(name=".Check call",value=message[1])
+    embed.add_field(name=".Check addRole",value=message[2])
+    embed.add_field(name=".Check rmRole",value=message[3])
+    embed.add_field(name=".Check language",value=message[4])
+    embed.add_field(name=".Check ListRoles",value=message[5])
+
+    await ctx.message.author.send(message[0])
+    await ctx.message.author.send(embed=embed)
+
+
 
 client.run(token)
 client.add_command(appel)
+client.add_command(help)
 client.add_command(addRole)
 client.add_command(rmRole)
 client.add_command(ListRoles)
+client.add_command(language)

@@ -1,0 +1,29 @@
+{
+    "changeLanguage": "La langue du bot est maintenant en **français**",
+    "unknowCommand": "Commande inconnue : Commandes envoyées en message privé",
+    "commands": [
+        "**Voici la liste des commandes que vous pouvez utiliser**",
+        ".Check appel ***@classe*** -> lance l'appel, *remplacer par la classe correspondante*",
+        ".Check addRole ***@role1 @role2***, -> Ajoute les privilèges à un rôle ou plus",
+        ".Check rmRole ***@role1 @role2***, -> Retire les privilèges à un ou plusieurs rôles",
+        ".Check language en|fr|de -> Change le language du bot dans les langues suivantes : English, French or German",
+        ".Check ListRoles -> Retourne les rôles ayant un privilège"
+    ],
+    "NoStudents": "⚠ **Aucun élève présent** ⚠",
+    "endcall": [
+        "**Elèves présents :**\n",
+        "**Elèves non présents :\n**",
+        "\n ✅ **Tous les élèves sont présents** ✅"
+    ],
+    "FinishCall": "a fini l'appel des",
+    "NoRightEnd": "**Vous n'avez pas les droits pour fermer l'appel !**",
+    "unknowEmoji": "**Emoji inconnu.\nLes élèves doivent cliquer sur ✅ pour se notifier présent.**",
+    "cantNotify": "Vous ne pouvez pas vous notifier présent",
+    "startCall": "*Début de l'appel:*\n**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel**",
+    "notTeacher": "**Vous n'êtes pas professeur ! Vous ne pouvez démarrer l'appel.**",
+    "NoPrivileges": "**Vous n'avez pas les privilèges!**\n*Tapez `.Check ListRoles` pour voir les rôles d'admin*",
+    "zeroPrivileges": "**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : `.Check addRole @role1 @role2, etc...`**",
+    "removeAdmin": "Admin retiré",
+    "notAdmin": "n'est pas admin",
+    "newAdmin": "Nouvel Admin"
+}

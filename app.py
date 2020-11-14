@@ -7,7 +7,8 @@ import sys
 
 # import time
 token = sys.argv[1]
-
+intents=discord.Intents.all()
+client = commands.Bot(command_prefix='.Check ',intents=intents)
 client = commands.Bot(command_prefix='.Check ')
 
 appelList = {}

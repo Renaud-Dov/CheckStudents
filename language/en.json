@@ -16,10 +16,11 @@
         "\n ✅ **All students are present** ✅"
     ],
     "FinishCall": "finished the call of",
+    "cancelCall": "⚠ **Canceled call** ⚠",
     "NoRightEnd": "**You do not have the rights to close the call!**",
     "unknowEmoji": "**Unknown emoji.\nStudents must click ✅ to notify themselves present.**",
     "cantNotify": "You cannot notify yourself present",
-    "startCall": "*Start of call:*\n**Students: Click on ✅ to notify you present\nTeacher: Click on 🆗 to validate the call**",
+    "startCall": "*Start of call:*\n**Students: Click on ✅ to notify you present\nTeacher: Click on 🆗 to validate the call or 🛑 to cancel**",
     "notTeacher": "**You are not a teacher! You cannot start the call.**",
     "NoPrivileges": "**You don't have privileges!** \n *Type `.Check ListRoles` to see admin roles*",
     "zeroPrivileges": "**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",

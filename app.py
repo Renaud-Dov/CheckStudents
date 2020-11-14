@@ -92,6 +92,7 @@ async def on_reaction_add(reaction, user):
 
     if entry in appelList:  # si c'est un message d'appel lancé par un professeur
         reactionContent = str(reaction).strip(" ")
+
         if reactionContent == "✅":  # si l'utilisateur a coché présent
             if got_the_role(appelList[entry]['ClasseRoleID'],
                             user.roles):  # si user a le role de la classe correspondante
@@ -119,6 +120,19 @@ async def on_reaction_add(reaction, user):
                 await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "NoRightEnd")),
                            reaction.message.channel)
 
+        elif reactionContent=="🛑":
+            if got_the_role(readGuild(idGuild)["admin"], user.roles):
+                await clear_reaction("✅", reaction.message)
+                await clear_reaction("🆗", reaction.message)
+                await clear_reaction("🛑", reaction.message)
+                del appelList[entry]
+                await send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"),
+                       reaction.message.channel)
+
+            elif not got_the_role(readGuild(idGuild)['botID'], user.roles):  # pas le bot
+                await remove_reaction("🛑", reaction.message, user)
+                await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "NoRightEnd")),
+                           reaction.message.channel)
         else:  #autre emoji
             await remove_reaction(reactionContent, reaction.message, user)
             await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "unknowEmoji")),
@@ -138,6 +152,8 @@ async def appel(context, args):
             await send(returnLanguage(data["language"], "startCall"), context.channel)
             await add_reaction("✅", context.message)  # on rajoute les réactions ✅ & 🆗
             await add_reaction("🆗", context.message)
+            await add_reaction("🆗", context.message)
+            await add_reaction("🛑", context.message)
         else:
             await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")),
                     context.channel)

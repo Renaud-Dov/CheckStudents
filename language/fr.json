@@ -16,10 +16,11 @@
         "\n ✅ **Tous les élèves sont présents** ✅"
     ],
     "FinishCall": "a fini l'appel des",
+    "cancelCall": "⚠ **Appel annulé** ⚠",
     "NoRightEnd": "**Vous n'avez pas les droits pour fermer l'appel !**",
     "unknowEmoji": "**Emoji inconnu.\nLes élèves doivent cliquer sur ✅ pour se notifier présent.**",
     "cantNotify": "Vous ne pouvez pas vous notifier présent",
-    "startCall": "*Début de l'appel:*\n**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel**",
+    "startCall": "*Début de l'appel:*\n**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**",
     "notTeacher": "**Vous n'êtes pas professeur ! Vous ne pouvez démarrer l'appel.**",
     "NoPrivileges": "**Vous n'avez pas les privilèges!**\n*Tapez `.Check ListRoles` pour voir les rôles d'admin*",
     "zeroPrivileges": "**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : `.Check addRole @role1 @role2, etc...`**",

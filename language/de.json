@@ -16,10 +16,11 @@
         "\n ✅ **Alle Schüler sind anwesend** ✅"
     ],
     "FinishCall": "Anruf beendet",
+    "cancelCall": "⚠ **Canceled call** ⚠",
     "NoRightEnd": "**Sie haben keine Rechten um den Anruf zu enden**",
     "unknowEmoji": "**Unbekanntes Emoji.\nDie Schüler müssen au ✅ klicken um sich zu benachrichtigen.**",
     "cantNotify": "Sie können sich nicht als anwesend melden",
-    "startCall": "*Anfang des Anrufs:*\n**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen**",
+    "startCall": "*Anfang des Anrufs:*\n**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**",
     "notTeacher": "**Sie sind keinen Lehrer. Sie können nicht anrufen.***",
     "NoPrivileges": "**Sie haben keine Privilegien!**\n*Schreiben `.Check ListRoles` um den Administrator Rollen zu sehen*",
     "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",

@@ -48,7 +48,11 @@ def returnPresent(idmessage: str, guildID: int,rolelist :list):
 
 
 def convert(role: str):
-    return int(role.replace(" ", "").lstrip("<@&").rstrip(">"))
+    try:
+        return int(role.replace(" ", "").lstrip("<@&").rstrip(">"))
+    except Exception as e:
+        print(e)
+        return None
 
 
 @client.event
@@ -126,20 +130,25 @@ async def appel(context, args):
     global appelList
     classe = convert(args)
     data = readGuild(context.guild.id)
-    if got_the_role(data["admin"], context.author.roles):
-        appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe, 'listStudents': []}
-        await send(returnLanguage(data["language"], "startCall"), context.channel)
-        await add_reaction("✅", context.message)  # on rajoute les réactions ✅ & 🆗
-        await add_reaction("🆗", context.message)
+    if classe is None:
+        await send(returnLanguage(data["language"], "rolenotValid"), context.channel)
     else:
-        await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")),
-                   context.channel)
+        if got_the_role(data["admin"], context.author.roles):
+            appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe, 'listStudents': []}
+            await send(returnLanguage(data["language"], "startCall"), context.channel)
+            await add_reaction("✅", context.message)  # on rajoute les réactions ✅ & 🆗
+            await add_reaction("🆗", context.message)
+        else:
+            await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")),
+                    context.channel)
 
 
-@client.command(aliases= ['listroles','roles','Roles'])
+@client.command(aliases= ['listroles','roles','Roles','list'])
 async def ListRoles(context):
+    message="**Admins :**"
     for i in readGuild(context.guild.id)["admin"]:
-        await send("<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i)), context.channel)
+        message+="\n<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i))
+    await send(message, context.channel)
 
 
 @client.command(aliases= ['add'])
@@ -150,10 +159,19 @@ async def addRole(context, *args):
         await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
                    context.channel)
     else:
+        message=returnLanguage(data["language"], "newAdmin")
         for i in args:
-            data["admin"].append(convert(i))
-            await send('*{} :*{}'.format(returnLanguage(data["language"], "newAdmin"), i), context.channel)
+            role = convert(i)
+            if role is not None:
+                if not role in data["admin"]:
+                    data["admin"].append(role)
+                    message+='\n'+i
+                else:
+                    message+="\n **{}** role already added".format(i)
+            else :
+                message+="\n**{}** not valid role".format(i)
         editGuild(guild, data)
+        await context.channel.send(message)
 
 
 @client.command(aliases= ['rm','del','remove'])
@@ -199,12 +217,6 @@ async def on_command_error(context, error):
         await send(returnLanguage(readGuild(context.guild.id)["language"], "unknowCommand"), context.message.channel)
         await help(context)
     raise error
-
-
-def allUser(guild,roleID:int):
-    role=guild.get_role(roleID)
-    print(role.members)
-
 
 client.remove_command('help')
 @client.command()

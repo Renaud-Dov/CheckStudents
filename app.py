@@ -113,7 +113,7 @@ async def on_reaction_add(reaction, user):
                     await reaction.message.channel.send(presents)
                 else:
                     await reaction.message.channel.send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"))
-                reaction.message.clear_reactions()
+                await reaction.message.clear_reactions()
                 del appelList[entry]
 
             elif not got_the_role(readGuild(idGuild)['botID'], user.roles):  # pas le bot

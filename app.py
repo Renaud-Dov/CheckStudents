@@ -103,35 +103,21 @@ async def on_reaction_add(reaction, user):
                            reaction.message.channel)
 
 
-        elif reactionContent == "🆗":  # si l'utilisateur a coché OK
+        elif reactionContent == "🆗" or reactionContent=="🛑":  # si l'utilisateur a coché OK
             if got_the_role(readGuild(idGuild)["admin"], user.roles):  # est prof
-                await send(
-                    "<@{}> :{} <@&{}>".format(user.id, returnLanguage(readGuild(idGuild)["language"], "FinishCall"),
-                                              appelList[entry]['ClasseRoleID']), reaction.message.channel)
-                await clear_reaction("✅", reaction.message)
-                await clear_reaction("🆗", reaction.message)
-                presents=returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
-                
-                await send(presents, reaction.message.channel)
+
+                if reactionContent == "🆗":
+                    await reaction.message.channel.send("<@{}> :{} <@&{}>".format(user.id, returnLanguage(readGuild(idGuild)["language"], "FinishCall"),
+                                                appelList[entry]['ClasseRoleID']))
+                    presents=returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+                    await reaction.message.channel.send(presents)
+                else:
+                    await reaction.message.channel.send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"))
+                reaction.message.clear_reactions()
                 del appelList[entry]
 
             elif not got_the_role(readGuild(idGuild)['botID'], user.roles):  # pas le bot
                 await remove_reaction("🆗", reaction.message, user)
-                await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "NoRightEnd")),
-                           reaction.message.channel)
-
-        elif reactionContent=="🛑":
-            if got_the_role(readGuild(idGuild)["admin"], user.roles):
-                # await clear_reaction("✅", reaction.message)
-                # await clear_reaction("🆗", reaction.message)
-                # await clear_reaction("🛑", reaction.message)
-                reaction.message.clear_reactions()
-                del appelList[entry]
-                await send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"),
-                       reaction.message.channel)
-
-            elif not got_the_role(readGuild(idGuild)['botID'], user.roles):  # pas le bot
-                await remove_reaction("🛑", reaction.message, user)
                 await send("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "NoRightEnd")),
                            reaction.message.channel)
         else:  #autre emoji

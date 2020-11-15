@@ -210,7 +210,7 @@ async def on_command_error(context, error):
 client.remove_command('help')
 
 
-@client.command()
+@client.command(aliases=["commands,command"])
 async def help(context):
     message = returnLanguage(readGuild(context.guild.id)["language"], "commands")
 

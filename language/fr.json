@@ -3,11 +3,11 @@
     "unknowCommand": "Commande inconnue : Commandes envoyées en message privé",
     "commands": [
         "**Voici la liste des commandes que vous pouvez utiliser**",
-        ".Check appel (ou call) ***@classe*** -> lance l'appel, *remplacer par la classe correspondante*",
-        ".Check addRole (ou add) ***@role1 @role2***, -> Ajoute les privilèges à un rôle ou plus",
-        ".Check remove (ou rm) ***@role1 @role2***, -> Retire les privilèges à un ou plusieurs rôles",
-        ".Check language en|fr|de -> Change le language du bot dans les langues suivantes : English, French or German",
-        ".Check list (ou roles) -> Retourne les rôles ayant un privilège"
+        [".Check appel","Lance l'appel (*remplacer par la classe correspondante*)"],
+        [".Check add ***@role1 @role2 ...***","Ajoute les privilèges à un rôle ou plus"],
+        [".Check remove (ou rm) ***@role1 @role2 ...    ***","Retire les privilèges à un ou plusieurs rôles"],
+        [".Check language en|fr|de","Change le language du bot dans les langues suivantes : English, French or German"],
+        [".Check list (ou roles)","Retourne les rôles ayant un privilège"]
     ],
     "NoStudents": "⚠ **Aucun élève présent** ⚠",
     "endcall": [

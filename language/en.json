@@ -3,11 +3,11 @@
     "unknowCommand": "Unknown command: I sent you commands tips in private message",
     "commands": [
         "**Here the list of commands you can use with this bot**",
-        ".Check call ***@class*** -> start the call, *replace by the corresponding class*",
-        ".Check addRole (or add) ***@role1 @role2***, -> add privileges to one or more roles",
-        ".Check remove (or rm) ***@role1 @role2***, -> remove privileges from one or more roles",
-        ".Check language en|fr|de -> Change bot language in the following languages : English, French or German",
-        ".Check list (or roles) -> Return roles with privileges"
+        [".Check call ***@class***","Start the call, *replace by the corresponding class*"],
+        [".Check add ***@role1 @role2***","Add privileges to one or more roles"],
+        [".Check remove (or rm) ***@role1 @role2***","Remove privileges from one or more roles"],
+        [".Check language en|fr|de","Change bot language in the following languages : English, French or German"],
+        [".Check list (or roles)","Return roles with privileges"]
     ],
     "NoStudents": "⚠ **No student present** ⚠",
     "endcall": [

@@ -122,9 +122,10 @@ async def on_reaction_add(reaction, user):
 
         elif reactionContent=="🛑":
             if got_the_role(readGuild(idGuild)["admin"], user.roles):
-                await clear_reaction("✅", reaction.message)
-                await clear_reaction("🆗", reaction.message)
-                await clear_reaction("🛑", reaction.message)
+                # await clear_reaction("✅", reaction.message)
+                # await clear_reaction("🆗", reaction.message)
+                # await clear_reaction("🛑", reaction.message)
+                reaction.message.clear_reactions()
                 del appelList[entry]
                 await send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"),
                        reaction.message.channel)
@@ -152,7 +153,6 @@ async def appel(context, args):
             await send(returnLanguage(data["language"], "startCall"), context.channel)
             await add_reaction("✅", context.message)  # on rajoute les réactions ✅ & 🆗
             await add_reaction("🆗", context.message)
-            await add_reaction("🆗", context.message)
             await add_reaction("🛑", context.message)
         else:
             await send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")),
@@ -160,14 +160,14 @@ async def appel(context, args):
 
 
 @client.command(aliases= ['listroles','roles','Roles','list'])
-async def ListRoles(context,args):
+async def ListRoles(context,*args):
     message="**Admins :**"
-    quiet= args=='-q'
+    quiet= args!=() and args[0]=='-q'
     for i in readGuild(context.guild.id)["admin"]:
         if quiet:
-            message+="\n{}".format(discord.utils.get(context.guild.roles, id=i))
+            message+="\n• {}".format(discord.utils.get(context.guild.roles, id=i))
         else:
-            message+="\n<@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i))
+            message+="\n• <@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i))
     await send(message, context.channel)
 
 
@@ -185,11 +185,11 @@ async def addRole(context, *args):
             if role is not None:
                 if not role in data["admin"]:
                     data["admin"].append(role)
-                    message+='\n'+returnLanguage(data["language"], "newAdmin")+i
+                    message+='\n• '+returnLanguage(data["language"], "newAdmin")+i
                 else:
-                    message+="\n **{}** role already added".format(i)
+                    message+="\n• **{}** role already added".format(i)
             else :
-                message+="\n**{}** not valid role".format(i)
+                message+="\n• **{}** not valid role".format(i)
         editGuild(guild, data)
         await context.channel.send(message)
 
@@ -205,9 +205,9 @@ async def rmRole(context, *args):
                 role = convert(i)
                 if role in data["admin"]:
                     data["admin"].remove(role)
-                    message+='\n*{}:* <@&{}>'.format(returnLanguage(data["language"], "removeAdmin"),role)
+                    message+='\n• *{}:* <@&{}>'.format(returnLanguage(data["language"], "removeAdmin"),role)
                 else:
-                    message+="\n*<@&{}> {}*".format(role, returnLanguage(data["language"], "notAdmin"))
+                    message+="\n• *<@&{}> {}*".format(role, returnLanguage(data["language"], "notAdmin"))
             editGuild(guild, data)
             await send(message,context.channel)
         else:
@@ -247,11 +247,11 @@ async def help(ctx):
     
     embed=discord.Embed(color=discord.Colour.green(),title="Help Commands")
     embed.set_author(name="CheckStudents",url="https://github.com/Renaud-Dov/CheckStudents",icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    embed.add_field(name=".Check call",value=message[1])
-    embed.add_field(name=".Check addRole",value=message[2])
-    embed.add_field(name=".Check rmRole",value=message[3])
-    embed.add_field(name=".Check language",value=message[4])
-    embed.add_field(name=".Check ListRoles",value=message[5])
+    embed.add_field(name=message[1][0],value=message[1][1])
+    embed.add_field(name=message[2][0],value=message[2][1])
+    embed.add_field(name=message[3][0],value=message[3][1])
+    embed.add_field(name=message[4][0],value=message[4][1])
+    embed.add_field(name=message[5][0],value=message[5][1])
 
     await ctx.message.author.send(message[0],embed=embed)
     # await ctx.message.author.send()

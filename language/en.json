@@ -26,6 +26,6 @@
     "zeroPrivileges": "**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",
     "removeAdmin": "Admin removed",
     "notAdmin": "is not admin",
-    "newAdmin": "New Admin :",
+    "newAdmin": ["New Admin :","role already added","not valid role"],
     "rolenotValid":"Invalid role : For more information : `.Check help`"
 }

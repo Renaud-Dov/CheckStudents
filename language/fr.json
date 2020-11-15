@@ -26,6 +26,6 @@
     "zeroPrivileges": "**Il n'y a aucun rôle ayant les privilèges! Pour en rajouter : `.Check addRole @role1 @role2, etc...`**",
     "removeAdmin": "Admin retiré",
     "notAdmin": "n'est pas admin",
-    "newAdmin": "Nouvel Admin :",
+    "newAdmin": ["Nouvel Admin :","rôle dejà ajouté","rôle non valide"],
     "rolenotValid":"Rôle non valide : Pour plus d'information : `.Check help`"
 }

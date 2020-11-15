@@ -26,6 +26,6 @@
     "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",
     "removeAdmin": "Administrator gestreicht",
     "notAdmin": "ist kein Administrator",
-    "newAdmin": "Neuer Administrator :",
+    "newAdmin": ["Neuer Administrator :","role already added","not valid role"],
     "rolenotValid":"Invalid role : For more information : `.Check help`"
 }

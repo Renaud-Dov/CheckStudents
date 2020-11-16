@@ -1,5 +1,6 @@
+from datetime import date
 import discord
-
+import datetime
 from discord.ext import commands
 from data import *
 
@@ -45,8 +46,12 @@ def returnPresent(idmessage: str, guildID: int, rolelist: list):
                 message += "• *{}* <@{}>\n".format(member.name, member.id)
         else:
             message += messages[2]
-        return message
+        return (message,rolelist)
 
+async def sendabsents(absents: list, channel: str, teacher: str,url : str):
+    message="Tu as été noté absent sur le channel **{}** par **{}**\n{}".format(channel,teacher,url)
+    for member in absents:
+        await member.send(message)
 
 def convert(role: str):
     try:
@@ -92,9 +97,11 @@ async def on_reaction_add(reaction, user):
                     await reaction.message.channel.send(
                         "<@{}> :{} <@&{}>".format(user.id, returnLanguage(readGuild(idGuild)["language"], "FinishCall"),
                                                   appelList[entry]['ClasseRoleID']))
-                    presents = returnPresent(entry, idGuild,
+                    presents,absents = returnPresent(entry, idGuild,
                                              reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
-                    await reaction.message.channel.send(presents)
+                    await reaction.message.channel.send(presents)#https://discord.com/channels/guild/channel/message   
+                    await sendabsents(absents,reaction.message.channel.name,reaction.message.author,
+                            "https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,idMessage))
                 else:
                     await reaction.message.channel.send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"))
                 await reaction.message.clear_reactions()
@@ -109,15 +116,16 @@ async def on_reaction_add(reaction, user):
 
 
 @client.command(aliases=['call'])
-async def appel(context, args):
+async def appel(context, *args):
     global appelList
-    classe = convert(args)
+    classe = convert(args[0])
     data = readGuild(context.guild.id)
+    quietMode='-q' in args
     if classe is None:
         await context.channel.send(returnLanguage(data["language"], "rolenotValid"))
     else:
         if got_the_role(data["admin"], context.author.roles):
-            appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe,
+            appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe,"quiet":quietMode,
                                                                                'listStudents': []}
             await context.channel.send(returnLanguage(data["language"], "startCall"))
             await  context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
@@ -127,7 +135,7 @@ async def appel(context, args):
             await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")))
 
 
-@client.command(aliases=[ 'roles', 'Roles', 'list'])
+@client.command(aliases=['roles', 'Roles', 'list'])
 async def ListRoles(context, *args):
     message = "**Admins :**"
     quiet = args != () and args[0] == '-q'
@@ -226,6 +234,13 @@ async def help(context):
     await context.message.author.send(message[0], embed=embed)
     # await ctx.message.author.send()
 
+@client.command()
+async def reset(context):
+    context.message.channel.send("**Factory reset:**\nLanguage set to English\nAdmins list reseted")
+    data=readGuild(context.guild.id)
+    data["admin"]=[]
+    data["language"]="en"
+    editGuild(context.guild.id,data)
 
 client.run(token)
 client.add_command(appel)

@@ -1,6 +1,8 @@
 {
     "changeLanguage": "Ie Sprache des Bots ist jetzt in **deutsch**",
     "unknowCommand": "Unbekannte Bestellung",
+    "class":["**Klasse :**","**__Call summary__**"],
+    "sendabsents":["**By :**","**Serveur :**","**Channel :**"],
     "commands": [
         "**Here the list of commands you can use with this bot**",
         [".Check call @klasse","Anruf tätigen, (*vertretet mit die Klasse sie wollen*)"],
@@ -20,12 +22,12 @@
     "NoRightEnd": "**Sie haben keine Rechten um den Anruf zu enden**",
     "unknowEmoji": "**Unbekanntes Emoji.\nDie Schüler müssen au ✅ klicken um sich zu benachrichtigen.**",
     "cantNotify": "Sie können sich nicht als anwesend melden",
-    "startCall": "*Anfang des Anrufs:*\n**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**",
     "notTeacher": "**Sie sind keinen Lehrer. Sie können nicht anrufen.***",
     "NoPrivileges": "**Sie haben keine Privilegien!**\n*Schreiben `.Check ListRoles` um den Administrator Rollen zu sehen*",
     "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",
     "removeAdmin": "Administrator gestreicht",
     "notAdmin": "ist kein Administrator",
     "newAdmin": ["Neuer Administrator :","role already added","not valid role"],
-    "rolenotValid":"Invalid role : For more information : `.Check help`"
+    "rolenotValid":"Invalid role : For more information : `.Check help`",
+    "startcall":["Anfang des Anrufs:","**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**","Klasse genannt:"]
 }

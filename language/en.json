@@ -1,6 +1,8 @@
 {
     "changeLanguage": "The language is now set to **english**",
     "unknowCommand": "Unknown command: I sent you commands tips in private message",
+    "class":["**Class:**","**__Call summary__**"],
+    "sendabsents":["**By :**","**Serveur :**","**Channel :**"],
     "commands": [
         "**Here the list of commands you can use with this bot**",
         [".Check call ***@class***","Start the call, *replace by the corresponding class*"],
@@ -20,12 +22,12 @@
     "NoRightEnd": "**You do not have the rights to close the call!**",
     "unknowEmoji": "**Unknown emoji.\nStudents must click ✅ to notify themselves present.**",
     "cantNotify": "You cannot notify yourself present",
-    "startCall": "*Start of call:*\n**Students: Click on ✅ to notify you present\nTeacher: Click on 🆗 to validate the call or 🛑 to cancel**",
     "notTeacher": "**You are not a teacher! You cannot start the call.**",
     "NoPrivileges": "**You don't have privileges!** \n *Type `.Check ListRoles` to see admin roles*",
     "zeroPrivileges": "**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",
     "removeAdmin": "Admin removed",
     "notAdmin": "is not admin",
     "newAdmin": ["New Admin :","role already added","not valid role"],
-    "rolenotValid":"Invalid role : For more information : `.Check help`"
+    "rolenotValid":"Invalid role : For more information : `.Check help`",
+    "startcall":["Start of call:","**Students: Click on ✅ to notify you present\nTeacher: Click on 🆗 to validate the call or 🛑 to cancel**","Class called:"]
 }

@@ -1,6 +1,5 @@
-from datetime import date
 import discord
-import datetime
+from datetime import datetime
 from discord.ext import commands
 from data import *
 
@@ -23,6 +22,11 @@ def got_the_role(role, author: list):
     elif isinstance(role, int):
         return role in [y.id for y in author]
 
+def name(member):
+    if member.nick is not None:
+        return member.nick
+    else:
+        return member.name
 
 def returnPresent(idmessage: str, guildID: int, rolelist: list):
     """
@@ -31,27 +35,41 @@ def returnPresent(idmessage: str, guildID: int, rolelist: list):
     liste = appelList[idmessage]['listStudents']
     messages = returnLanguage(readGuild(guildID)["language"], "endcall")
     if liste == []:
-        return returnLanguage(readGuild(guildID)["language"], "NoStudents")
+        return (returnLanguage(readGuild(guildID)["language"], "NoStudents"),[])
     else:
         message = messages[0]
         eleve = []
         for member in liste:
             if not member.id in eleve:
-                message += "• *{}* <@{}>\n".format(member.name, member.id)  # [user.display_name,user.id]
+                message += "• *{}* <@{}>\n".format(name(member), member.id)  # [user.display_name,user.id]
                 eleve.append(member.id)
                 if rolelist is not None: rolelist.remove(member)
         if rolelist != []:
             message += "\n" + messages[1]
             for member in rolelist:
-                message += "• *{}* <@{}>\n".format(member.name, member.id)
+                message += "• *{}* <@{}>\n".format(name(member), member.id)
         else:
             message += messages[2]
         return (message,rolelist)
 
-async def sendabsents(absents: list, channel: str, teacher: str,url : str):
-    message="Tu as été noté absent sur le channel **{}** par **{}**\n{}".format(channel,teacher,url)
+async def sendabsents(absents: list,guild,url : str, author,channel):
+    langmsg=returnLanguage(readGuild(guild.id)["language"], "sendabsents")
+    embed = discord.Embed(color=discord.Colour.red(), title="Absence")
+    embed.set_author(name=name(author),icon_url=author.avatar_url)
+    embed.add_field(name=langmsg[0],value=name(author))
+    embed.add_field(name=langmsg[1],value=guild)
+    embed.add_field(name=langmsg[2],value=channel)
     for member in absents:
-        await member.send(message)
+        await member.send(url,embed=embed)
+
+async def sendlist(member,liste : str,classe,guildID):
+    langmsg=returnLanguage(readGuild(guildID)["language"], "class")
+    embed = discord.Embed(color=discord.Colour.blue(), title=langmsg[1])
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    embed.add_field(name=langmsg[0], value=classe)
+    await member.send(embed=embed)
+    await member.send(liste)
 
 def convert(role: str):
     try:
@@ -100,8 +118,8 @@ async def on_reaction_add(reaction, user):
                     presents,absents = returnPresent(entry, idGuild,
                                              reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
                     await reaction.message.channel.send(presents)#https://discord.com/channels/guild/channel/message   
-                    await sendabsents(absents,reaction.message.channel.name,reaction.message.author,
-                            "https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,idMessage))
+                    await sendlist(reaction.message.author,presents,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild)
+                    await sendabsents(absents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,idMessage),reaction.message.author,reaction.message.channel)
                 else:
                     await reaction.message.channel.send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"))
                 await reaction.message.clear_reactions()
@@ -127,7 +145,14 @@ async def appel(context, *args):
         if got_the_role(data["admin"], context.author.roles):
             appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe,"quiet":quietMode,
                                                                                'listStudents': []}
-            await context.channel.send(returnLanguage(data["language"], "startCall"))
+            message=returnLanguage(data["language"], "startcall")
+
+            embed = discord.Embed(color=discord.Colour.orange(), title=message[0],description=message[1])
+            embed.set_author(name=name(context.message.author),
+                     icon_url=context.message.author.avatar_url)
+            embed.add_field(name="**__{}__**".format(message[2]), value=args[0])
+
+            await context.channel.send(embed=embed)
             await  context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
             await  context.message.add_reaction("🆗")
             await  context.message.add_reaction("🛑")
@@ -201,8 +226,7 @@ async def language(context, langue):
             await context.channel.send(returnLanguage(langue, "changeLanguage"))
             editGuild(context.guild.id, data)
         else:
-            await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")),
-                       context.channel)
+            await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
     else:
         await context.channel.send("Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de")
 

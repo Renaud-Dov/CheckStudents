@@ -1,6 +1,7 @@
 import discord
 from datetime import datetime
 from discord.ext import commands
+from discord.ext.commands.core import is_owner
 from data import *
 
 import sys
@@ -9,7 +10,7 @@ import sys
 token = sys.argv[1]
 intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
                           guild_reactions=True)
-client = commands.Bot(command_prefix='.Check ', intents=intents)
+client = commands.Bot(command_prefix= get_prefix, intents=intents)
 
 appelList = {}
 
@@ -83,6 +84,12 @@ def convert(role: str):
 async def on_guild_join(guild):  # readGuild(message.guild.id)
     rolebot = discord.utils.get(guild.roles, name="CheckStudents").id
     createGuild(guild.id, rolebot)
+    if guild.system_channel is not None:
+        embed = discord.Embed(color=discord.Colour.blue(), title="I joined the Server",description="Here the list of commands you can use:")
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        # embed.add_field(name="call", value=classe)
+        await guild.system_channel.send(embed=embed)
 
 
 @client.event
@@ -199,7 +206,7 @@ async def addRole(context, *args):
 async def rmRole(context, *args):
     guild = str(context.guild.id)
     data = readGuild(guild)
-    if len(data["admin"]) > 0:
+    if data["admin"] !=[]:
         if got_the_role(data["admin"], context.author.roles):
             message = str()
             for i in args:
@@ -215,6 +222,11 @@ async def rmRole(context, *args):
             await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
     else:
         await context.channel.send(returnLanguage(data["language"], "zeroPrivileges"))
+
+@client.command()
+async def prefix(context, arg):
+    set_prefix(context.guild.id,arg)
+    await context.message.channel.send(returnLanguage(readGuild(context.guild.id)["language"], "newPrefix")+arg)
 
 
 @client.command()
@@ -254,17 +266,27 @@ async def help(context):
     embed.add_field(name=message[3][0], value=message[3][1])
     embed.add_field(name=message[4][0], value=message[4][1])
     embed.add_field(name=message[5][0], value=message[5][1])
+    embed.add_field(name=message[6][0], value=message[6][1])
 
     await context.message.author.send(message[0], embed=embed)
     # await ctx.message.author.send()
 
 @client.command()
 async def reset(context):
-    context.message.channel.send("**Factory reset:**\nLanguage set to English\nAdmins list reseted")
     data=readGuild(context.guild.id)
-    data["admin"]=[]
-    data["language"]="en"
-    editGuild(context.guild.id,data)
+    if got_the_role(data["admin"], context.author.roles):
+        data["admin"]=[]
+        data["language"]="en"
+        data["prefix"]=".Check "
+        editGuild(context.guild.id,data)
+        if context.guild.system_channel is not None:
+            await context.guild.system_channel.send("**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
+        else:
+            await context.guild.channel.send("**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
+        
+    else:
+        await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+        
 
 client.run(token)
 client.add_command(appel)
@@ -273,3 +295,5 @@ client.add_command(addRole)
 client.add_command(rmRole)
 client.add_command(ListRoles)
 client.add_command(language)
+client.add_command(prefix)
+client.add_command(reset)

@@ -4,12 +4,14 @@
     "class":["**Classe :**","**__Résumé appel__**"],
     "sendabsents":["**Par :**","**Serveur :**","**Channel :**"],
     "commands": [
-        "**Voici la liste des commandes que vous pouvez utiliser**",
-        [".Check appel","Lance l'appel (*remplacer par la classe correspondante*)"],
-        [".Check add ***@role1 @role2 ...***","Ajoute les privilèges à un rôle ou plus"],
-        [".Check remove (ou rm) ***@role1 @role2 ...    ***","Retire les privilèges à un ou plusieurs rôles"],
-        [".Check language en|fr|de","Change le language du bot dans les langues suivantes : English, French or German"],
-        [".Check list (ou roles)","Retourne les rôles ayant un privilège"]
+        "**Voici la liste des commandes que vous pouvez utiliser\n Par défaut, le préfixe du bot est .Check.**",
+        ["appel","Lance l'appel (*remplacer par la classe correspondante*)"],
+        [" add ***@role1 @role2 ...***","Ajoute les privilèges à un rôle ou plus"],
+        ["remove (ou rm) ***@role1 @role2 ...    ***","Retire les privilèges à un ou plusieurs rôles"],
+        ["language en|fr|de","Change le language du bot dans les langues suivantes : English, French or German"],
+        ["list (ou roles)","Retourne les rôles ayant un privilège"],
+        ["reset","Réinitialise le bot"],
+        ["prefix","Change le préfix du bot"]
     ],
     "NoStudents": "⚠ **Aucun élève présent** ⚠",
     "endcall": [
@@ -29,5 +31,6 @@
     "notAdmin": "n'est pas admin",
     "newAdmin": ["Nouvel Admin :","rôle dejà ajouté","rôle non valide"],
     "rolenotValid":"Rôle non valide : Pour plus d'information : `.Check help`",
-    "startcall":["Début d'appel","**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**","Classe appelée :"]
+    "startcall":["Début d'appel","**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**","Classe appelée :"],
+    "newPrefix":"Nouveau préfix : "
 }

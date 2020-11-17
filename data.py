@@ -24,3 +24,15 @@ def editGuild(guildID, data):
 def readGuild(guild):
     with open('database/{}.json'.format(guild), 'r') as outfile:
         return json.load(outfile)
+
+def get_prefix(client,message):
+    with open("database/{}.json".format(message.guild.id),"r") as outfile:
+        var = json.load(outfile)
+    return var["prefix"]
+
+def set_prefix(guildID,prefix):
+    var =readGuild(guildID)
+    var["prefix"]=prefix
+    editGuild(guildID,var)
+
+#{"760808606672093184":".Check "}

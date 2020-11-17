@@ -5,11 +5,13 @@
     "sendabsents":["**By :**","**Serveur :**","**Channel :**"],
     "commands": [
         "**Here the list of commands you can use with this bot**",
-        [".Check call @klasse","Anruf tätigen, (*vertretet mit die Klasse sie wollen*)"],
-        [".Check add @role1 @role2","Streicht den Privilegien von einer oder mehrere Rollen"],
-        [".Check remove (oder rm) ***@role1 @role2***","Remove privileges from one or more roles"],
-        [".Check language en|fr|de","Change bot language in the following languages : English, French or German"],
-        [".Check list (oder roles)","Return roles with privileges"]
+        ["call @klasse","Anruf tätigen, (*vertretet mit die Klasse sie wollen*)"],
+        ["add @role1 @role2","Streicht den Privilegien von einer oder mehrere Rollen"],
+        ["remove (oder rm) ***@role1 @role2***","Remove privileges from one or more roles"],
+        ["language en|fr|de","Change bot language in the following languages : English, French or German"],
+        ["list (oder roles)","Return roles with privileges"],
+        ["reset","Reset the bot"],
+        ["prefix","Change bot prefix"]
     ],
     "NoStudents": "⚠ **Kein Student ist da** ⚠",
     "endcall": [
@@ -29,5 +31,7 @@
     "notAdmin": "ist kein Administrator",
     "newAdmin": ["Neuer Administrator :","role already added","not valid role"],
     "rolenotValid":"Invalid role : For more information : `.Check help`",
-    "startcall":["Anfang des Anrufs:","**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**","Klasse genannt:"]
+    "startcall":["Anfang des Anrufs:","**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**","Klasse genannt:"],
+    "newPrefix":"New Prefix: "
+
 }

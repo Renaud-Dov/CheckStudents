@@ -2,7 +2,7 @@
     "changeLanguage": "The language is now set to **english**",
     "unknowCommand": "Unknown command: I sent you commands tips in private message",
     "class":["**Class:**","**__Call summary__**"],
-    "sendabsents":["**By :**","**Serveur :**","**Channel :**"],
+    "sendabsents":["**By :**","**Server :**","**Channel :**"],
     "commands": [
         "**Here the list of commands you can use with this bot**",
         ["call ***@class***","Start the call, *replace by the corresponding class*"],

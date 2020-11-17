@@ -158,6 +158,7 @@ async def appel(context, *args):
             embed.set_author(name=name(context.message.author),
                      icon_url=context.message.author.avatar_url)
             embed.add_field(name="**__{}__**".format(message[2]), value=args[0])
+            embed.set_footer(text="Need help : Use help command")
 
             await context.channel.send(embed=embed)
             await  context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗

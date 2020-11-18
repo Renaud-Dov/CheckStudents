@@ -31,6 +31,6 @@
     "notAdmin": "n'est pas admin",
     "newAdmin": ["Nouvel Admin :","rôle dejà ajouté","rôle non valide"],
     "rolenotValid":"Rôle non valide : Pour plus d'information : `.Check help`",
-    "startcall":["Début d'appel","**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**","Classe appelée :","Besoin d'aide ? Utiliser la commande help"],
+    "startcall":["Début d'appel","**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**","Classe appelée :","Besoin d'aide ? Utilisez la commande help"],
     "newPrefix":"Nouveau préfix : "
 }

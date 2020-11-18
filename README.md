@@ -13,7 +13,7 @@ To add this bot to your Discord Server :
 
 
 
-For make a call, a teacher (or any other user with an authorized role : See `.Check list` command), `.Check call @class`
+For make a call, a teacher (or any other user with an authorized role): `.Check call @class`
 ![startcall](img/startcall.png)
 
 Emojis will appear below your message, the students belonging to the `@class` role would be able to click on the ✅ to notify their presence.

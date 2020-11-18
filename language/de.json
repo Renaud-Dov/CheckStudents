@@ -2,7 +2,7 @@
     "changeLanguage": "Ie Sprache des Bots ist jetzt in **deutsch**",
     "unknowCommand": "Unbekannte Bestellung",
     "class":["**Klasse :**","**__Call summary__**"],
-    "sendabsents":["**By :**","**Server :**","**Channel :**"],
+    "sendabsents":["**By :**","**Server :**","**Channel :**",["Show message","Link"]],
     "commands": [
         "**Here the list of commands you can use with this bot**",
         ["call @klasse","Anruf tätigen, (*vertretet mit die Klasse sie wollen*)"],
@@ -31,7 +31,7 @@
     "notAdmin": "ist kein Administrator",
     "newAdmin": ["Neuer Administrator :","role already added","not valid role"],
     "rolenotValid":"Invalid role : For more information : `.Check help`",
-    "startcall":["Anfang des Anrufs:","**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**","Klasse genannt:"],
+    "startcall":["Anfang des Anrufs:","**Schüler: Klicken Sie auf ✅, um Sie über die Anwesenheit zu  benachrichtigen\nLehrer: Klicken Sie auf 🆗, um den Anruf zu bestätigen, oder auf 🛑 um ihn abzubrechen**","Klasse genannt:","Need help ? Use help command"],
     "newPrefix":"New Prefix: "
 
 }

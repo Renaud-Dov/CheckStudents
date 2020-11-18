@@ -60,8 +60,9 @@ async def sendabsents(absents: list,guild,url : str, author,channel):
     embed.add_field(name=langmsg[0],value=name(author))
     embed.add_field(name=langmsg[1],value=guild)
     embed.add_field(name=langmsg[2],value=channel)
+    embed.add_field(name=langmsg[3][0],value="[{}]({})".format(langmsg[3][1],url))
     for member in absents:
-        await member.send(url,embed=embed)
+        await member.send(embed=embed)
 
 async def sendlist(member,liste : str,classe,guildID):
     langmsg=returnLanguage(readGuild(guildID)["language"], "class")
@@ -158,7 +159,7 @@ async def appel(context, *args):
             embed.set_author(name=name(context.message.author),
                      icon_url=context.message.author.avatar_url)
             embed.add_field(name="**__{}__**".format(message[2]), value=args[0])
-            embed.set_footer(text="Need help : Use help command")
+            embed.set_footer(text=message[3])
 
             await context.channel.send(embed=embed)
             await  context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗

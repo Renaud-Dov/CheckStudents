@@ -2,7 +2,7 @@
     "changeLanguage": "La langue du bot est maintenant en **français**",
     "unknowCommand": "Commande inconnue : Commandes envoyées en message privé",
     "class":["**Classe :**","**__Résumé appel__**"],
-    "sendabsents":["**Par :**","**Serveur :**","**Channel :**"],
+    "sendabsents":["**Par :**","**Serveur :**","**Channel :**",["Voir message","Lien"]],
     "commands": [
         "**Voici la liste des commandes que vous pouvez utiliser\n Par défaut, le préfixe du bot est .Check.**",
         ["appel","Lance l'appel (*remplacer par la classe correspondante*)"],
@@ -31,6 +31,6 @@
     "notAdmin": "n'est pas admin",
     "newAdmin": ["Nouvel Admin :","rôle dejà ajouté","rôle non valide"],
     "rolenotValid":"Rôle non valide : Pour plus d'information : `.Check help`",
-    "startcall":["Début d'appel","**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**","Classe appelée :"],
+    "startcall":["Début d'appel","**Elèves : Cliquez sur ✅ pour vous notifier présent\nProfesseur : Cliquez sur 🆗 pour valider l'appel ou 🛑 pour l'annuler**","Classe appelée :","Besoin d'aide ? Utiliser la commande help"],
     "newPrefix":"Nouveau préfix : "
 }

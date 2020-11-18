@@ -269,6 +269,7 @@ async def help(context):
     embed.add_field(name=message[4][0], value=message[4][1])
     embed.add_field(name=message[5][0], value=message[5][1])
     embed.add_field(name=message[6][0], value=message[6][1])
+    embed.add_field(name=message[7][0], value=message[7][1])
 
     await context.message.author.send(message[0], embed=embed)
     # await ctx.message.author.send()

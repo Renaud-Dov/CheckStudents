@@ -5,7 +5,7 @@
 # CheckStudents
 To add this bot to your Discord Server :
 [![Click here](https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=8&scope=bot
-) or [Click Here](https://bit.ly/3mI4tWI)
+)
 
 >**Note : You need the corresponding privileges to add the bot on a server.**
 

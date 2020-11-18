@@ -15,7 +15,7 @@
     ],
     "NoStudents": "⚠ **No student present** ⚠",
     "endcall": [
-        "**Students present:**\n",
+        "**Present students:**\n",
         "**Missing students:\n**",
         "\n ✅ **All students are present** ✅"
     ],

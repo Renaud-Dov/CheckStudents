@@ -185,7 +185,7 @@ async def addRole(context, *args):
     guild = str(context.guild.id)
     data = readGuild(guild)
     if data["admin"]!=[] and not got_the_role(data["admin"], context.author.roles):
-        await embedError(context.channel,"<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
         message = str()
         langMessage=returnLanguage(data["language"], "newAdmin")
@@ -220,7 +220,7 @@ async def rmRole(context, *args):
             editGuild(guild, data)
             await context.channel.send(message)
         else:
-            await embedError(context.channel,"<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+            await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
         await context.channel.send(returnLanguage(data["language"], "zeroPrivileges"))
 
@@ -240,7 +240,7 @@ async def language(context, langue):
             editGuild(context.guild.id, data)
         else:
             
-            await embedError(context.channel,"<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+            await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
         await context.channel.send("Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de")
 
@@ -287,7 +287,7 @@ async def reset(context):
             await context.guild.channel.send("**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
         
     else:
-        await embedError(context.channel,"<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
 
 async def embedError(channel,message):
     embed = discord.Embed(color=discord.Color.red(), title=message)

@@ -43,6 +43,7 @@ Every absent student will get an absence notification, like this one :
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
 **To see the list of admins,** use command `.Check list` or `.Check roles` (same command)
+> Mode quiet : -q
 
 ## Change bot prefix
 If you want to change bot prefix, use command `prefix` followed by the new prefix. Default prefix is "`.Check `"

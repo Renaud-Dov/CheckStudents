@@ -186,7 +186,7 @@ async def addRole(context, *args):
     guild = str(context.guild.id)
     data = readGuild(guild)
     if data["admin"]!=[] and not got_the_role(data["admin"], context.author.roles):
-        await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
         message = str()
         langMessage=returnLanguage(data["language"], "newAdmin")
@@ -221,7 +221,7 @@ async def rmRole(context, *args):
             editGuild(guild, data)
             await context.channel.send(message)
         else:
-            await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+            await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
         await context.channel.send(returnLanguage(data["language"], "zeroPrivileges"))
 
@@ -240,7 +240,8 @@ async def language(context, langue):
             await context.channel.send(returnLanguage(langue, "changeLanguage"))
             editGuild(context.guild.id, data)
         else:
-            await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
+            
+            await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
         await context.channel.send("Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de")
 
@@ -288,8 +289,15 @@ async def reset(context):
             await context.guild.channel.send("**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
         
     else:
-        await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "NoPrivileges")))
-        
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
+
+async def embedError(channel,message):
+    embed = discord.Embed(color=discord.Color.red(), title=message)
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    # embed.add_field(name="Permission Denied",value=message)
+    embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
+    await channel.send(embed=embed)
 
 client.run(token)
 client.add_command(appel)

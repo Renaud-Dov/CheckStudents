@@ -91,36 +91,14 @@ async def on_guild_join(guild):  # readGuild(message.guild.id)
     rolebot = discord.utils.get(guild.roles, name="CheckStudents").id
     createGuild(guild.id, rolebot)
     if guild.system_channel is not None:
+        message = returnLanguage("en","commands")
         embed = discord.Embed(color=discord.Colour.blue(), title="I joined the Server",description="Here the list of commands you can use:")
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
         # embed.add_field(name="call", value=classe)
+        embed = CompleteHelpEmbed(embed,message)
         await guild.system_channel.send(embed=embed)
 
-async def finishCall(channel,entry,idGuild,reaction):
-    embed = discord.Embed(color=discord.Colour.blue())
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    if appelList[entry]['listStudents']==[]:
-        embed.title = "No students presents, please use 🛑 to cancel the call"
-        embed.color=discord.Color.red()
-        embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
-
-        await channel.send(embed=embed)
-    else:
-        presentsMessage, absentsMessage, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
-        
-        
-        embed.add_field(name="Present students",value=presentsMessage)
-
-        if absentsMessage != "":embed.add_field(name="Absents students",value=absentsMessage) 
-        else: embed.add_field(name="All students are present",value=":thumbsup:")
-        # embed.set_footer("The teacher and  MP")
-        # send the list of students to the teacher who started the call
-        await channel.send(embed=embed)
-        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,[presentsMessage,absentsMessage])
-
-        await sendabsents(listAbsents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,reaction.message.id),reaction.message.author,reaction.message.channel)
 
 
 @client.event
@@ -166,6 +144,30 @@ async def on_reaction_add(reaction, user):
             await reaction.message.remove_reaction(reactionContent, user)
             await reaction.message.channel.sendsend("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "unknowEmoji")))
 
+async def finishCall(channel,entry,idGuild,reaction):
+    embed = discord.Embed(color=discord.Colour.blue())
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    if appelList[entry]['listStudents']==[]:
+        embed.title = "No students presents, please use 🛑 to cancel the call"
+        embed.color=discord.Color.red()
+        embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
+
+        await channel.send(embed=embed)
+    else:
+        presentsMessage, absentsMessage, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+        
+        
+        embed.add_field(name="Present students",value=presentsMessage)
+
+        if absentsMessage != "":embed.add_field(name="Absents students",value=absentsMessage) 
+        else: embed.add_field(name="All students are present",value=":thumbsup:")
+        # embed.set_footer("The teacher and  MP")
+        # send the list of students to the teacher who started the call
+        await channel.send(embed=embed)
+        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,[presentsMessage,absentsMessage])
+
+        await sendabsents(listAbsents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,reaction.message.id),reaction.message.author,reaction.message.channel)
 
 @client.command(aliases=['call'])
 async def appel(context, *args):
@@ -193,7 +195,7 @@ async def appel(context, *args):
             await context.channel.send("<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")))
 
 
-@client.command(aliases=['roles', 'Roles', 'list'])
+@client.command(aliases=['roles', 'Roles', 'list','admin','admins'])
 async def ListRoles(context, *args):
     message = ""
     embed = discord.Embed(color=discord.Colour.orange())
@@ -291,7 +293,7 @@ async def prefix(context, arg):
         await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
 
 
-@client.command()
+@client.command(aliases=["lang"])
 async def language(context, langue=None):
     if langue in ["fr", "en", "de"]:
         data = readGuild(context.guild.id)
@@ -327,13 +329,8 @@ async def help(context):
     embed = discord.Embed(color=discord.Colour.green(), title="Help Commands")
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    embed.add_field(name=message[1][0], value=message[1][1])
-    embed.add_field(name=message[2][0], value=message[2][1])
-    embed.add_field(name=message[3][0], value=message[3][1])
-    embed.add_field(name=message[4][0], value=message[4][1])
-    embed.add_field(name=message[5][0], value=message[5][1])
-    embed.add_field(name=message[6][0], value=message[6][1])
-    embed.add_field(name=message[7][0], value=message[7][1])
+    embed = CompleteHelpEmbed(embed,message)
+    
 
     await context.message.author.send(message[0], embed=embed)
     # await ctx.message.author.send()
@@ -373,7 +370,16 @@ async def AdminCommand(context,embed: discord.Embed):
         embed.add_field(name="Used by",value=context.message.author.mention)
         await context.guild.system_channel.send(embed=embed)
     # jump_url
-
+def CompleteHelpEmbed(embed: discord.Embed,message):
+    embed.add_field(name=message[1][0], value=message[1][1])
+    embed.add_field(name=message[2][0], value=message[2][1])
+    embed.add_field(name=message[3][0], value=message[3][1])
+    embed.add_field(name=message[4][0], value=message[4][1])
+    embed.add_field(name=message[5][0], value=message[5][1])
+    embed.add_field(name=message[6][0], value=message[6][1])
+    embed.add_field(name=message[7][0], value=message[7][1])
+    embed.add_field(name=message[8][0], value=message[8][1])
+    return embed
 client.run(token)
 client.add_command(appel)
 client.add_command(help)

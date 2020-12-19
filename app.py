@@ -1,5 +1,6 @@
 import discord
 from datetime import datetime
+from discord import embeds
 from discord.ext import commands
 from discord.ext.commands.core import is_owner
 from data import *
@@ -34,24 +35,20 @@ def returnPresent(idmessage: str, guildID: int, rolelist: list):
     Retourne la liste des élèves ayant notifié leur présence sur un message.
     """
     liste = appelList[idmessage]['listStudents']
-    messages = returnLanguage(readGuild(guildID)["language"], "endcall")
-    if liste == []:
-        return (returnLanguage(readGuild(guildID)["language"], "NoStudents"),[])
-    else:
-        message = messages[0]
-        eleve = []
-        for member in liste:
-            if not member.id in eleve:
-                message += "• *{}* <@{}>\n".format(name(member), member.id)  # [user.display_name,user.id]
-                eleve.append(member.id)
-                if rolelist is not None: rolelist.remove(member)
-        if rolelist != []:
-            message += "\n" + messages[1]
-            for member in rolelist:
-                message += "• *{}* <@{}>\n".format(name(member), member.id)
-        else:
-            message += messages[2]
-        return (message,rolelist)
+    # messages = returnLanguage(readGuild(guildID)["language"], "endcall")
+    
+    messageA = ""
+    messageB = ""
+    eleve = []
+    for member in liste:
+        if not member.id in eleve:
+            messageA += "*{}* <@{}>\n".format(name(member), member.id)
+            eleve.append(member.id)
+            if rolelist is not None: rolelist.remove(member)
+    if rolelist != []:
+        for member in rolelist:
+            messageB += "*{}* <@{}>\n".format(name(member), member.id)
+    return (messageA,messageB,rolelist)
 
 async def sendabsents(absents: list,guild,url : str, author,channel):
     langmsg=returnLanguage(readGuild(guild.id)["language"], "sendabsents")
@@ -64,14 +61,22 @@ async def sendabsents(absents: list,guild,url : str, author,channel):
     for member in absents:
         await member.send(embed=embed)
 
-async def sendlist(member,liste : str,classe,guildID):
+async def sendlist(member,classe,guildID,students):
+    """
+    Send the list to the teacher
+    """
     langmsg=returnLanguage(readGuild(guildID)["language"], "class")
     embed = discord.Embed(color=discord.Colour.blue(), title=langmsg[1])
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     embed.add_field(name=langmsg[0], value=classe)
+
+    embed.add_field(name="Present students",value=students[0])
+    if students[1]!= "": embed.add_field(name="Absents students",value=students[1])
+    else: embed.add_field(name="All students are present",value=":thumbsup:")
+
+
     await member.send(embed=embed)
-    await member.send(liste)
 
 def convert(role: str):
     try:
@@ -91,6 +96,31 @@ async def on_guild_join(guild):  # readGuild(message.guild.id)
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
         # embed.add_field(name="call", value=classe)
         await guild.system_channel.send(embed=embed)
+
+async def finishCall(channel,entry,idGuild,reaction):
+    embed = discord.Embed(color=discord.Colour.blue())
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    if appelList[entry]['listStudents']==[]:
+        embed.title = "No students presents, please use 🛑 to cancel the call"
+        embed.color=discord.Color.red()
+        embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
+
+        await channel.send(embed=embed)
+    else:
+        presentsMessage, absentsMessage, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+        
+        
+        embed.add_field(name="Present students",value=presentsMessage)
+
+        if absentsMessage != "":embed.add_field(name="Absents students",value=absentsMessage) 
+        else: embed.add_field(name="All students are present",value=":thumbsup:")
+        # embed.set_footer("The teacher and  MP")
+        # send the list of students to the teacher who started the call
+        await channel.send(embed=embed)
+        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,[presentsMessage,absentsMessage])
+
+        await sendabsents(listAbsents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,reaction.message.id),reaction.message.author,reaction.message.channel)
 
 
 @client.event
@@ -123,11 +153,7 @@ async def on_reaction_add(reaction, user):
                     await reaction.message.channel.send(
                         "<@{}> :{} <@&{}>".format(user.id, returnLanguage(readGuild(idGuild)["language"], "FinishCall"),
                                                   appelList[entry]['ClasseRoleID']))
-                    presents,absents = returnPresent(entry, idGuild,
-                                             reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
-                    await reaction.message.channel.send(presents)#https://discord.com/channels/guild/channel/message   
-                    await sendlist(reaction.message.author,presents,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild)
-                    await sendabsents(absents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,idMessage),reaction.message.author,reaction.message.channel)
+                    await finishCall(reaction.message.channel,entry,idGuild,reaction)
                 else:
                     await reaction.message.channel.send(returnLanguage(readGuild(idGuild)["language"], "cancelCall"))
                 await reaction.message.clear_reactions()
@@ -146,16 +172,14 @@ async def appel(context, *args):
     global appelList
     classe = convert(args[0])
     data = readGuild(context.guild.id)
-    quietMode='-q' in args
     if classe is None:
         await context.channel.send(returnLanguage(data["language"], "rolenotValid"))
     else:
         if got_the_role(data["admin"], context.author.roles):
-            appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe,"quiet":quietMode,
-                                                                               'listStudents': []}
+            appelList["{}-{}".format(context.guild.id, context.message.id)] = {'ClasseRoleID': classe,'listStudents': []}
             message=returnLanguage(data["language"], "startcall")
 
-            embed = discord.Embed(color=discord.Colour.orange(), title=message[0],description=message[1])
+            embed = discord.Embed(color=discord.Colour.green(), title=message[0],description=message[1])
             embed.set_author(name=name(context.message.author),
                      icon_url=context.message.author.avatar_url)
             embed.add_field(name="**__{}__**".format(message[2]), value=args[0])
@@ -171,14 +195,18 @@ async def appel(context, *args):
 
 @client.command(aliases=['roles', 'Roles', 'list'])
 async def ListRoles(context, *args):
-    message = "**Admins :**"
-    quiet = args != () and args[0] == '-q'
-    for i in readGuild(context.guild.id)["admin"]:
-        if quiet:
-            message += "\n• {}".format(discord.utils.get(context.guild.roles, id=i))
-        else:
-            message += "\n• <@&{}> : {}".format(i, discord.utils.get(context.guild.roles, id=i))
-    await context.channel.send(message)
+    message = ""
+    embed = discord.Embed(color=discord.Colour.orange())
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    admins = readGuild(context.guild.id)["admin"]
+    if admins == []:
+        embed.add_field(name="**Admins :**",value="There is no admin yet")
+    else:
+        for i in admins:
+            message += "<@&{}>\n".format(i)
+        embed.add_field(name="**Admins :**",value=message)
+    await context.channel.send(embed=embed)
 
 
 @client.command(aliases=['add'])
@@ -190,19 +218,29 @@ async def addRole(context, *args):
     else:
         message = str()
         langMessage=returnLanguage(data["language"], "newAdmin")
+        embed = discord.Embed(color=discord.Colour.orange())
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            
+        a = ""
+        b = ""
         for i in args:
             role = convert(i)
-            if role is not None:
-                if not role in data["admin"]:
-                    data["admin"].append(role)
-                    message += '\n• ' + langMessage[0] + i
-                else:
-                    message += "\n• **{}** ".format(i)+langMessage[1]
-            else:
-                message += "\n• **{}** ".format(i)+langMessage[2]
-        editGuild(guild, data)
-        await context.channel.send(message)
 
+            if not role in data["admin"]:
+                data["admin"].append(role)
+                a += i + "\n"
+            else:
+                b += i + "\n"
+        
+        if a == "" and b == "":
+            embed.add_field(name="You need to add roles to use the command",value="add @role1 @role2")
+            await context.channel.send(embed=embed)
+        else:
+            if a != "" : embed.add_field(name="Added roles",value=a)
+            if b != "" : embed.add_field(name="Already added",value=b)
+            editGuild(guild, data)
+            await AdminCommand(context,embed)
 
 @client.command(aliases=['rm', 'del', 'remove'])
 async def rmRole(context, *args):
@@ -210,40 +248,65 @@ async def rmRole(context, *args):
     data = readGuild(guild)
     if data["admin"] !=[]:
         if got_the_role(data["admin"], context.author.roles):
-            message = str()
+            embed = discord.Embed(color=discord.Colour.orange())
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            
+            a = ""
+            b = ""
+
             for i in args:
                 role = convert(i)
                 if role in data["admin"]:
+                    a+= "<@&{}>\n".format(role)
                     data["admin"].remove(role)
-                    message += '\n• *{}:* <@&{}>'.format(returnLanguage(data["language"], "removeAdmin"), role)
                 else:
-                    message += "\n• *<@&{}> {}*".format(role, returnLanguage(data["language"], "notAdmin"))
-            editGuild(guild, data)
-            await context.channel.send(message)
+                    b+= "<@&{}>\n".format(role)
+            if a == "" and b == "":
+                embed.add_field(name="You need to write role(s) to use the command",value="rm @role")
+                await context.channel.send(embed=embed)
+            else:
+                if a != "" : embed.add_field(name="Removed roles",value=a)
+                if b != "" : embed.add_field(name="Was not an admin",value=b)
+                editGuild(guild, data)
+                await AdminCommand(context,embed)
         else:
             await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
-        await context.channel.send(returnLanguage(data["language"], "zeroPrivileges"))
+        await embedError(context.channel,returnLanguage(data["language"], "zeroPrivileges"))
 
 @client.command()
 async def prefix(context, arg):
-    set_prefix(context.guild.id,arg)
-    await context.message.channel.send(returnLanguage(readGuild(context.guild.id)["language"], "newPrefix")+arg)
+    data = readGuild(context.guild.id)
+    if got_the_role(data["admin"], context.author.roles):
+        try:
+            set_prefix(context.guild.id,arg)
+            embed = discord.Embed(color=discord.Colour.orange(), title=returnLanguage(readGuild(context.guild.id)["language"], "newPrefix")+"**{}**".format(arg))
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                        icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            await AdminCommand(context,embed)
+        except commands.errors.MissingRequiredArgument:
+            embedError("You did not specify a prefix")
+    else:
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
 
 
 @client.command()
-async def language(context, langue):
+async def language(context, langue=None):
     if langue in ["fr", "en", "de"]:
         data = readGuild(context.guild.id)
         if got_the_role(data["admin"], context.author.roles):
             data["language"] = langue
-            await context.channel.send(returnLanguage(langue, "changeLanguage"))
+            embed = discord.Embed(color=discord.Colour.orange(), title=returnLanguage(langue, "changeLanguage"))
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            await AdminCommand(context,embed)
             editGuild(context.guild.id, data)
         else:
             
             await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
-        await context.channel.send("Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de")
+        await embedError(context.channel,"Unknow language:\n**Languages :**\n• English: en\n• French: fr\n• German: de")
 
 
 @client.event
@@ -283,10 +346,12 @@ async def reset(context):
         data["language"]="en"
         data["prefix"]=".Check "
         editGuild(context.guild.id,data)
-        if context.guild.system_channel is not None:
-            await context.guild.system_channel.send("**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
-        else:
-            await context.guild.channel.send("**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
+
+        embed = discord.Embed(color=discord.Colour.orange(), title="**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        
+        await AdminCommand(context,embed)
         
     else:
         await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
@@ -298,6 +363,16 @@ async def embedError(channel,message):
     # embed.add_field(name="Permission Denied",value=message)
     embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
     await channel.send(embed=embed)
+
+async def AdminCommand(context,embed: discord.Embed):
+    
+    await context.channel.send(embed=embed)
+
+    if context.guild.system_channel is not None and context.guild.system_channel != context.channel:
+        embed.add_field(name="Link to the action",value="[Link]({})".format(context.message.jump_url))
+        embed.add_field(name="Used by",value=context.message.author.mention)
+        await context.guild.system_channel.send(embed=embed)
+    # jump_url
 
 client.run(token)
 client.add_command(appel)

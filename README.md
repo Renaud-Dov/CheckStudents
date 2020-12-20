@@ -9,6 +9,7 @@ To add this bot to your Discord Server :
 
 >**Note : You need the corresponding privileges to add the bot on a server.**
 
+### Read [CHANGELOG](CHANGELOG.md) here.
 ## How it works ?
 
 

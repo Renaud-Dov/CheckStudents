@@ -62,7 +62,7 @@ If you want to add another language, please check english json prototype (`langu
 ## Reset the bot
 
 To reset the bot, use command `reset`. Reset command will reset admin list, put default prefix, and set language to english.
->You must be an admin in order to execute this command
+>You must be an admin or the server owner in order to execute this command
 
 ## Activate/Deactivate bot system messages
 

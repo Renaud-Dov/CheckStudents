@@ -291,7 +291,7 @@ async def prefix(context, arg):
                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
             await AdminCommand(context,embed)
         except commands.errors.MissingRequiredArgument:
-            embedError("You did not specify a prefix")
+            embedError(context.channel,"You did not specify a prefix")
     else:
         await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
 
@@ -341,7 +341,7 @@ async def help(context):
 @client.command()
 async def reset(context):
     data=readGuild(context.guild.id)
-    if got_the_role(data["admin"], context.author.roles):
+    if got_the_role(data["admin"], context.author.roles) or context.message.author == context.guild.owner:
         data["admin"]=[]
         data["language"]="en"
         data["prefix"]=".Check "

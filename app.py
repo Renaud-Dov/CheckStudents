@@ -433,7 +433,7 @@ async def settings(context):
     embed.add_field(name="Private Messages",value=str(data["mp"]),inline=False)
     embed.add_field(name="Language",value=str(data["language"]),inline=False)
 
-    context.channel.send(embed=embed)
+    await context.channel.send(embed=embed)
 
 
 def CompleteHelpEmbed(embed: discord.Embed,message):

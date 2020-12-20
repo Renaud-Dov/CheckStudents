@@ -82,8 +82,8 @@ async def sendlist(member,classe,guildID,students):
 
 
     await member.send(embed=embed)
-    await member.send(students[0])
-    await member.send(students[1])
+    if students[0]!="":await member.send(students[0])
+    if students[1]!="":await member.send(students[1])
 
 def convert(role: str):
     try:

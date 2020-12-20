@@ -37,19 +37,24 @@ def returnPresent(idmessage: str, guildID: int, rolelist: list):
     """
     liste = appelList[idmessage]['listStudents']
     # messages = returnLanguage(readGuild(guildID)["language"], "endcall")
-    
-    messageA = ""
-    messageB = ""
-    eleve = []
-    for member in liste:
-        if not member.id in eleve:
-            messageA += "*{}* <@{}>\n".format(name(member), member.id)
-            eleve.append(member.id)
-            if rolelist is not None: rolelist.remove(member)
-    if rolelist != []:
-        for member in rolelist:
-            messageB += "*{}* <@{}>\n".format(name(member), member.id)
-    return (messageA,messageB,rolelist)
+    messages = returnLanguage(readGuild(guildID)["language"], "endcall")
+    if liste == []:
+        return (returnLanguage(readGuild(guildID)["language"], "NoStudents"),[])
+    else:
+        message = messages[0]
+        eleve = []
+        for member in liste:
+            if not member.id in eleve:
+                message += "• *{}* <@{}>\n".format(name(member), member.id)  # [user.display_name,user.id]
+                eleve.append(member.id)
+                if rolelist is not None: rolelist.remove(member)
+        if rolelist != []:
+            message += "\n" + messages[1]
+            for member in rolelist:
+                message += "• *{}* <@{}>\n".format(name(member), member.id)
+        else:
+            message += messages[2]
+        return (message,rolelist)
 
 async def sendabsents(absents: list,guild,url : str, author,channel):
     langmsg=returnLanguage(readGuild(guild.id)["language"], "sendabsents")
@@ -73,12 +78,10 @@ async def sendlist(member,classe,guildID,students):
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     embed.add_field(name=langmsg[0], value=classe)
     embed.add_field(name="Date",value=date.today().strftime("%d/%m/%Y"),inline=False)
-    embed.add_field(name="Present students",value=students[0])
-    if students[1]!= "": embed.add_field(name="Absent students",value=students[1])
-    else: embed.add_field(name="All students are present",value=":thumbsup:")
 
 
     await member.send(embed=embed)
+    await member.send(students)
 
 def convert(role: str):
     try:
@@ -147,27 +150,19 @@ async def on_reaction_add(reaction, user):
             await reaction.message.channel.sendsend("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "unknowEmoji")))
 
 async def finishCall(channel,entry,idGuild,reaction):
-    embed = discord.Embed(color=discord.Colour.blue())
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     if appelList[entry]['listStudents']==[]:
-        embed.title = "No students presents, please use 🛑 to cancel the call"
-        embed.color=discord.Color.red()
+        embed = discord.Embed(color=discord.Colour.red(),title = "No students presents, please use 🛑 to cancel the call")
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
         embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
 
         await channel.send(embed=embed)
     else:
-        presentsMessage, absentsMessage, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+        presentsMessage, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+    
         
-        
-        embed.add_field(name="Present students",value=presentsMessage)
-
-        if absentsMessage != "":embed.add_field(name="Absents students",value=absentsMessage) 
-        else: embed.add_field(name="All students are present",value=":thumbsup:")
-        # embed.set_footer("The teacher and  MP")
-        # send the list of students to the teacher who started the call
-        await channel.send(embed=embed)
-        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,[presentsMessage,absentsMessage])
+        await channel.send(presentsMessage)
+        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,presentsMessage)
 
         await sendabsents(listAbsents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,reaction.message.id),reaction.message.author,reaction.message.channel)
 

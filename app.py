@@ -399,7 +399,11 @@ async def AdminCommand(context,embed: discord.Embed, title =None):
         embed.add_field(name="Used by",value=context.message.author.mention)
         if title is not None:
             embed.title = title
-        await context.guild.system_channel.send(embed=embed)
+        try:
+            await context.guild.system_channel.send(embed=embed)
+
+        except commands.CommandInvokeError as e:
+            print(context.guild,context.guild.id,"raised commands.CommandInvokeError")
     # jump_url
 
 @client.command(aliases=["MP,mp"])

@@ -14,6 +14,7 @@
         ["prefix","Change bot prefix"],
         ["sysMessages (or sys)","Activte or desactivate bot system messages"],
         ["DeactivateMP","Activte or desactivate private messages"],
+        ["settings","Return settings values"],
         ["For more information","[Click here](https://github.com/Renaud-Dov/CheckStudents)"]
     ],
     "NoStudents": "⚠ **No student present** ⚠",

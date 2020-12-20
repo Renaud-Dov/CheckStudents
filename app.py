@@ -447,6 +447,7 @@ def CompleteHelpEmbed(embed: discord.Embed,message):
     embed.add_field(name=message[8][0], value=message[8][1],inline=False)
     embed.add_field(name=message[9][0], value=message[9][1],inline=False)
     embed.add_field(name=message[10][0], value=message[10][1],inline=False)
+    embed.add_field(name=message[11][0], value=message[11][1],inline=False)
     return embed
 
 client.run(token)

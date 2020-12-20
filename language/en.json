@@ -1,7 +1,7 @@
 {
     "changeLanguage": "The language is now set to **english**",
-    "unknowCommand": "Unknown command: I sent you commands tips in private message",
-    "class":["**Class:**","**__Call summary__**"],
+    "unknowCommand": "Unknown command: I sent you commands list in private message",
+    "class":["**Class:**","**__Attendence summary__**"],
     "sendabsents":["**By :**","**Server :**","**Channel :**",["Show message","Link"]],
     "commands": [
         "**Here the list of commands you can use with this bot**",
@@ -27,8 +27,8 @@
     "unknowEmoji": "**Unknown emoji.\nStudents must click ✅ to notify themselves present.**",
     "cantNotify": "You cannot notify yourself present",
     "notTeacher": "**You are not a teacher! You cannot start the call.**",
-    "NoPrivileges": "**You don't have privileges!** \n *Type `.Check ListRoles` to see admin roles*",
-    "zeroPrivileges": "**There is no role with privileges! To add more: .Check addRole @ role1 @ role2, etc ...**",
+    "NoPrivileges": "**You don't have privileges!** \n *Use `list` command to see admin roles*",
+    "zeroPrivileges": "**There is no role with privileges! To add more: .Check add @ role1 @ role2, etc ...**",
     "removeAdmin": "Admin removed",
     "notAdmin": "is not admin",
     "newAdmin": ["New Admin :","role already added","not valid role"],

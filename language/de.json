@@ -1,7 +1,7 @@
 {
     "changeLanguage": "Ie Sprache des Bots ist jetzt in **deutsch**",
     "unknowCommand": "Unbekannte Bestellung",
-    "class":["**Klasse :**","**__Call summary__**"],
+    "class":["**Klasse :**","**__Attendence summary__**"],
     "sendabsents":["**By :**","**Server :**","**Channel :**",["Show message","Link"]],
     "commands": [
         "**Here the list of commands you can use with this bot**",
@@ -27,8 +27,8 @@
     "unknowEmoji": "**Unbekanntes Emoji.\nDie Schüler müssen au ✅ klicken um sich zu benachrichtigen.**",
     "cantNotify": "Sie können sich nicht als anwesend melden",
     "notTeacher": "**Sie sind keinen Lehrer. Sie können nicht anrufen.***",
-    "NoPrivileges": "**Sie haben keine Privilegien!**\n*Schreiben `.Check ListRoles` um den Administrator Rollen zu sehen*",
-    "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check addRole @role1 @role2, etc...`**",
+    "NoPrivileges": "**Sie haben keine Privilegien!**\n*Schreiben `.Check list` um den Administrator Rollen zu sehen*",
+    "zeroPrivileges": "**Es gibt keine Rolle, die Privilegien hat! Um hinzufügen : `.Check add @role1 @role2, etc...`**",
     "removeAdmin": "Administrator gestreicht",
     "notAdmin": "ist kein Administrator",
     "newAdmin": ["Neuer Administrator :","role already added","not valid role"],

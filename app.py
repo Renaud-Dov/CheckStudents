@@ -4,6 +4,7 @@ from discord import embeds
 from discord.ext import commands
 from discord.ext.commands.core import is_owner
 from data import *
+from datetime import date
 
 import sys
 
@@ -57,6 +58,7 @@ async def sendabsents(absents: list,guild,url : str, author,channel):
     embed.add_field(name=langmsg[0],value=name(author))
     embed.add_field(name=langmsg[1],value=guild)
     embed.add_field(name=langmsg[2],value=channel)
+    embed.add_field(name="Date",value=date.today().strftime("%d/%m/%Y"))
     embed.add_field(name=langmsg[3][0],value="[{}]({})".format(langmsg[3][1],url))
     for member in absents:
         await member.send(embed=embed)
@@ -70,9 +72,9 @@ async def sendlist(member,classe,guildID,students):
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     embed.add_field(name=langmsg[0], value=classe)
-
+    embed.add_field(name="Date",value=date.today().strftime("%d/%m/%Y"),inline=False)
     embed.add_field(name="Present students",value=students[0])
-    if students[1]!= "": embed.add_field(name="Absents students",value=students[1])
+    if students[1]!= "": embed.add_field(name="Absent students",value=students[1])
     else: embed.add_field(name="All students are present",value=":thumbsup:")
 
 
@@ -185,6 +187,7 @@ async def appel(context, *args):
             embed.set_author(name=name(context.message.author),
                      icon_url=context.message.author.avatar_url)
             embed.add_field(name="**__{}__**".format(message[2]), value=args[0])
+            embed.add_field(name="Date",value=date.today().strftime("%d/%m/%Y"))
             embed.set_footer(text=message[3])
 
             await context.channel.send(embed=embed)
@@ -398,15 +401,15 @@ async def AdminCommand(context,embed: discord.Embed):
 
     
 def CompleteHelpEmbed(embed: discord.Embed,message):
-    embed.add_field(name=message[1][0], value=message[1][1])
-    embed.add_field(name=message[2][0], value=message[2][1])
-    embed.add_field(name=message[3][0], value=message[3][1])
-    embed.add_field(name=message[4][0], value=message[4][1])
-    embed.add_field(name=message[5][0], value=message[5][1])
-    embed.add_field(name=message[6][0], value=message[6][1])
-    embed.add_field(name=message[7][0], value=message[7][1])
-    embed.add_field(name=message[8][0], value=message[8][1])
-    embed.add_field(name=message[9][0], value=message[9][1])
+    embed.add_field(name=message[1][0], value=message[1][1],inline=False)
+    embed.add_field(name=message[2][0], value=message[2][1],inline=False)
+    embed.add_field(name=message[3][0], value=message[3][1],inline=False)
+    embed.add_field(name=message[4][0], value=message[4][1],inline=False)
+    embed.add_field(name=message[5][0], value=message[5][1],inline=False)
+    embed.add_field(name=message[6][0], value=message[6][1],inline=False)
+    embed.add_field(name=message[7][0], value=message[7][1],inline=False)
+    embed.add_field(name=message[8][0], value=message[8][1],inline=False)
+    embed.add_field(name=message[9][0], value=message[9][1],inline=False)
     return embed
 
 client.run(token)

@@ -164,8 +164,8 @@ async def finishCall(channel,entry,idGuild,reaction):
         presentsMessage, absents, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
     
         
-        await channel.send(presentsMessage)
-        await channel.send(absents)
+        if presentsMessage!="": await channel.send(presentsMessage)
+        if absents!="": await channel.send(absents)
         await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,[presentsMessage,absents])
         
         if data["mp"]:

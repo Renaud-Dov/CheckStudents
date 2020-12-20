@@ -426,7 +426,7 @@ async def DeactivateMP(context):
 @client.command()
 async def settings(context):
     data= data=readGuild(context.guild.id)
-    embed = discord.Embed(color=discord.Colour.orange(), title="**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`\n**Sys Messages and Private Messages :** Activated")
+    embed = discord.Embed(color=discord.Colour.orange(), title="Current settings")
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     embed.add_field(name="System Messages",value=str(data["sysMessages"]),inline=False)

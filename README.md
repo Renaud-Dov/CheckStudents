@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-1.5-green)
+![Version](https://img.shields.io/badge/version-1.6-green)
 ![Github](https://img.shields.io/badge/license-GNU3-orange)
 ![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 
@@ -32,14 +32,14 @@ Once the call is finished, the bot will return the list of present and missing s
 
 ![finishcall](img/endcall.png)
 
-Call summary :
+The teacher who started the call will get a copy of the call in private message:
 
 ![CallSumarry](img/summary.png)
 
-Every absent student will get an absence notification, like this one :
+Every absent student will get an absence notification in private message, like this:
 
 ![absence](img/absence.png)
-## Add/Remove privileges from a role
+## Add/Remove Admin privileges to a role
 
 >Only a user with privileges can add/remove roles.
 * Add : `.Check add @role1 @role2,...` 
@@ -52,6 +52,7 @@ Note that the admin rights will not be checked if no admin has been registered b
 
 ## Change bot prefix
 If you want to change bot prefix, use command `prefix` followed by the new prefix. Default prefix is "`.Check `"
+>You must be an admin in order to execute this command
 ## Translation
 
 You can also use the bot in different languages (French,English,German only for the moment)
@@ -61,7 +62,14 @@ If you want to add another language, please check english json prototype (`langu
 ## Reset the bot
 
 To reset the bot, use command `reset`. Reset command will reset admin list, put default prefix, and set language to english.
->You must be an admin
+>You must be an admin in order to execute this command
+
+## Activate/Desactivate bot system messages
+
+If you have a system messages on your server and want the bot to send a message when someone has changed bot settings, you can activate this functionality. This functionality is activated by default.
+
+> Command : `sys or sysMessages`
+
 ## Data pravicy
 
 The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and theirs users IDs.

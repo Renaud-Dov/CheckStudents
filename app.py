@@ -342,6 +342,7 @@ async def reset(context):
         data["admin"]=[]
         data["language"]="en"
         data["prefix"]=".Check "
+        data["sysMessages"]=True
         editGuild(context.guild.id,data)
 
         embed = discord.Embed(color=discord.Colour.orange(), title="**__Factory reset:__**\nLanguage set to English\nAdmins list reseted\n**Prefix :** `.Check`")
@@ -361,15 +362,41 @@ async def embedError(channel,message):
     embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
     await channel.send(embed=embed)
 
+@client.command(aliases=["sys"])
+async def sysMessages(context):
+    """
+    Activate/Desactivate system message
+    
+    """
+    data = readGuild(context.guild.id)
+    if got_the_role(data["admin"], context.author.roles):
+        if data["sysMessages"]:
+            data["sysMessages"] = False
+            embed = discord.Embed(color=discord.Color.red(), title="System Messages are now disabled")
+        else:
+            data["sysMessages"] = True
+            embed = discord.Embed(color=discord.Color.red(), title="System Messages are now activated")
+
+    
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                        icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        editGuild(context.guild.id, data)
+        await AdminCommand(context,embed)
+    else:
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
+
 async def AdminCommand(context,embed: discord.Embed):
     
     await context.channel.send(embed=embed)
-
-    if context.guild.system_channel is not None and context.guild.system_channel != context.channel:
+    #  
+    
+    if readGuild(context.guild.id)["sysMessages"] and context.guild.system_channel is not None and context.guild.system_channel != context.channel:
         embed.add_field(name="Link to the action",value="[Link]({})".format(context.message.jump_url))
         embed.add_field(name="Used by",value=context.message.author.mention)
         await context.guild.system_channel.send(embed=embed)
     # jump_url
+
+    
 def CompleteHelpEmbed(embed: discord.Embed,message):
     embed.add_field(name=message[1][0], value=message[1][1])
     embed.add_field(name=message[2][0], value=message[2][1])
@@ -379,7 +406,9 @@ def CompleteHelpEmbed(embed: discord.Embed,message):
     embed.add_field(name=message[6][0], value=message[6][1])
     embed.add_field(name=message[7][0], value=message[7][1])
     embed.add_field(name=message[8][0], value=message[8][1])
+    embed.add_field(name=message[9][0], value=message[9][1])
     return embed
+
 client.run(token)
 client.add_command(appel)
 client.add_command(help)
@@ -389,3 +418,4 @@ client.add_command(ListRoles)
 client.add_command(language)
 client.add_command(prefix)
 client.add_command(reset)
+client.add_command(sysMessages)

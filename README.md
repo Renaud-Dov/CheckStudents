@@ -64,16 +64,16 @@ If you want to add another language, please check english json prototype (`langu
 To reset the bot, use command `reset`. Reset command will reset admin list, put default prefix, and set language to english.
 >You must be an admin in order to execute this command
 
-## Activate/Desactivate bot system messages
+## Activate/Deactivate bot system messages
 
-If you have a system messages on your server and want the bot to send a message when someone has changed bot settings, you can activate this functionality. This functionality is activated by default.
+If you have a system messages on your server and wants the bot to send a message when someone has changed bot settings, you can activate this functionality. This functionality is activated by default.
 
 > Command : `sys or sysMessages`
 
-## Data pravicy
+## Data privacy
 
-The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and theirs users IDs.
+The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and their users IDs.
 
-We also analyse every discord reaction on every servers to see if it correspond to a call message.
+We also analyse every discord reaction on every servers to see if it corresponds to a call message.
 ##### This repository use [Discord.py](https://github.com/Rapptz/discord.py) library from [Rapptz](https://github.com/Rapptz)
 ###### Icons made by [Freepik](http://www.freepik.com/) from [Flaticon](https://www.flaticon.com/)

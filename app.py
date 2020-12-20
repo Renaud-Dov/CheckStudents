@@ -245,7 +245,7 @@ async def addRole(context, *args):
             if a != "" : embed.add_field(name="Added roles",value=a)
             if b != "" : embed.add_field(name="Already added",value=b)
             editGuild(guild, data)
-            await AdminCommand(context,embed)
+            await AdminCommand(context,embed,"Add Command")
 
 @client.command(aliases=['rm', 'del', 'remove'])
 async def rmRole(context, *args):
@@ -274,7 +274,7 @@ async def rmRole(context, *args):
                 if a != "" : embed.add_field(name="Removed roles",value=a)
                 if b != "" : embed.add_field(name="Was not an admin",value=b)
                 editGuild(guild, data)
-                await AdminCommand(context,embed)
+                await AdminCommand(context,embed,"Remove Command")
         else:
             await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
     else:
@@ -388,7 +388,7 @@ async def sysMessages(context):
     else:
         await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
 
-async def AdminCommand(context,embed: discord.Embed):
+async def AdminCommand(context,embed: discord.Embed, title =None):
     
     await context.channel.send(embed=embed)
     #  
@@ -396,6 +396,8 @@ async def AdminCommand(context,embed: discord.Embed):
     if readGuild(context.guild.id)["sysMessages"] and context.guild.system_channel is not None and context.guild.system_channel != context.channel:
         embed.add_field(name="Link to the action",value="[Link]({})".format(context.message.jump_url))
         embed.add_field(name="Used by",value=context.message.author.mention)
+        if title is not None:
+            embed.title = title
         await context.guild.system_channel.send(embed=embed)
     # jump_url
 

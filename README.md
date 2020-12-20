@@ -14,24 +14,30 @@ To add this bot to your Discord Server :
 
 
 For make a call, a teacher (or any other user with an authorized role): `.Check call @class`
+
 ![startcall](img/startcall.png)
 
 Emojis will appear below your message, the students belonging to the `@class` role would be able to click on the ✅ to notify their presence.
 The teacher, or anyone with privileges, can end the call by clicking 🆗 or cancel with 🛑.
+
 ![cantnotify](img/cantnotify.png)
 
 Note : Users can only notify their presence if they are part of the group (External students will not be counted)
 Also, someone who does not have privileges cannot close the call.
+
 ![noright](img/noright.png)
 
 
 Once the call is finished, the bot will return the list of present and missing students and send the list to the teacher in private message.
+
 ![finishcall](img/endcall.png)
 
 Call summary :
+
 ![CallSumarry](img/summary.png)
 
 Every absent student will get an absence notification, like this one :
+
 ![absence](img/absence.png)
 ## Add/Remove privileges from a role
 
@@ -43,7 +49,6 @@ Every absent student will get an absence notification, like this one :
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
 **To see the list of admins,** use command `.Check list` or `.Check roles` (same command)
-> Mode quiet : -q
 
 ## Change bot prefix
 If you want to change bot prefix, use command `prefix` followed by the new prefix. Default prefix is "`.Check `"

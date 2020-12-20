@@ -12,7 +12,7 @@
         ["list (or roles)","Return roles with privileges"],
         ["reset","Reset the bot"],
         ["prefix","Change bot prefix"],
-        ["sysMessages","Activte or desactivate bot's system messages"],
+        ["sysMessages (or sys)","Activte or desactivate bot's system messages"],
         ["For more information","[Click here](https://github.com/Renaud-Dov/CheckStudents)"]
     ],
     "NoStudents": "⚠ **No student present** ⚠",

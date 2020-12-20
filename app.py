@@ -41,20 +41,21 @@ def returnPresent(idmessage: str, guildID: int, rolelist: list):
     if liste == []:
         return (returnLanguage(readGuild(guildID)["language"], "NoStudents"),[])
     else:
-        message = messages[0]
+        messageA = messages[0]
+        messageB = ""
         eleve = []
         for member in liste:
             if not member.id in eleve:
-                message += "• *{}* <@{}>\n".format(name(member), member.id)  # [user.display_name,user.id]
+                messageA += "• *{}* <@{}>\n".format(name(member), member.id)  # [user.display_name,user.id]
                 eleve.append(member.id)
                 if rolelist is not None: rolelist.remove(member)
         if rolelist != []:
-            message += "\n" + messages[1]
+            messageB = "\n" + messages[1]
             for member in rolelist:
-                message += "• *{}* <@{}>\n".format(name(member), member.id)
+                messageB += "• *{}* <@{}>\n".format(name(member), member.id)
         else:
-            message += messages[2]
-        return (message,rolelist)
+            messageA += messages[2]
+        return (messageA,messageB,rolelist)
 
 async def sendabsents(absents: list,guild,url : str, author,channel):
     langmsg=returnLanguage(readGuild(guild.id)["language"], "sendabsents")
@@ -81,7 +82,8 @@ async def sendlist(member,classe,guildID,students):
 
 
     await member.send(embed=embed)
-    await member.send(students)
+    await member.send(students[0])
+    await member.send(students[1])
 
 def convert(role: str):
     try:
@@ -150,6 +152,7 @@ async def on_reaction_add(reaction, user):
             await reaction.message.channel.sendsend("<@{}> : {}".format(user.id, returnLanguage(readGuild(idGuild)["language"], "unknowEmoji")))
 
 async def finishCall(channel,entry,idGuild,reaction):
+    data  = readGuild(idGuild)
     if appelList[entry]['listStudents']==[]:
         embed = discord.Embed(color=discord.Colour.red(),title = "No students presents, please use 🛑 to cancel the call")
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
@@ -158,13 +161,15 @@ async def finishCall(channel,entry,idGuild,reaction):
 
         await channel.send(embed=embed)
     else:
-        presentsMessage, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
+        presentsMessage, absents, listAbsents =returnPresent(entry, idGuild,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members)
     
         
         await channel.send(presentsMessage)
-        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,presentsMessage)
-
-        await sendabsents(listAbsents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,reaction.message.id),reaction.message.author,reaction.message.channel)
+        await channel.send(absents)
+        await sendlist(reaction.message.author,reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']),idGuild,[presentsMessage,absents])
+        
+        if data["mp"]:
+            await sendabsents(listAbsents,reaction.message.guild,"https://discord.com/channels/{}/{}/{}".format(idGuild,reaction.message.channel.id,reaction.message.id),reaction.message.author,reaction.message.channel)
 
 @client.command(aliases=['call'])
 async def appel(context, *args):
@@ -396,7 +401,25 @@ async def AdminCommand(context,embed: discord.Embed, title =None):
         await context.guild.system_channel.send(embed=embed)
     # jump_url
 
-    
+@client.command(aliases=["MP,mp"])
+async def DeactivateMP(context):
+    data = readGuild(context.guild.id)
+    if got_the_role(data["admin"], context.author.roles):
+        if data["mp"]:
+            data["mp"] = False
+            embed = discord.Embed(color=discord.Color.red(), title="Private messages are now disabled")
+        else:
+            data["mp"] = True
+            embed = discord.Embed(color=discord.Color.red(), title="Private messages are now activated")
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                        icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        editGuild(context.guild.id, data)
+        await AdminCommand(context,embed)
+    else:
+        await embedError(context.channel,returnLanguage(data["language"], "NoPrivileges"))
+
+
+
 def CompleteHelpEmbed(embed: discord.Embed,message):
     embed.add_field(name=message[1][0], value=message[1][1],inline=False)
     embed.add_field(name=message[2][0], value=message[2][1],inline=False)
@@ -407,6 +430,7 @@ def CompleteHelpEmbed(embed: discord.Embed,message):
     embed.add_field(name=message[7][0], value=message[7][1],inline=False)
     embed.add_field(name=message[8][0], value=message[8][1],inline=False)
     embed.add_field(name=message[9][0], value=message[9][1],inline=False)
+    embed.add_field(name=message[10][0], value=message[10][1],inline=False)
     return embed
 
 client.run(token)
@@ -419,3 +443,4 @@ client.add_command(language)
 client.add_command(prefix)
 client.add_command(reset)
 client.add_command(sysMessages)
+client.add_command(DeactivateMP)

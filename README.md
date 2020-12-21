@@ -1,19 +1,29 @@
-![Version](https://img.shields.io/badge/version-1.6-green)
-![Github](https://img.shields.io/badge/license-GNU3-orange)
-![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
+![Version]
+(https://img.shields.io/badge/version-0.6.1-green)
+![Github]
+(https://img.shields.io/badge/license-GNU3-orange)
+![Last commit]
+(https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 
 # CheckStudents
-To add this bot to your Discord Server :
-[![Click here](https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot)
 
+## Installation
+To add this bot to your Discord Server :
+[![Click here]
+(https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot)
+
+**Please accept all permissions, or the bot will not respond on your server. Please refer to [this issue](#the-bot-doesnt-respond-to-any-command).**
 >**Note : You need the corresponding privileges to add the bot on a server.**
+
 
 ### Read [CHANGELOG](CHANGELOG.md) here.
 ## How it works ?
 
 
 
-For make a call, a teacher (or any other user with an authorized role): `.Check call @class`
+For make a call, a teacher (or any other user with an authorized role): `call @class`.
+> By default, if you did not change bot prefix, the command will be `.Check call @class`.
+> Please refer to [prefix page](#change-bot-prefix) for more information.
 
 ![startcall](img/startcall.png)
 
@@ -42,34 +52,56 @@ Every absent student will get an absence notification in private message, like t
 ## Add/Remove Admin privileges to a role
 
 >Only a user with privileges can add/remove roles.
-* Add : `.Check add @role1 @role2,...` 
-* Remove : `.Check remove @role1 @role2,...`
+* Add : `add @role1 @role2,...` 
+* Remove : `remove @role1 @role2,...`
 >Note: You can add / remove as many roles as you want at the same time.
 
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
-**To see the list of admins,** use command `.Check list` or `.Check roles` (same command)
+**To see the list of admins, use command `list` or `roles` (same command)**
 
-## Change bot prefix
+
+## Other commands
+### Change bot prefix
 If you want to change bot prefix, use command `prefix` followed by the new prefix. Default prefix is "`.Check `"
 >You must be an admin in order to execute this command
-## Translation
+### Translation
 
-You can also use the bot in different languages (French,English,German only for the moment)
-Use `.Check language fr|en|de`. The language is applied to all the server.
-If you want to add another language, please check english json prototype (`language/en.json`) and pull-request your translation!
-
-## Reset the bot
-
-To reset the bot, use command `reset`. Reset command will reset admin list, put default prefix, and set language to english.
->You must be an admin or the server owner in order to execute this command
-
-## Activate/Deactivate bot system messages
-
+You can also use the bot in different languages (French, English and German only for the moment)
+The language is applied to the whole server.
+If you want to add another language, please check the [json prototype](language/en.json)  and pull-request your translation!
+>You must be an admin in order to execute this command
+> 
+> Command : `language fr|en|de`
+### Activate/Deactivate bot system messages
 If you have a system messages on your server and wants the bot to send a message when someone has changed bot settings, you can activate this functionality. This functionality is activated by default.
-
+>You must be an admin in order to execute this command
+> 
 > Command : `sys or sysMessages`
 
+### Activate/Deactivate bot private messages
+When a student is marked absent, he will receive 
+This functionality is activated by default.
+>You must be an admin in order to execute this command
+> 
+> Command : `DeactivateMP`
+
+### Reset the bot
+Reset command will reset admin list, put default prefix (`.Check`), activate bot private and system messages,  and set language to english.
+>You must be an admin, **or the server owner** in order to execute this command
+> 
+> Command : `reset`
+
+### Get current settings
+Return language, and private and system messages status values.
+> Command : `settings`
+
+## Common Errors
+### The bot doesn't respond to any command
+>If the bot doesn't respond to any command, it might be because you did not accept all permissions. In that case, remove the bot from the server, and invite him again.
+
+### Any other issue
+> Please read [CHANGELOG](CHANGELOG.md) or create an issue.
 ## Data privacy
 
 The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and their users IDs.

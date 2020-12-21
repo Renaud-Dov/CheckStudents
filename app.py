@@ -113,27 +113,28 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     """
     try:
         bot_id = discord.utils.get(guild.roles, name="CheckStudents").id
+        createGuild(guild.id, bot_id)
+        if guild.system_channel is not None:
+            message = returnLanguage("en", "commands")
+            embed = discord.Embed(color=discord.Colour.blue(), title="I joined the Server",
+                                  description="Here the list of commands you can use:")
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            # embed.add_field(name="call", value=classe)
+            embed = CompleteHelpEmbed(embed, message)
+
+            await guild.system_channel.send(embed=embed)
+
     except AttributeError:
         await guild.owner.send("You're trying to add the bot on {} but you denied some permissions."
                                "In that case, the bot cannot work on your server."
                                "Please, remove the bot, and add it again, allowing permissions."
                                "Link : {}".format(guild.name,
                                                   "https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot"))
-        return
+    except commands.CommandInvokeError:
+        print("CommandInvokeError", guild.id, guild)
 
-    createGuild(guild.id, bot_id)
-    if guild.system_channel is not None:
-        message = returnLanguage("en", "commands")
-        embed = discord.Embed(color=discord.Colour.blue(), title="I joined the Server",
-                              description="Here the list of commands you can use:")
-        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-        # embed.add_field(name="call", value=classe)
-        embed = CompleteHelpEmbed(embed, message)
-        try:
-            await guild.system_channel.send(embed=embed)
-        except commands.CommandInvokeError:
-            print("CommandInvokeError", guild.id, guild)
+
 
 
 @client.event

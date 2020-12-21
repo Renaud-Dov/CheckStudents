@@ -1,6 +1,6 @@
 {
     "changeLanguage": "Ie Sprache des Bots ist jetzt in **deutsch**",
-    "unknowCommand": "Unbekannte Bestellung",
+    "unknownCommand": "Unbekannte Bestellung",
     "class":["**Klasse :**","**__Attendence summary__**"],
     "sendabsents":["**By :**","**Server :**","**Channel :**",["Show message","Link"]],
     "commands": [

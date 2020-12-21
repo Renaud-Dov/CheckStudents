@@ -1,6 +1,6 @@
 {
     "changeLanguage": "The language is now set to **english**",
-    "unknowCommand": "Unknown command: I sent you commands list in private message",
+    "unknownCommand": "Unknown command: I sent you commands list in private message",
     "class":["**Class:**","**__Attendence summary__**"],
     "sendabsents":["**By :**","**Server :**","**Channel :**",["Show message","Link"]],
     "commands": [

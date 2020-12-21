@@ -1,6 +1,6 @@
 {
     "changeLanguage": "La langue du bot est maintenant en **français**",
-    "unknowCommand": "Commande inconnue : Commandes envoyées en message privé",
+    "unknownCommand": "Commande inconnue : Commandes envoyées en message privé",
     "class":["**Classe :**","**__Résumé appel__**"],
     "sendabsents":["**Par :**","**Serveur :**","**Channel :**",["Voir message","Lien"]],
     "commands": [

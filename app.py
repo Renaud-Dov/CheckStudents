@@ -126,9 +126,9 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
             await guild.system_channel.send(embed=embed)
 
     except AttributeError:
-        await guild.owner.send("You're trying to add the bot on {} but you denied some permissions."
-                               "In that case, the bot cannot work on your server."
-                               "Please, remove the bot, and add it again, allowing permissions."
+        await guild.owner.send("You're trying to add the bot on **{}** but you denied some permissions. "
+                               "In that case, the bot cannot work on your server. "
+                               "Please, remove the bot, and add it again, allowing permissions. "
                                "Link : {}".format(guild.name,
                                                   "https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot"))
     except commands.CommandInvokeError:

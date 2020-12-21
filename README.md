@@ -1,16 +1,12 @@
-![Version]
-(https://img.shields.io/badge/version-0.6.1-green)
-![Github]
-(https://img.shields.io/badge/license-GNU3-orange)
-![Last commit]
-(https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
+![Version](https://img.shields.io/badge/version-0.6.1-green)
+![Github](https://img.shields.io/badge/license-GNU3-orange)
+![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 
 # CheckStudents
 
 ## Installation
 To add this bot to your Discord Server :
-[![Click here]
-(https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot)
+[![Click here](https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot)
 
 **Please accept all permissions, or the bot will not respond on your server. Please refer to [this issue](#the-bot-doesnt-respond-to-any-command).**
 >**Note : You need the corresponding privileges to add the bot on a server.**

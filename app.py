@@ -114,10 +114,11 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     try:
         bot_id = discord.utils.get(guild.roles, name="CheckStudents").id
     except AttributeError:
-        guild.owner.send("You're trying to add the bot on {} but you denied some permissions."
-                         "In that case, the bot cannot work on your server."
-                         "Please, remove the bot, and add it again, allowing permissions."
-                         "Link : {}".format(guild.name,"https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot"))
+        await guild.owner.send("You're trying to add the bot on {} but you denied some permissions."
+                               "In that case, the bot cannot work on your server."
+                               "Please, remove the bot, and add it again, allowing permissions."
+                               "Link : {}".format(guild.name,
+                                                  "https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot"))
         return
 
     createGuild(guild.id, bot_id)
@@ -137,7 +138,10 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
 
 @client.event
 async def on_guild_remove(guild):
-    removeGuild(guild.id)
+    try:
+        removeGuild(guild.id)
+    except FileNotFoundError:
+        print("FileNotFoundError", guild, guild.id)
 
 
 async def CheckReaction(reaction: discord.reaction, user, entry: str):
@@ -447,7 +451,7 @@ async def sysMessages(context):
 async def AdminCommand(context, embed: discord.Embed, title=None):
     await context.channel.send(embed=embed)
 
-    if readGuild(context.guild.id)["sysMessages"] and context.guild.system_channel is not None\
+    if readGuild(context.guild.id)["sysMessages"] and context.guild.system_channel is not None \
             and context.guild.system_channel != context.channel:
         embed.add_field(name="Link to the action", value="[Link]({})".format(context.message.jump_url))
         embed.add_field(name="Used by", value=context.message.author.mention)

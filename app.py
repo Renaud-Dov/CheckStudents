@@ -135,8 +135,6 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
         print("CommandInvokeError", guild.id, guild)
 
 
-
-
 @client.event
 async def on_guild_remove(guild):
     try:
@@ -145,41 +143,41 @@ async def on_guild_remove(guild):
         print("FileNotFoundError", guild, guild.id)
 
 
-async def CheckReaction(reaction: discord.reaction, user, entry: str):
+async def CheckReaction(reaction: discord.Reaction, user, entry: str):
     reactionContent = str(reaction).strip(" ")
 
     if reactionContent == "✅":  # si l'utilisateur a coché présent
         if got_the_role(appelList[entry]['ClasseRoleID'],
                         user.roles):  # si user a le role de la classe correspondante
             appelList[entry]['listStudents'].append(user)  # on le rajoute à la liste d'appel
-        elif not got_the_role(readGuild(reaction.guild.id)['botID'], user.roles):
+        elif not got_the_role(readGuild(reaction.message.guild.id)['botID'], user.roles):
             await reaction.message.remove_reaction("✅", user)
             await reaction.message.channel.send(
-                "<@{}> : {}".format(user.id, returnLanguage(readGuild(reaction.guild.id)["language"], "cantNotify")))
+                "<@{}> : {}".format(user.id, returnLanguage(readGuild(reaction.message.guild.id)["language"], "cantNotify")))
 
     elif reactionContent in ("🆗", "🛑"):
-        if got_the_role(readGuild(reaction.guild.id)["admin"], user.roles):  # est prof
+        if got_the_role(readGuild(reaction.message.guild.id)["admin"], user.roles):  # est prof
 
             if reactionContent == "🆗":
                 await reaction.message.channel.send(
                     "<@{}> :{} <@&{}>".format(user.id,
-                                              returnLanguage(readGuild(reaction.guild.id)["language"], "FinishCall"),
+                                              returnLanguage(readGuild(reaction.message.guild.id)["language"], "FinishCall"),
                                               appelList[entry]['ClasseRoleID']))
-                await finishCall(reaction.message.channel, entry, reaction.guild.id, reaction)
+                await finishCall(reaction.message.channel, entry, reaction.message.guild.id, reaction)
             else:
                 await reaction.message.channel.send(
-                    returnLanguage(readGuild(reaction.guild.id)["language"], "cancelCall"))
+                    returnLanguage(readGuild(reaction.message.guild.id)["language"], "cancelCall"))
             await reaction.message.clear_reactions()
             del appelList[entry]
 
-        elif not got_the_role(readGuild(reaction.guild.id)['botID'], user.roles):  # pas le bot
+        elif not got_the_role(readGuild(reaction.message.guild.id)['botID'], user.roles):  # pas le bot
             await reaction.message.remove_reaction(reactionContent, user)
             await reaction.message.channel.send(
-                "<@{}> : {}".format(user.id, returnLanguage(readGuild(reaction.guild.id)["language"], "NoRightEnd")))
+                "<@{}> : {}".format(user.id, returnLanguage(readGuild(reaction.message.guild.id)["language"], "NoRightEnd")))
     else:  # autre emoji
         await reaction.message.remove_reaction(reactionContent, user)
         await reaction.message.channel.sendsend(
-            "<@{}> : {}".format(user.id, returnLanguage(readGuild(reaction.guild.id)["language"], "unknowEmoji")))
+            "<@{}> : {}".format(user.id, returnLanguage(readGuild(reaction.message.guild.id)["language"], "unknowEmoji")))
 
 
 @client.event

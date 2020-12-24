@@ -41,14 +41,16 @@ def name(member):
 async def admin(context):
     if context.invoked_subcommand is None:
         embed = helpEmbed.AdminHelp()
-        embed.add_field(name="help", value="admin help")
+        embed.add_field(name="admin help", value="Show this message")
+        await context.channel.send(embed=embed)
 
 
 @client.group()
 async def teacher(context):
     if context.invoked_subcommand is None:
         embed = helpEmbed.TeacherHelp()
-        embed.add_field(name="help", value="teacher help")
+        embed.add_field(name="teacher help", value="Show this message")
+        await context.channel.send(embed=embed)
 
 
 def returnPresent(id_msg: str, guild_id: int, role_list: list):

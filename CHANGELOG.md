@@ -2,6 +2,30 @@
 All notable changes to this project will be documented in this file.
 
 <!-- ## Unreleased [0.7.0]-->
+## [0.7.0] - 2020-12-24
+### Added
+* Permissions are now split in two categories : Admins and Teachers.
+  >Only teachers can start a call.
+  > 
+  >Only admin can change settings and roles privileges.
+* Even if you changed bot prefix, you still can use the bot with default prefix.
+### Changed
+_Commands have changed, here the new commands list:_ 
+* **Teacher command**
+  * `teacher add @role`: Add a teacher permission to a role
+  * `teacher rm @role`: Remove a teacher permission to a role
+  * `teacher list`: List teacher list
+* **Admin Command**
+  * `admin add @role`: Add a admin permission to a role
+  * `admin rm @role`: Remove a admin permission to a role
+  * `admin list`: List admin list
+  * `admin sys`: Activate/Deactivate system messages
+  * `admin DeactivateMP`: Activate/Deactivate private messages
+  * `admin prefix`: Change bot prefix
+  * `admin language`: Set server language bot
+  * `admin reset`: Reset server settings
+  
+
 ## [0.6.1] - 2020-12-20
 ### Added
 * `settings` command to get language, and private and system messages status values.

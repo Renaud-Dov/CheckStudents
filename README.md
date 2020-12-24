@@ -47,19 +47,24 @@ Every absent student will get an absence notification in private message, like t
 ![absence](img/absence.png)
 ## Add/Remove Admin privileges to a role
 
->Only a user with privileges can add/remove roles.
-* Add : `add @role1 @role2,...` 
-* Remove : `remove @role1 @role2,...`
+>Only a user with admin privileges can add/remove roles.
+
+* Teacher:
+    * Add: `teacher add @role1 @role2,...` 
+    * Remove: `teacher remove @role1 @role2,...`
+* Admin:
+    * Add: `admin add @role1 @role2,...` 
+    * Remove: `admin remove @role1 @role2,...`
 >Note: You can add / remove as many roles as you want at the same time.
 
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
-**To see the list of admins, use command `list` or `roles` (same command)**
+**To see the list of admins or teachers, use command `admin list` or `teacher list`**
 
 
 ## Other commands
 ### Change bot prefix
-If you want to change bot prefix, use command `prefix` followed by the new prefix. Default prefix is "`.Check `"
+If you want to change bot prefix, use command `admin prefix` followed by the new prefix. Default prefix is "`.Check `"
 >You must be an admin in order to execute this command
 ### Translation
 
@@ -68,29 +73,29 @@ The language is applied to the whole server.
 If you want to add another language, please check the [json prototype](language/en.json)  and pull-request your translation!
 >You must be an admin in order to execute this command
 > 
-> Command : `language fr|en|de`
+> Command : `admin language fr|en|de`
 ### Activate/Deactivate bot system messages
 If you have a system messages on your server and wants the bot to send a message when someone has changed bot settings, you can activate this functionality. This functionality is activated by default.
 >You must be an admin in order to execute this command
 > 
-> Command : `sys or sysMessages`
+> Command : `admin sys`
 
 ### Activate/Deactivate bot private messages
 When a student is marked absent, he will receive 
 This functionality is activated by default.
 >You must be an admin in order to execute this command
 > 
-> Command : `DeactivateMP`
+> Command : `admin DeactivateMP`
 
 ### Reset the bot
 Reset command will reset admin list, put default prefix (`.Check`), activate bot private and system messages,  and set language to english.
 >You must be an admin, **or the server owner** in order to execute this command
 > 
-> Command : `reset`
+> Command : `admin reset`
 
 ### Get current settings
 Return language, and private and system messages status values.
-> Command : `settings`
+> Command : `admin settings`
 
 ## Common Errors
 ### The bot doesn't respond to any command
@@ -98,6 +103,7 @@ Return language, and private and system messages status values.
 
 ### Any other issue
 > Please read [CHANGELOG](CHANGELOG.md) or create an issue.
+
 ## Data privacy
 
 The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and their users IDs.

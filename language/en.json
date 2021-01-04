@@ -14,8 +14,8 @@
         ["admin prefix","Change bot prefix"],
         ["admin sys","Activate or deactivate bot system messages"],
         ["admin DeactivateMP","Activate or deactivate private messages"],
-        ["settings","Return settings values"],
-        ["For more information","[Click here](https://github.com/Renaud-Dov/CheckStudents)"]
+        ["For more information","[Click here](https://github.com/Renaud-Dov/CheckStudents)"],
+        ["settings","Return settings values"]
     ],
     "NoStudents": "⚠ **No student present** ⚠",
     "endcall": [

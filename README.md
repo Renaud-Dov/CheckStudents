@@ -45,7 +45,7 @@ The teacher who started the call will get a copy of the call in private message:
 Every absent student will get an absence notification in private message, like this:
 
 ![absence](img/absence.png)
-## Add/Remove Admin privileges to a role
+## Add/Remove privileges to a role
 
 >Only a user with admin privileges can add/remove roles.
 
@@ -65,7 +65,9 @@ Note that the admin rights will not be checked if no admin has been registered b
 ## Other commands
 ### Change bot prefix
 If you want to change bot prefix, use command `admin prefix` followed by the new prefix. Default prefix is "`.Check `"
->You must be an admin in order to execute this command
+>You still can use `.Check ` even if you changed the prefix.
+> 
+>You must be an admin in order to execute this command.
 ### Translation
 
 You can also use the bot in different languages (French, English and German only for the moment)

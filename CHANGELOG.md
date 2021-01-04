@@ -1,7 +1,13 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
 
-<!-- ## Unreleased [0.7.0]-->
+<!-- ## Unreleased [0.7.1]
+## [0.7.1] - 2021-01-04
+### Added
+* Bot remind default prefix in Discord Activity
+* Bot will receive both of `.Check ` default prefix (with and without a space)
+  > Example : `.Check help` or `.Checkhelp`
+-->
 ## [0.7.0] - 2020-12-24
 ### Added
 * Permissions are now split in two categories : Admins and Teachers.

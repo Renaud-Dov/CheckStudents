@@ -32,7 +32,7 @@ def readGuild(guild_id):
 def get_prefix(client, message):
     with open("database/{}.json".format(message.guild.id), "r") as outfile:
         var = json.load(outfile)
-    return ['.Check ', var["prefix"]]
+    return ['.Check ','.Check', var["prefix"]]
 
 
 def set_prefix(guild_id, prefix):

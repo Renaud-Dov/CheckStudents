@@ -15,6 +15,14 @@ client = commands.Bot(command_prefix=get_prefix, intents=intents)
 appelList = {}
 
 
+@client.event
+async def on_ready():
+    await client.change_presence(activity=discord.Game(name=".Check help"))
+    # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=".Check help"))
+    # await client.change_presence(activity=discord.Game(name=".Check help"))
+    print("Bot is ready!")
+
+
 def got_the_role(role, author: list):
     """
     Check if a user got at least one role in author list
@@ -382,7 +390,8 @@ async def prefix(context, arg):
             set_prefix(context.guild.id, arg)
             embed = discord.Embed(color=discord.Colour.orange(),
                                   title=returnLanguage(readGuild(context.guild.id)["language"],
-                                                       "newPrefix") + f"**{arg}**",description="You still can use \"`.Check `\"")
+                                                       "newPrefix") + f"**{arg}**",
+                                  description="You still can use \"`.Check `\"")
             embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                              icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
             await AdminCommand(context, embed)
@@ -524,12 +533,14 @@ async def settings(context):
 
 @teacher.command(aliases=["commands,command"])
 async def help(context):
-    await context.message.author.send("Here the list of subcommand you can use with *teacher*", embed=helpEmbed.TeacherHelp())
+    await context.message.author.send("Here the list of subcommand you can use with *teacher*",
+                                      embed=helpEmbed.TeacherHelp())
 
 
 @admin.command(aliases=["commands,command"])
 async def help(context):
-    await context.message.author.send("Here the list of subcommand you can use with *admin*", embed=helpEmbed.AdminHelp())
+    await context.message.author.send("Here the list of subcommand you can use with *admin*",
+                                      embed=helpEmbed.AdminHelp())
 
 
 client.remove_command('help')

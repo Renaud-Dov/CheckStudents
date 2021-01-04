@@ -66,12 +66,15 @@ def returnPresent(id_msg: str, guild_id: int, role_list: list):
     Return presents and absents students who have reacted on a message
     """
     class_list = appelList[id_msg]['listStudents']
-    # messages = returnLanguage(readGuild(guildID)["language"], "endcall")
+    class_list.sort(key=lambda x: name(x))
+    role_list.sort(key=lambda x: name(x))
     messages = returnLanguage(readGuild(guild_id)["language"], "endcall")
 
     presents_msg = messages[0]
     absents_msg = ""
     students = []
+
+
     for member in class_list:
         if member.id not in students:
             presents_msg += f"• *{name(member)}* <@{member.id}>\n"  # [user.display_name,user.id]

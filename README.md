@@ -1,5 +1,5 @@
-![Version](https://img.shields.io/badge/version-0.7.1-green)
-![Github](https://img.shields.io/badge/license-GNU3-orange)
+![Version](https://img.shields.io/github/v/tag/Renaud-Dov/CheckStudents?label=latest%20version)
+![Github](https://img.shields.io/github/license/Renaud-Dov/CheckStudents)
 ![Last commit](https://img.shields.io/github/last-commit/Renaud-Dov/CheckStudents?color=yellow&logo=Python&logoColor=yellow)
 
 # CheckStudents

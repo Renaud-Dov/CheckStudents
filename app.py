@@ -10,7 +10,7 @@ import sys
 token = sys.argv[1]
 intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
                           guild_reactions=True)
-client = commands.Bot(command_prefix=get_prefix, intents=intents)
+client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
 
 appelList = {}
 
@@ -23,16 +23,16 @@ async def on_ready():
     print("Bot is ready!")
 
 
-def got_the_role(role, author: list):
+def got_the_role(role, user: discord.User):
     """
     Check if a user got at least one role in author list
     """
     if isinstance(role, list):
         for i in role:
-            if i in [y.id for y in author]:
+            if i in [y.id for y in user.roles]:
                 return True
     elif isinstance(role, int):
-        return role in [y.id for y in author]
+        return role in [y.id for y in user.roles]
 
 
 def name(member):
@@ -61,19 +61,17 @@ async def teacher(context):
         await context.channel.send(embed=embed)
 
 
-def returnPresent(id_msg: str, guild_id: int, role_list: list):
+def returnPresent(guild_id: int, role_list: list, class_list: list):
     """
     Return presents and absents students who have reacted on a message
     """
-    class_list = appelList[id_msg]['listStudents']
-    class_list.sort(key=lambda x: name(x))
-    role_list.sort(key=lambda x: name(x))
+    class_list.sort(key=lambda x: name(x).lower())
+    role_list.sort(key=lambda x: name(x).lower())
     messages = returnLanguage(readGuild(guild_id)["language"], "endcall")
 
     presents_msg = messages[0]
     absents_msg = ""
     students = []
-
 
     for member in class_list:
         if member.id not in students:
@@ -86,7 +84,7 @@ def returnPresent(id_msg: str, guild_id: int, role_list: list):
         for member in role_list:
             absents_msg += f"• *{name(member)}* <@{member.id}>\n"
     else:
-        presents_msg += messages[2]
+        absents_msg += messages[2]
     return presents_msg, absents_msg, role_list
 
 
@@ -119,8 +117,8 @@ async def SendList(message: discord.Message, entry, students: list):
     embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"), inline=False)
 
     await message.author.send(embed=embed)
-    if students[0]:
-        await message.author.send(students[0])
+
+    await message.author.send(students[0])
     if students[1]:
         await message.author.send(students[1])
 
@@ -168,16 +166,17 @@ async def CheckReaction(reaction: discord.Reaction, user, entry: str):
 
     if reactionContent == "✅":  # si l'utilisateur a coché présent
         if got_the_role(appelList[entry]['ClasseRoleID'],
-                        user.roles):  # si user a le role de la classe correspondante
+                        user):  # si user a le role de la classe correspondante
             appelList[entry]['listStudents'].append(user)  # on le rajoute à la liste d'appel
-        elif not got_the_role(readGuild(reaction.message.guild.id)['botID'], user.roles):
+        elif not got_the_role(readGuild(reaction.message.guild.id)['botID'], user):
             await reaction.message.remove_reaction("✅", user)
             await reaction.message.channel.send(
                 "<@{}> : {}".format(user.id,
                                     returnLanguage(readGuild(reaction.message.guild.id)["language"], "cantNotify")))
 
     elif reactionContent in ("🆗", "🛑"):
-        if got_the_role(readGuild(reaction.message.guild.id)["teacher"], user.roles):  # est prof
+        # Check if user got teacher privileges
+        if got_the_role(readGuild(reaction.message.guild.id)["teacher"], user):
 
             if reactionContent == "🆗":
                 await reaction.message.channel.send(
@@ -192,14 +191,14 @@ async def CheckReaction(reaction: discord.Reaction, user, entry: str):
             await reaction.message.clear_reactions()
             del appelList[entry]
 
-        elif not got_the_role(readGuild(reaction.message.guild.id)['botID'], user.roles):  # pas le bot
+        elif not got_the_role(readGuild(reaction.message.guild.id)['botID'], user):  # pas le bot
             await reaction.message.remove_reaction(reactionContent, user)
             await reaction.message.channel.send(
                 "<@{}> : {}".format(user.id,
                                     returnLanguage(readGuild(reaction.message.guild.id)["language"], "NoRightEnd")))
     else:  # autre emoji
         await reaction.message.remove_reaction(reactionContent, user)
-        await reaction.message.channel.sendsend(
+        await reaction.message.channel.send(
             "<@{}> : {}".format(user.id,
                                 returnLanguage(readGuild(reaction.message.guild.id)["language"], "unknowEmoji")))
 
@@ -226,14 +225,14 @@ async def finishCall(channel: discord.TextChannel, entry, guild_id, reaction: di
 
         await channel.send(embed=embed)
     else:
-        presentsMessage, absents, listAbsents = returnPresent(entry, guild_id, reaction.message.guild.get_role(
-            appelList[entry]['ClasseRoleID']).members)
+        role_list = reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members
+        nbStudents: int = len(role_list)
+        presentsMessage, absents, listAbsents = returnPresent(guild_id, role_list, appelList[entry]['listStudents'])
+        firstMsg = presentsMessage if data["showPresents"] and presentsMessage else f"{len(appelList[entry]['listStudents'])} students out of {nbStudents} are present"
+        await channel.send(firstMsg)
 
-        if presentsMessage:
-            await channel.send(presentsMessage)
-        if absents:
-            await channel.send(absents)
-        await SendList(reaction.message, entry, [presentsMessage, absents])
+        await channel.send(absents)
+        await SendList(reaction.message, entry, [firstMsg, absents])
 
         if data["mp"]:
             await Send_MP_absents(listAbsents, reaction.message)
@@ -245,10 +244,11 @@ async def Call(context, *args):
     class_role = convert(args[0])
     data = readGuild(context.guild.id)
     if class_role is None:
-        await context.channel.send(returnLanguage(data["language"], "rolenotValid"))
+        await embedError(context.channel, "This is not a role, but a specific user")
     else:
-        if got_the_role(data["teacher"], context.author.roles):
+        if got_the_role(data["teacher"], context.author):
             appelList[f"{context.guild.id}-{context.message.id}"] = {'ClasseRoleID': class_role,
+                                                                     "teacher": context.message.author,
                                                                      'listStudents': []}
             message = returnLanguage(data["language"], "startcall")
 
@@ -306,7 +306,7 @@ async def add(context, *args):
 async def addRole(context, value, args):
     guild = str(context.guild.id)
     data = readGuild(guild)
-    if data["admin"] != [] and not got_the_role(data["admin"], context.author.roles):
+    if data["admin"] != [] and not got_the_role(data["admin"], context.author):
         await embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
     else:
         # message = str()
@@ -354,41 +354,40 @@ async def rmRole(context, value, args):
     data = readGuild(guild)
     if not data["admin"]:
         await embedError(context.channel, returnLanguage(data["language"], "zeroPrivileges"))
-    else:
-        if got_the_role(data["admin"], context.author.roles):
-            embed = discord.Embed(color=discord.Colour.orange())
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    elif got_the_role(data["admin"], context.author):
+        embed = discord.Embed(color=discord.Colour.orange())
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
 
-            removed_roles = ""
-            not_removed_roles = ""
+        removed_roles = ""
+        not_removed_roles = ""
 
-            for i in args:
-                role = convert(i)
-                if role in data[value]:
-                    removed_roles += i + "\n"
-                    data[value].remove(role)
-                else:
-                    not_removed_roles += i + "\n"
-
-            if removed_roles == "" and not_removed_roles == "":
-                embed.add_field(name="You need to write role(s) to use the command", value=f"{value} rm @role")
-                await context.channel.send(embed=embed)
+        for i in args:
+            role = convert(i)
+            if role in data[value]:
+                removed_roles += i + "\n"
+                data[value].remove(role)
             else:
-                if removed_roles != "":
-                    embed.add_field(name="Removed roles", value=removed_roles)
-                if not_removed_roles != "":
-                    embed.add_field(name=f"Was not an {value}", value=not_removed_roles)
-                editGuild(guild, data)
-                await AdminCommand(context, embed, "Remove Command")
+                not_removed_roles += i + "\n"
+
+        if removed_roles == "" and not_removed_roles == "":
+            embed.add_field(name="You need to write role(s) to use the command", value=f"{value} rm @role")
+            await context.channel.send(embed=embed)
         else:
-            await embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+            if removed_roles != "":
+                embed.add_field(name="Removed roles", value=removed_roles)
+            if not_removed_roles != "":
+                embed.add_field(name=f"Was not an {value}", value=not_removed_roles)
+            editGuild(guild, data)
+            await AdminCommand(context, embed, "Remove Command")
+    else:
+        await embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
 
 
 @admin.command()
 async def prefix(context, arg):
     data = readGuild(context.guild.id)
-    if got_the_role(data["admin"], context.author.roles):
+    if got_the_role(data["admin"], context.author):
         try:
             set_prefix(context.guild.id, arg)
             embed = discord.Embed(color=discord.Colour.orange(),
@@ -408,7 +407,7 @@ async def prefix(context, arg):
 async def language(context, lang=None):
     if lang in ["fr", "en", "de"]:
         data = readGuild(context.guild.id)
-        if got_the_role(data["admin"], context.author.roles):
+        if got_the_role(data["admin"], context.author):
             data["language"] = lang
             embed = discord.Embed(color=discord.Colour.orange(), title=returnLanguage(lang, "changeLanguage"))
             embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
@@ -426,25 +425,48 @@ async def language(context, lang=None):
 @client.event
 async def on_command_error(context, error):
     if isinstance(error, commands.errors.CommandNotFound):
-        await context.channel.send(returnLanguage(readGuild(context.guild.id)["language"], "unknownCommand"))
-        await help(context)
-    raise error
+        await embedError(context.channel, "Unknown Command. Use help command")
+    # print(error, context.guild, context.guild.id, context.channel, context.message.jump_url)
+
+
+@admin.command()
+async def ShowPresents(context):
+    """
+        Activate/Deactivate Show presents students in call summary
+    """
+    data = readGuild(context.guild.id)
+    if got_the_role(data["admin"], context.author):
+        if data["showPresents"]:
+            data["showPresents"] = False
+            embed = discord.Embed(color=discord.Color.red(), title="Call summary will only show absents students")
+        else:
+            data["showPresents"] = True
+            embed = discord.Embed(color=discord.Color.red(),
+                                  title="Call summary will show absents and presents students")
+
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        editGuild(context.guild.id, data)
+        await AdminCommand(context, embed)
+    else:
+        await embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
 
 
 @admin.command()
 async def reset(context):
     data = readGuild(context.guild.id)
-    if got_the_role(data["admin"], context.author.roles) or context.message.author == context.guild.owner:
+    if got_the_role(data["admin"], context.author) or context.message.author == context.guild.owner:
         data["admin"] = []
         data["teacher"] = []
         data["language"] = "en"
         data["prefix"] = ".Check "
         data["sysMessages"] = True
         data["mp"] = True
+        data["ShowPresents"] = True
         editGuild(context.guild.id, data)
 
         embed = discord.Embed(color=discord.Colour.orange(),
-                              title="**__Factory reset:__**\nLanguage set to English\nAdmins and teachers list reseted\n**Prefix :** `.Check`\n**Sys Messages and Private Messages :** Activated")
+                              title="**__Factory reset:__**\nLanguage set to English\nAdmins and teachers list reseted\n**Prefix :** `.Check`\n**Show presents students, Sys Messages and Private Messages :** Activated")
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
 
@@ -469,7 +491,7 @@ async def sysMessages(context):
     Activate/Deactivate system message
     """
     data = readGuild(context.guild.id)
-    if got_the_role(data["admin"], context.author.roles):
+    if got_the_role(data["admin"], context.author):
         if data["sysMessages"]:
             data["sysMessages"] = False
             embed = discord.Embed(color=discord.Color.red(), title="System Messages are now disabled")
@@ -505,7 +527,7 @@ async def AdminCommand(context, embed: discord.Embed, title=None):
 @admin.command(aliases=["MP,mp"])
 async def DeactivateMP(context):
     data = readGuild(context.guild.id)
-    if got_the_role(data["admin"], context.author.roles):
+    if got_the_role(data["admin"], context.author):
         if data["mp"]:
             data["mp"] = False
             embed = discord.Embed(color=discord.Color.red(), title="Private messages are now disabled")
@@ -528,6 +550,7 @@ async def settings(context):
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     embed.add_field(name="• System Messages", value=str(data["sysMessages"]), inline=False)
     embed.add_field(name="• Private Messages", value=str(data["mp"]), inline=False)
+    embed.add_field(name="• Show present students after call", value=str(data["showPresents"]), inline=False)
     embed.add_field(name="• Language", value=str(data["language"]), inline=False)
     embed.add_field(name="• Prefix", value=str(data["prefix"]), inline=False)
 
@@ -544,9 +567,6 @@ async def help(context):
 async def help(context):
     await context.message.author.send("Here the list of subcommand you can use with *admin*",
                                       embed=helpEmbed.AdminHelp())
-
-
-client.remove_command('help')
 
 
 @client.command(aliases=["commands,command"])

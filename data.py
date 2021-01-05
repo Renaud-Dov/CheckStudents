@@ -11,7 +11,7 @@ def returnLanguage(lg, stat):
 def createGuild(guild_id, role_bot):
     with open("database/{}.json".format(guild_id), "x") as outfile:
         json.dump(
-            {"botID": role_bot, "prefix": ".Check ", "mp": True, "language": "en", "sysMessages": True, "admin": [],"teacher":[]},
+            {"botID": role_bot, "prefix": ".Check ", "language": "en", "mp": True, "sysMessages": True, "showPresents": True,  "admin": [],"teacher":[]},
             outfile)
 
 
@@ -30,9 +30,12 @@ def readGuild(guild_id):
 
 
 def get_prefix(client, message):
-    with open("database/{}.json".format(message.guild.id), "r") as outfile:
-        var = json.load(outfile)
-    return ['.Check ','.Check', var["prefix"]]
+    try:
+        with open("database/{}.json".format(message.guild.id), "r") as outfile:
+            var = json.load(outfile)
+        return [".Check ", ".Check", var["prefix"]]
+    except AttributeError as e:
+        print(message, e)
 
 
 def set_prefix(guild_id, prefix):

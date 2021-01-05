@@ -88,7 +88,10 @@ This functionality is activated by default.
 >You must be an admin in order to execute this command
 > 
 > Command : `admin DeactivateMP`
+### Activate/Deactivate the sending of the list of students present
+Use this command if you do not want the bot to send the list of students present.
 
+> Command : `admin showPresents`
 ### Reset the bot
 Reset command will reset admin list, put default prefix (`.Check`), activate bot private and system messages,  and set language to english.
 >You must be an admin, **or the server owner** in order to execute this command

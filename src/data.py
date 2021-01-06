@@ -1,4 +1,5 @@
 import json
+import discord
 import os
 
 
@@ -29,11 +30,18 @@ def readGuild(guild_id):
         return json.load(outfile)
 
 
-def get_prefix(client, message):
+async def get_prefix(client, message: discord.Message):
+
     try:
-        with open("database/{}.json".format(message.guild.id), "r") as outfile:
-            var = json.load(outfile)
-        return [".Check ", ".Check", var["prefix"]]
+        if isinstance(message.channel, discord.TextChannel):
+            with open("database/{}.json".format(message.guild.id), "r") as outfile:
+                var = json.load(outfile)
+            return [".Check ", ".Check", var["prefix"]]
+        else:
+            await message.author.send("DM actions don't work here, use me on your server")
+            return [".Check ", ".Check"]
+        # elif isinstance(message.channel, discord.DMChannel):
+        #     message
     except AttributeError as e:
         print(message, e)
 

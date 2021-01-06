@@ -1,8 +1,12 @@
 import logging
 
-logging.basicConfig(filename='../error.log', format='[%(levelname)s]-%(asctime)s : %(message)s',
+logging.basicConfig(filename='error.log', format='[%(levelname)s]-%(asctime)s : %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
-def Spam(user, nameCommand):
-    logging.warning(f"{user} is spamming {nameCommand}")
+class DiscordLog:
+
+    @staticmethod
+    def Spam(user, nameCommand):
+        print("spam")
+        logging.warning(f"{user} is spamming {nameCommand}")

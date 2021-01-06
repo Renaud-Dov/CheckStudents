@@ -1,6 +1,7 @@
 from datetime import date
 from src.data import *
 from src.tools import Tools
+from src.log import DiscordLog
 
 
 class Calling:
@@ -76,6 +77,7 @@ class Calling:
                 await reaction.message.remove_reaction("✅", user)
                 await Tools.embedError(user,
                                        "You do not have the right to click on ✅, you're not part of this class!")
+                DiscordLog.Spam(user, "CheckReaction (not part of the class)")
 
         elif reactionContent in ("🆗", "🛑"):
             # Check if user got teacher privileges
@@ -97,9 +99,11 @@ class Calling:
             elif not Tools.got_the_role(readGuild(reaction.message.guild.id)['botID'], user):  # pas le bot
                 await reaction.message.remove_reaction(reactionContent, user)
                 await Tools.embedError(user, "You can't stop the call, you do not have teacher privileges!")
+                DiscordLog.Spam(user, f"CheckReaction : Trying to stop the call {reaction.message.jump_url}")
         else:  # autre emoji
             await reaction.message.remove_reaction(reactionContent, user)
             await Tools.embedError(user, "Do not use another emoji on this message while the call is not finished!")
+            DiscordLog.Spam(user, f"CheckReaction : Trying to use another emoji during the call {reaction.message.jump_url}")
 
     def returnPresent(self, guild_id: int, role_list: list, class_list: list):
         """

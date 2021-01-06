@@ -70,7 +70,7 @@ def returnPresent(guild_id: int, role_list: list, class_list: list):
     messages = returnLanguage(readGuild(guild_id)["language"], "endcall")
 
     presents_msg = messages[0]
-    absents_msg = ""
+    absents_msg = str()
     students = []
 
     for member in class_list:
@@ -79,13 +79,15 @@ def returnPresent(guild_id: int, role_list: list, class_list: list):
             students.append(member.id)
             if role_list is not None:
                 role_list.remove(member)
-    if role_list:
+    # if there is no more people
+    if not role_list:
+        absents_msg += messages[2]
+    # if there is still people
+    else:
         absents_msg = "\n" + messages[1]
         for member in role_list:
             absents_msg += f"• *{name(member)}* <@{member.id}>\n"
-    else:
-        absents_msg += messages[2]
-    return presents_msg, absents_msg, role_list
+    return presents_msg, absents_msg, role_list,students
 
 
 async def Send_MP_absents(absents: list, message: discord.Message):  # guild, url: str, author, channel
@@ -227,8 +229,10 @@ async def finishCall(channel: discord.TextChannel, entry, guild_id, reaction: di
     else:
         role_list = reaction.message.guild.get_role(appelList[entry]['ClasseRoleID']).members
         nbStudents: int = len(role_list)
-        presentsMessage, absents, listAbsents = returnPresent(guild_id, role_list, appelList[entry]['listStudents'])
-        firstMsg = presentsMessage if data["showPresents"] and presentsMessage else f"{len(appelList[entry]['listStudents'])} students out of {nbStudents} are present"
+        presentsMessage, absents, listAbsents,listPresents = returnPresent(guild_id, role_list, appelList[entry]['listStudents'])
+
+        firstMsg = presentsMessage if (appelList[entry]["showPresents"] or data["showPresents"]) and presentsMessage \
+            else f"{len(listPresents)} students out of {nbStudents} are present"
         await channel.send(firstMsg)
 
         await channel.send(absents)
@@ -243,12 +247,14 @@ async def Call(context, *args):
     global appelList
     class_role = convert(args[0])
     data = readGuild(context.guild.id)
+    showAll = len(args) > 1 and args[1] == '-a'
     if class_role is None:
         await embedError(context.channel, "This is not a role, but a specific user")
     else:
         if got_the_role(data["teacher"], context.author):
             appelList[f"{context.guild.id}-{context.message.id}"] = {'ClasseRoleID': class_role,
                                                                      "teacher": context.message.author,
+                                                                     "showPresents": showAll,
                                                                      'listStudents': []}
             message = returnLanguage(data["language"], "startcall")
 

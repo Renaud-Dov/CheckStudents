@@ -88,12 +88,24 @@ This functionality is activated by default.
 >You must be an admin in order to execute this command
 > 
 > Command : `admin DeactivateMP`
+
+### Choose the delay for late students
+Late students got ten minutes to click on a DM message to inform their teacher. If you want to change the value, use this command :
+>You must be an admin in order to execute this command
+> 
+> Command : `admin delay time` replacing time by a positive value.
+> Example : `.Check admin delay 15` will set the delay to 15 minutes.
+> 
+> If you want to deactivate this functionality, put the value to zero : `admin value 0`
+
 ### Activate/Deactivate the sending of the list of students present
 Use this command if you do not want the bot to send the list of students present.
 
 > Command : `admin showPresents`
+> Note: Teachers can override the deactivation using `-a` option in a call after the class. Example : `.Check call @Class -a`
+
 ### Reset the bot
-Reset command will reset admin list, put default prefix (`.Check`), activate bot private and system messages,  and set language to english.
+Reset command will reset admin and teacher list, put default prefix (`.Check`), set language to english, and reset other settings by their default values.
 >You must be an admin, **or the server owner** in order to execute this command
 > 
 > Command : `admin reset`

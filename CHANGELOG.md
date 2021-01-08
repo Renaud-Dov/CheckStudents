@@ -1,5 +1,22 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
+###[0.8.0] - 2021-01-09
+### Added
+* Absents students got ten minutes (default delay) after call to send a late ticket with the bot.
+  > Note that this only work if you activated private messages. (See admin DeactivateMP command)
+* New command to change delay : `admin delay value`
+  > Example : `.Check admin value 15` will set the delay to 15 minutes.
+  > If you want to deactivate it : `admin value 0`
+
+* Add `-a` option to force display of present student
+  > Use `-a` after the class. Example : `.Check call @Class -a`
+### Changed
+* Only the teacher who started the call can close it.
+* When a student try to stop the call, or doing something forbidden during the call, the bot warn in DM instead in text channel.
+
+### Fixed
+* Admins and Teachers subcommands doesn't respond.
+* The bot displays the wrong number of present students in class
 
 ## [0.7.2] - 2021-01-05
 ### Added

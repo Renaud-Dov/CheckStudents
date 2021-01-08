@@ -15,6 +15,7 @@ def AdminHelp():
     embed.add_field(name="admin prefix", value="Change bot prefix")
     embed.add_field(name="admin reset", value="Reset settings")
     embed.add_field(name="admin ShowPresents", value="Activate/Deactivate Show presents students in call summary")
+    embed.add_field(name="admin delay", value="Set delay for absent students to get marked as late")
     return embed
 
 

@@ -12,6 +12,7 @@ if __name__ == "__main__":
     intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
                               guild_reactions=True)
     client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
+    AdminInstance = Admin()
 
 
 @client.event
@@ -80,6 +81,8 @@ async def on_reaction_add(reaction: discord.Reaction, user):
 
         if CheckClass.check(entry):  # if the message is a calling message
             await CheckClass.CheckReaction(reaction, user, entry)
+    elif isinstance(reaction.message.channel, discord.DMChannel) and reaction.message.author == client.user:
+        await CheckClass.LateStudent(user, reaction.message, reaction)
 
 
 @admin.command(aliases=['Roles', 'list', 'admin', 'admins'])
@@ -109,32 +112,37 @@ async def ListRoles(context, value: str):
 
 @admin.command()
 async def add(context, *args):
-    await Admin.addRole(context, "admin", args)
+    await AdminInstance.addRole(context, "admin", args)
 
 
 @teacher.command()
 async def add(context, *args):
-    await Admin.addRole(context, "teacher", args)
+    await AdminInstance.addRole(context, "teacher", args)
 
 
 @admin.command(aliases=['del', 'remove'])
 async def rm(context, *args):
-    await Admin.rmRole(context, "admin", args)
+    await AdminInstance.rmRole(context, "admin", args)
 
 
 @teacher.command(aliases=['del', 'remove'])
 async def rm(context, *args):
-    await Admin.rmRole(context, "teacher", args)
+    await AdminInstance.rmRole(context, "teacher", args)
 
 
 @admin.command()
 async def prefix(context, arg):
-    await Admin.prefix(context, arg)
+    await AdminInstance.prefix(arg)
 
 
 @admin.command(aliases=["lang"])
 async def language(context, lang=None):
-    await Admin.language(context, lang)
+    await AdminInstance.language(lang)
+
+
+@admin.command()
+async def delay(context, time=None):
+    await AdminInstance.Delay(context, time)
 
 
 @client.event
@@ -146,22 +154,22 @@ async def on_command_error(context, error):
 
 @admin.command()
 async def ShowPresents(context):
-    await Admin.ShowPresents(context)
+    await AdminInstance.ShowPresents()
 
 
 @admin.command()
 async def reset(context):
-    await Admin.reset(context)
+    await AdminInstance.reset()
 
 
 @admin.command(aliases=["sys"])
 async def sysMessages(context):
-    await Admin.sysMessages(context)
+    await AdminInstance.sysMessages()
 
 
 @admin.command(aliases=["MP,mp"])
 async def DeactivateMP(context):
-    await Admin.DeactivateMP(context)
+    await AdminInstance.DeactivateMP(context)
 
 
 @client.command()
@@ -175,6 +183,7 @@ async def settings(context):
     embed.add_field(name="• Show present students after call", value=str(data["showPresents"]), inline=False)
     embed.add_field(name="• Language", value=str(data["language"]), inline=False)
     embed.add_field(name="• Prefix", value=str(data["prefix"]), inline=False)
+    embed.add_field(name="• Delay in minutes", value=str(data["delay"]), inline=False)
 
     await context.channel.send(embed=embed)
 
@@ -194,5 +203,6 @@ async def help(context):
 @client.command(aliases=["commands,command"])
 async def help(context):
     await context.message.author.send(embed=helpEmbed.HelpMsg())
+
 
 client.run(token)

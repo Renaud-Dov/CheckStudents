@@ -1,19 +1,32 @@
 from datetime import date
 from src.data import *
 from src.tools import Tools
-from src.log import DiscordLog
+import asyncio
+
+
+class Check:
+    def __init__(self, classroom: int, teacher: discord.Member, showAll: bool, delay: int):
+        self.classroom = classroom
+        self.teacher = teacher
+        self.showPresents = showAll
+        self.listStudents = list()
+        self.delay = delay
+
+    async def AddStudent(self, student: discord.Member):
+        self.listStudents.append(student)
 
 
 class Calling:
     def __init__(self):
         self.callList = dict()
+        self.missing = dict()
 
     def check(self, entry: str) -> bool:
         return entry in self.callList
 
     async def finishCall(self, channel: discord.TextChannel, entry, guild_id, reaction: discord.Reaction):
         data = readGuild(guild_id)
-        if not self.callList[entry]['listStudents']:
+        if not self.callList[entry].listStudents:
             embed = discord.Embed(color=discord.Colour.red(),
                                   title="No students presents, please use 🛑 to cancel the call")
             embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
@@ -22,40 +35,56 @@ class Calling:
 
             await channel.send(embed=embed)
         else:
-            role_list = reaction.message.guild.get_role(self.callList[entry]['ClasseRoleID']).members
+            role_list = reaction.message.guild.get_role(self.callList[entry].classroom).members
             nbStudents: int = len(role_list)
             presentsMessage, absents, listAbsents, listPresents = self.returnPresent(guild_id, role_list,
-                                                                                     self.callList[entry][
-                                                                                         'listStudents'])
+                                                                                     self.callList[entry].listStudents)
 
-            firstMsg = presentsMessage if (self.callList[entry]["showPresents"] or data[
+            firstMsg = presentsMessage if (self.callList[entry].showPresents or data[
                 "showPresents"]) and presentsMessage \
                 else f"{len(listPresents)} students out of {nbStudents} are present"
             await channel.send(firstMsg)
 
             await channel.send(absents)
-            await self.SendList(reaction.message, entry, [firstMsg, absents])
+
+            delay = self.callList[entry].delay if self.callList[entry].delay > 0 and (
+                    nbStudents - len(listPresents)) > 0 else 0
+
+            await self.SendList(reaction.message, entry, [firstMsg, absents], delay, data["mp"])
 
             if data["mp"]:
-                await self.Send_MP_absents(listAbsents, reaction.message)
+                await self.Send_MP_absents(listAbsents, entry, reaction.message, delay, data["mp"])
+            if listAbsents and self.callList[entry].delay and data["mp"]:
+                await channel.send(
+                    f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to report their late arrival by private message with me")
+                await asyncio.sleep(delay)
+                await self.EndDelay(channel, delay)
+            del self.callList[entry]
 
-    async def Call(self, context, classe, showAll: bool):
-        class_role = Tools.convert(classe)
+    @staticmethod
+    async def EndDelay(channel: discord.TextChannel, delay: int):
+        embed = discord.Embed(color=discord.Colour.red(),
+                              title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket")
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        await channel.send(embed=embed)
+
+    async def Call(self, context, classroom, showAll: bool):
+        class_role = Tools.convert(classroom)
         data = readGuild(context.guild.id)
         if class_role is None:
             await Tools.embedError("This is not a role, but a specific user")
         else:
             if Tools.got_the_role(data["teacher"], context.author):
-                self.callList[f"{context.guild.id}-{context.message.id}"] = {'ClasseRoleID': class_role,
-                                                                             "teacher": context.message.author,
-                                                                             "showPresents": showAll,
-                                                                             'listStudents': []}
+                self.callList[f"{context.guild.id}-{context.message.id}"] = Check(class_role, context.message.author,
+                                                                                  showAll, data["delay"] if data[
+                                                                                                                "delay"] > 0 else 0)
                 message = returnLanguage(data["language"], "startcall")
 
                 embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
                 embed.set_author(name=Tools.name(context.message.author),
                                  icon_url=context.message.author.avatar_url)
-                embed.add_field(name=f"**__{message[2]}__**", value=classe)
+                embed.add_field(name=f"**__{message[2]}__**", value=classroom)
                 embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
                 embed.set_footer(text=message[3])
 
@@ -70,40 +99,37 @@ class Calling:
     async def CheckReaction(self, reaction: discord.Reaction, user, entry: str):
         reactionContent = str(reaction).strip(" ")
         if reactionContent == "✅":  # si l'utilisateur a coché présent
-            if Tools.got_the_role(self.callList[entry]['ClasseRoleID'],
+            if Tools.got_the_role(self.callList[entry].classroom,
                                   user):  # si user a le role de la classe correspondante
-                self.callList[entry]['listStudents'].append(user)  # on le rajoute à la liste d'appel
+                await self.callList[entry].AddStudent(user)  # on le rajoute à la liste d'appel
             elif not Tools.got_the_role(readGuild(reaction.message.guild.id)['botID'], user):
                 await reaction.message.remove_reaction("✅", user)
                 await Tools.embedError(user,
                                        "You do not have the right to click on ✅, you're not part of this class!")
-                DiscordLog.Spam(user, "CheckReaction (not part of the class)")
 
         elif reactionContent in ("🆗", "🛑"):
             # Check if user got teacher privileges
-            if Tools.got_the_role(readGuild(reaction.message.guild.id)["teacher"], user):
+            if self.callList[entry].teacher == user:
+                await reaction.message.clear_reactions()
 
                 if reactionContent == "🆗":
                     await reaction.message.channel.send(
                         "<@{}> :{} <@&{}>".format(user.id,
                                                   returnLanguage(readGuild(reaction.message.guild.id)["language"],
                                                                  "FinishCall"),
-                                                  self.callList[entry]['ClasseRoleID']))
+                                                  self.callList[entry].classroom))
                     await self.finishCall(reaction.message.channel, entry, reaction.message.guild.id, reaction)
                 else:
                     await reaction.message.channel.send(
                         returnLanguage(readGuild(reaction.message.guild.id)["language"], "cancelCall"))
-                await reaction.message.clear_reactions()
-                del self.callList[entry]
+                    del self.callList[entry]
 
             elif not Tools.got_the_role(readGuild(reaction.message.guild.id)['botID'], user):  # pas le bot
                 await reaction.message.remove_reaction(reactionContent, user)
                 await Tools.embedError(user, "You can't stop the call, you do not have teacher privileges!")
-                DiscordLog.Spam(user, f"CheckReaction : Trying to stop the call {reaction.message.jump_url}")
-        else:  # autre emoji
+        else:  # other emoji
             await reaction.message.remove_reaction(reactionContent, user)
             await Tools.embedError(user, "Do not use another emoji on this message while the call is not finished!")
-            DiscordLog.Spam(user, f"CheckReaction : Trying to use another emoji during the call {reaction.message.jump_url}")
 
     def returnPresent(self, guild_id: int, role_list: list, class_list: list):
         """
@@ -133,7 +159,7 @@ class Calling:
                 absents_msg += f"• *{Tools.name(member)}* <@{member.id}>\n"
         return presents_msg, absents_msg, role_list, students
 
-    async def Send_MP_absents(self, absents: list, message: discord.Message):  # guild, url: str, author, channel
+    async def Send_MP_absents(self, absents: list, entry: str, message: discord.Message, delay: int):
         """
         Send a mp message to all absents
         """
@@ -146,10 +172,17 @@ class Calling:
         embed.add_field(name=language_msg[2], value=message.guild)
         embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
         embed.add_field(name=language_msg[3][0], value=f"[{language_msg[3][1]}]({message.jump_url})")
+
+        if delay:
+            embed.add_field(name="Time on receipt of the message to report late", value=f"{delay} minutes")
         for member in absents:
             await member.send(embed=embed)
+            if delay:
+                message = await member.send("Click to send a message to the teacher that you're late")
+                await message.add_reaction("⏰")
+                self.missing[message.id] = entry
 
-    async def SendList(self, message: discord.Message, entry, students: list):
+    async def SendList(self, message: discord.Message, entry, students: list, delay: int, mp: bool):
         """
         Send the list of absents and presents students to the teacher
         """
@@ -157,11 +190,24 @@ class Calling:
         embed = discord.Embed(color=discord.Colour.blue(), title=language_msg[1])
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-        embed.add_field(name=language_msg[0], value=message.guild.get_role(self.callList[entry]['ClasseRoleID']))
+        embed.add_field(name=language_msg[0], value=message.guild.get_role(self.callList[entry].classroom))
         embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"), inline=False)
-
+        if delay > 0 and mp:
+            embed.add_field(name="Deadline for late students", value=f"{delay} minutes")
         await message.author.send(embed=embed)
 
         await message.author.send(students[0])
         if students[1]:
             await message.author.send(students[1])
+
+    async def LateStudent(self, user: discord.User, message: discord.Message, reaction: discord.Reaction):
+        if str(reaction).strip(" ") == "⏰" and not user.bot and message.id in self.missing:
+            if self.missing[message.id] in self.callList:
+                data = self.callList[self.missing[message.id]]
+                await data.teacher.send(f"**{user}** <@{user.id}> is late")
+                await message.delete()
+                await user.send("I told the teacher you were late")
+
+            else:
+                await user.send("It's too late to notify your delay")
+                await message.delete()

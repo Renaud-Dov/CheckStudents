@@ -57,7 +57,7 @@ class Calling:
             if listAbsents and self.callList[entry].delay and data["mp"]:
                 await channel.send(
                     f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to report their late arrival by private message with me")
-                await asyncio.sleep(delay)
+                await asyncio.sleep(delay * 60)
                 await self.EndDelay(channel, delay)
             del self.callList[entry]
 

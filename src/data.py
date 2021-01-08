@@ -12,8 +12,8 @@ def returnLanguage(lg, stat):
 def createGuild(guild_id, role_bot):
     with open("database/{}.json".format(guild_id), "x") as outfile:
         json.dump(
-            {"botID": role_bot, "prefix": ".Check ", "language": "en", "mp": True, "sysMessages": True, "showPresents": True,  "admin": [],"teacher":[]},
-            outfile)
+            {"botID": role_bot, "prefix": ".Check ", "language": "en", "mp": True,
+             "sysMessages": True, "showPresents": True,  "admin": [], "teacher": []}, outfile)
 
 
 def removeGuild(guild_id):
@@ -31,17 +31,13 @@ def readGuild(guild_id):
 
 
 async def get_prefix(client, message: discord.Message):
-
     try:
         if isinstance(message.channel, discord.TextChannel):
             with open("database/{}.json".format(message.guild.id), "r") as outfile:
                 var = json.load(outfile)
             return [".Check ", ".Check", var["prefix"]]
         else:
-            # await message.author.send("DM actions don't work here, use me on your server")
             return [".Check ", ".Check"]
-        # elif isinstance(message.channel, discord.DMChannel):
-        #     message
     except AttributeError as e:
         print(message, e)
 

@@ -8,5 +8,4 @@ class DiscordLog:
 
     @staticmethod
     def Spam(user, nameCommand):
-        print("spam")
         logging.warning(f"{user} is spamming {nameCommand}")

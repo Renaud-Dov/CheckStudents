@@ -109,10 +109,5 @@ Return language, and private and system messages status values.
 ### Any other issue
 > Please read [CHANGELOG](CHANGELOG.md) or create an issue.
 
-## Data privacy
-
-The bot communicates with the server every time you use it. We only keep IDs guilds, roles with privileges, and just during a call, guilds usernames and their users IDs.
-
-We also analyse every discord reaction on every servers to see if it corresponds to a call message.
 ##### This repository use [Discord.py](https://github.com/Rapptz/discord.py) library from [Rapptz](https://github.com/Rapptz)
 ###### Icons made by [Freepik](http://www.freepik.com/) from [Flaticon](https://www.flaticon.com/)

@@ -38,7 +38,7 @@ async def get_prefix(client, message: discord.Message):
                 var = json.load(outfile)
             return [".Check ", ".Check", var["prefix"]]
         else:
-            await message.author.send("DM actions don't work here, use me on your server")
+            # await message.author.send("DM actions don't work here, use me on your server")
             return [".Check ", ".Check"]
         # elif isinstance(message.channel, discord.DMChannel):
         #     message

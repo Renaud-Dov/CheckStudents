@@ -9,11 +9,12 @@ def returnLanguage(lg, stat):
     return var[stat]
 
 
-def createGuild(guild_id, role_bot):
+def createGuild(guild_id):
     with open("database/{}.json".format(guild_id), "x") as outfile:
         json.dump(
-            {"botID": role_bot, "prefix": ".Check ", "language": "en", "mp": True,
-             "sysMessages": True, "showPresents": True, "delay": 10,  "admin": [], "teacher": []}, outfile)
+            {"prefix": ".Check ", "language": "en", "mp": True,
+             "sysMessages": True, "showPresents": True, "delay": 10,
+             "admin": {"roles": [], "users": []}, "teacher": {"roles": [], "users": []}}, outfile)
 
 
 def removeGuild(guild_id):

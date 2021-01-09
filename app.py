@@ -23,7 +23,7 @@ async def on_ready():
 
 @client.command(aliases=["call"])
 async def Call(context, *args):
-    await CheckClass.Call(context, args[0], len(args) > 1 and args[1] == '-a')
+    await CheckClass.Call(context, args)
 
 
 @client.group()
@@ -47,21 +47,13 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     """
     Send help message  when joining a server
     """
-    try:
-        bot_id = discord.utils.get(guild.roles, name="CheckStudents").id
-        createGuild(guild.id, bot_id)
-        if guild.system_channel is not None:
-            await guild.system_channel.send(embed=helpEmbed.HelpMsg())
-            await guild.system_channel.send(embed=helpEmbed.TeacherHelp())
-            await guild.system_channel.send(embed=helpEmbed.AdminHelp())
 
-    except AttributeError:
-        await guild.owner.send(f"You're trying to add the bot on **{guild.name}** but you denied some permissions. "
-                               "In that case, the bot cannot work on your server. "
-                               "Please, remove the bot, and add it again, allowing permissions. "
-                               "Link : https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot")
-    except commands.CommandInvokeError:
-        print("CommandInvokeError", guild.id, guild)
+    bot_id = discord.utils.get(guild.roles, name="CheckStudents").id
+    createGuild(guild.id, bot_id)
+    if guild.system_channel is not None:
+        await guild.system_channel.send(embed=helpEmbed.HelpMsg())
+        await guild.system_channel.send(embed=helpEmbed.TeacherHelp())
+        await guild.system_channel.send(embed=helpEmbed.AdminHelp())
 
 
 @client.event
@@ -80,9 +72,9 @@ async def on_reaction_add(reaction: discord.Reaction, user):
         entry = idGuild + "-" + idMessage
 
         if CheckClass.check(entry):  # if the message is a calling message
-            await CheckClass.CheckReaction(reaction, user, entry)
+            await CheckClass.CheckReaction(client.user, reaction, user, entry)
     elif isinstance(reaction.message.channel, discord.DMChannel) and reaction.message.author == client.user:
-        await CheckClass.LateStudent(user, reaction.message, reaction)
+        await CheckClass.LateStudent(client.user, user, reaction.message, reaction)
 
 
 @admin.command(aliases=['Roles', 'list', 'admin', 'admins'])
@@ -96,48 +88,56 @@ async def roles(context):
 
 
 async def ListRoles(context, value: str):
-    message = ""
+
     embed = discord.Embed(color=discord.Colour.orange())
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
     role = readGuild(context.guild.id)[value]
-    if not role:
+    if not role["roles"] and not role["users"]:
         embed.add_field(name=f"**{value} :**", value=f"There is no {value} yet")
     else:
-        for i in role:
-            message += f"<@&{i}>\n"
-        embed.add_field(name=f"**{value.capitalize()} :**", value=message)
+        if role["roles"]:
+            message = ""
+            for i in role["roles"]:
+                message += f"<@&{i}>\n"
+            embed.add_field(name=f"**{value.capitalize()} roles :**", value=message)
+
+        if role["users"]:
+            message = ""
+            for i in role["users"]:
+                message += f"<@&{i}>\n"
+            embed.add_field(name=f"**{value.capitalize()} users :**", value=message)
     await context.channel.send(embed=embed)
 
 
 @admin.command()
-async def add(context, *args):
-    await AdminInstance.addRole(context, "admin", args)
+async def add(context):
+    await AdminInstance.addRole(context, "admin")
 
 
 @teacher.command()
-async def add(context, *args):
-    await AdminInstance.addRole(context, "teacher", args)
+async def add(context):
+    await AdminInstance.addRole(context, "teacher")
 
 
 @admin.command(aliases=['del', 'remove'])
-async def rm(context, *args):
-    await AdminInstance.rmRole(context, "admin", args)
+async def rm(context):
+    await AdminInstance.rmRole(context, "admin")
 
 
 @teacher.command(aliases=['del', 'remove'])
-async def rm(context, *args):
-    await AdminInstance.rmRole(context, "teacher", args)
+async def rm(context):
+    await AdminInstance.rmRole(context, "teacher")
 
 
 @admin.command()
 async def prefix(context, arg):
-    await AdminInstance.prefix(context,arg)
+    await AdminInstance.prefix(context, arg)
 
 
 @admin.command(aliases=["lang"])
 async def language(context, lang=None):
-    await AdminInstance.language(lang)
+    await AdminInstance.language(context, lang)
 
 
 @admin.command()
@@ -167,8 +167,8 @@ async def sysMessages(context):
     await AdminInstance.sysMessages(context)
 
 
-@admin.command(aliases=["MP,mp"])
-async def DeactivateMP(context):
+@admin.command()
+async def DM(context):
     await AdminInstance.DeactivateMP(context)
 
 

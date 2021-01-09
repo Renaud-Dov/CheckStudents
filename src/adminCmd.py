@@ -4,10 +4,11 @@ from src.tools import Tools
 
 class Admin:
     @staticmethod
-    async def addRole(context, value, args):
+    async def addRole(context, value):
         guild = str(context.guild.id)
         data = readGuild(guild)
-        if data["admin"] != [] and not Tools.got_the_role(data["admin"], context.author):
+        a = Tools.got_the_role(data["admin"], context.author)
+        if (data["admin"]["roles"] != [] or data["admin"]["users"] != []) and not Tools.got_the_role(data["admin"], context.author):
             await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
         else:
             embed = discord.Embed(color=discord.Colour.orange())
@@ -16,32 +17,45 @@ class Admin:
 
             added_roles = ""
             already_added_roles = ""
-            for i in args:
 
-                role = Tools.convert(i)
+            added_user = ""
+            already_added_user = ""
+            for role in context.message.role_mentions:
 
-                if role not in data[value]:
-                    data[value].append(role)
-                    added_roles += i + "\n"
+                if role.id not in data[value]["roles"]:
+                    data[value]["roles"].append(role.id)
+                    added_roles += role.mention + "\n"
                 else:
-                    already_added_roles += i + "\n"
+                    already_added_roles += role.mention + "\n"
 
-            if added_roles == "" and already_added_roles == "":
-                embed.add_field(name="You need to add roles to use the command", value=f"{value} add @role1 @role2")
-                await context.channel.send(embed=embed)
-            else:
+            for user in context.message.mentions:
+                if user.id not in data[value]["users"]:
+                    data[value]["users"].append(user.id)
+                    added_user += user.mention + "\n"
+                else:
+                    already_added_user += user.mention + "\n"
+
+            if added_roles != "" or already_added_roles != "" or added_user != "" or already_added_user != "":
                 if added_roles != "":
                     embed.add_field(name="Added roles", value=added_roles)
                 if already_added_roles != "":
-                    embed.add_field(name="Already added", value=already_added_roles)
+                    embed.add_field(name="Roles already added", value=already_added_roles)
+
+                if added_user != "":
+                    embed.add_field(name="Added users", value=added_user)
+                if already_added_user != "":
+                    embed.add_field(name="Users already added", value=already_added_user)
+
                 editGuild(guild, data)
                 await Admin.AdminCommand(context, embed, "Add teacher Command")
+            else:
+                await Tools.embedError(context.channel, "You need to add roles or users to use the command")
 
     @staticmethod
-    async def rmRole(context, value, args):
+    async def rmRole(context, value):
         guild = str(context.guild.id)
         data = readGuild(guild)
-        if not data["admin"]:
+        if not data["admin"]["users"] and not data["admin"]["roles"]:
             await Tools.embedError(context.channel, returnLanguage(data["language"], "zeroPrivileges"))
         elif Tools.got_the_role(data["admin"], context.author):
             embed = discord.Embed(color=discord.Colour.orange())
@@ -51,22 +65,35 @@ class Admin:
             removed_roles = ""
             not_removed_roles = ""
 
-            for i in args:
-                role = Tools.convert(i)
-                if role in data[value]:
-                    removed_roles += i + "\n"
-                    data[value].remove(role)
-                else:
-                    not_removed_roles += i + "\n"
+            removed_users = ""
+            not_removed_users = ""
 
-            if removed_roles == "" and not_removed_roles == "":
-                embed.add_field(name="You need to write role(s) to use the command", value=f"{value} rm @role")
-                await context.channel.send(embed=embed)
+            for role in context.message.role_mentions:
+                if role.id in data[value]["roles"]:
+                    removed_roles += role + "\n"
+                    data[value]["roles"].remove(role.id)
+                else:
+                    not_removed_roles += role + "\n"
+
+            for user in context.message.mentions:
+                if user.id in data[value]["users"]:
+                    removed_users += user + "\n"
+                    data[value]["roles"].remove(user.id)
+                else:
+                    not_removed_users += user + "\n"
+
+            if removed_roles == "" and not_removed_roles == "" and removed_users == "" and not_removed_users == "":
+                await Tools.embedError(context.channel, "You need to write role or user in order to use the command")
             else:
                 if removed_roles != "":
                     embed.add_field(name="Removed roles", value=removed_roles)
                 if not_removed_roles != "":
-                    embed.add_field(name=f"Was not an {value}", value=not_removed_roles)
+                    embed.add_field(name=f"Was not an {value} role", value=not_removed_roles)
+
+                if removed_users != "":
+                    embed.add_field(name="Removed users", value=removed_users)
+                if not_removed_users != "":
+                    embed.add_field(name=f"Was not an {value} user", value=not_removed_users)
                 editGuild(guild, data)
                 await Admin.AdminCommand(context, embed, "Remove Command")
         else:
@@ -134,8 +161,8 @@ class Admin:
     async def reset(context):
         data = readGuild(context.guild.id)
         if Tools.got_the_role(data["admin"], context.author) or context.message.author == context.guild.owner:
-            data["admin"] = []
-            data["teacher"] = []
+            data["admin"] = {"roles": [], "users": []}
+            data["teacher"] = {"roles": [], "users": []}
             data["language"] = "en"
             data["prefix"] = ".Check "
             data["sysMessages"] = True
@@ -227,6 +254,7 @@ class Admin:
                 editGuild(context.guild.id, data)
                 await Admin.AdminCommand(context, embed)
             except ValueError:
-                await Tools.embedError(context.channel, "Value must be between 0 and 60 minutes\nEnter 0 if you do not want to have any delay")
+                await Tools.embedError(context.channel,
+                                       "Value must be between 0 and 60 minutes\nEnter 0 if you do not want to have any delay")
         else:
             await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))

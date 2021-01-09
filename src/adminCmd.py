@@ -215,19 +215,18 @@ class Admin:
     async def Delay(context, delay: str):
         data = readGuild(context.guild.id)
         if Tools.got_the_role(data["admin"], context.author):
-            embed = discord.Embed(color=discord.Color.red())
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+
             try:
                 delay = int(delay)
-                if delay < 0:
+                if delay < 0 or delay > 60:
                     raise ValueError
                 data["delay"] = delay
-                embed.title = f"New delay : **{delay} minutes**"
+                embed = discord.Embed(color=discord.Color.red(), title=f"New delay : **{delay} minutes**")
+                embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                                 icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
                 editGuild(context.guild.id, data)
+                await Admin.AdminCommand(context, embed)
             except ValueError:
-                embed.title = "This is not a positive number\n Enter 0 if you do not want to have any delay"
-            await Admin.AdminCommand(context, embed)
-
+                await Tools.embedError(context.channel, "Value must be between 0 and 60 minutes\nEnter 0 if you do not want to have any delay")
         else:
             await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))

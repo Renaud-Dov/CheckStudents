@@ -53,7 +53,7 @@ class Calling:
             await self.SendList(reaction.message, entry, [firstMsg, absents], delay, data["mp"])
 
             if data["mp"]:
-                await self.Send_MP_absents(listAbsents, entry, reaction.message, delay, data["mp"])
+                await self.Send_MP_absents(listAbsents, entry, reaction.message, delay)
             if listAbsents and self.callList[entry].delay and data["mp"]:
                 await channel.send(
                     f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to report their late arrival by private message with me")

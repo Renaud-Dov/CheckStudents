@@ -132,7 +132,7 @@ async def rm(context, *args):
 
 @admin.command()
 async def prefix(context, arg):
-    await AdminInstance.prefix(arg)
+    await AdminInstance.prefix(context,arg)
 
 
 @admin.command(aliases=["lang"])
@@ -154,17 +154,17 @@ async def on_command_error(context, error):
 
 @admin.command()
 async def ShowPresents(context):
-    await AdminInstance.ShowPresents()
+    await AdminInstance.ShowPresents(context)
 
 
 @admin.command()
 async def reset(context):
-    await AdminInstance.reset()
+    await AdminInstance.reset(context)
 
 
 @admin.command(aliases=["sys"])
 async def sysMessages(context):
-    await AdminInstance.sysMessages()
+    await AdminInstance.sysMessages(context)
 
 
 @admin.command(aliases=["MP,mp"])

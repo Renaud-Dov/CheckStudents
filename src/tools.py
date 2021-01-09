@@ -15,10 +15,19 @@ class Tools:
         """
         Check if a user got at least one role in author list
         """
-        if isinstance(role, list):
+
+        if isinstance(role, dict):
+            if user.id in role["users"]:
+                return True
+            for i in role["roles"]:
+                if i in [y.id for y in user.roles]:
+                    return True
+        elif isinstance(role, list):
             for i in role:
                 if i in [y.id for y in user.roles]:
                     return True
+        elif isinstance(role, discord.Role):
+            return role in user.roles
         elif isinstance(role, int):
             return role in [y.id for y in user.roles]
 

@@ -70,17 +70,17 @@ class Admin:
 
             for role in context.message.role_mentions:
                 if role.id in data[value]["roles"]:
-                    removed_roles += role + "\n"
+                    removed_roles += role.mention + "\n"
                     data[value]["roles"].remove(role.id)
                 else:
-                    not_removed_roles += role + "\n"
+                    not_removed_roles += role.mention + "\n"
 
             for user in context.message.mentions:
                 if user.id in data[value]["users"]:
-                    removed_users += user + "\n"
-                    data[value]["roles"].remove(user.id)
+                    removed_users += user.mention + "\n"
+                    data[value]["users"].remove(user.id)
                 else:
-                    not_removed_users += user + "\n"
+                    not_removed_users += user.mention + "\n"
 
             if removed_roles == "" and not_removed_roles == "" and removed_users == "" and not_removed_users == "":
                 await Tools.embedError(context.channel, "You need to write role or user in order to use the command")

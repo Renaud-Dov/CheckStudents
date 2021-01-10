@@ -88,6 +88,9 @@ class Calling:
                     delay = data["delay"] if data["delay"] > 0 else 0
                     if '-d' in args:
                         delay = int(args[args.index('-d')+1])
+                        if delay > 60:
+                            raise ValueError
+
                     self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message.author,
                                                                                       showAll, delay)
                     message = returnLanguage(data["language"], "startcall")

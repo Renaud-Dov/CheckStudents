@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime, timedelta
+from time import gmtime, strftime
 from src.data import *
 from src.tools import Tools
 import asyncio
@@ -42,7 +43,8 @@ class Calling:
         else:
             self.callList[entry].classroom.members
             nbStudents: int = len(self.callList[entry].classroom.members)
-            presentsMessage, absents, listAbsents, listPresents = self.returnPresent(guild_id, self.callList[entry].classroom.members,
+            presentsMessage, absents, listAbsents, listPresents = self.returnPresent(guild_id, self.callList[
+                entry].classroom.members,
                                                                                      self.callList[entry].listStudents)
             await channel.send(f"{len(listPresents)} students out of {nbStudents} are present")
 
@@ -83,7 +85,8 @@ class Calling:
         else:
             if Tools.got_the_role(data["teacher"], context.author):
                 self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message.author,
-                                                                                  showAll, data["delay"] if data["delay"] > 0 else 0)
+                                                                                  showAll, data["delay"] if data[
+                                                                                                                "delay"] > 0 else 0)
                 message = returnLanguage(data["language"], "startcall")
 
                 embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
@@ -120,9 +123,9 @@ class Calling:
                 if reactionContent == "🆗":
                     await reaction.message.channel.send(
                         "<@{}> :{} {}".format(user.id,
-                                                  returnLanguage(readGuild(reaction.message.guild.id)["language"],
-                                                                 "FinishCall"),
-                                                  self.callList[entry].classroom.name))
+                                              returnLanguage(readGuild(reaction.message.guild.id)["language"],
+                                                             "FinishCall"),
+                                              self.callList[entry].classroom.name))
                     await self.finishCall(reaction.message.channel, entry, reaction.message.guild.id, reaction)
                 else:
                     await reaction.message.channel.send(
@@ -155,9 +158,10 @@ class Calling:
         for member in absents:
             await member.send(embed=embed)
             if delay:
+                time = datetime.now()
                 message = await member.send("Click to send a message to the teacher that you're late")
                 await message.add_reaction("⏰")
-                self.missing[message.id] = entry
+                self.missing[message.id] = (entry, time)
 
     async def SendList(self, message: discord.Message, entry, students: list, delay: int, mp: bool):
         """
@@ -167,27 +171,29 @@ class Calling:
         embed = discord.Embed(color=discord.Colour.blue(), title=language_msg[1])
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-        embed.add_field(name=language_msg[0], value=message.guild.get_role(self.callList[entry].classroom))
+        embed.add_field(name=language_msg[0], value=self.callList[entry].classroom.mention)
         embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"), inline=False)
         if delay > 0 and mp:
             embed.add_field(name="Deadline for late students", value=f"{delay} minutes")
         await message.author.send(embed=embed)
 
         for i in students:
-            await message.author.send(i)
-            # if len(i) > 2000:
-            #     # await Calling.file(i, message.author)
-            #     pass
-            # else:
-            #
-            #     await Calling.file(i, message.author)
+
+            if len(i) > 2000:
+                await Calling.file(i, message.author, self.callList[entry].classroom.name)
+            else:
+
+                await message.author.send(i)
 
     async def LateStudent(self, botUser: discord.ClientUser, user, message: discord.Message,
                           reaction: discord.Reaction):
         if str(reaction).strip(" ") == "⏰" and user != botUser and message.id in self.missing:
-            if self.missing[message.id] in self.callList:
-                data = self.callList[self.missing[message.id]]
-                await data.teacher.send(f"**{user}** <@{user.id}> arrived late")
+            if self.missing[message.id][0] in self.callList:
+                data = self.callList[self.missing[message.id][0]]
+                time_user = datetime.now() - self.missing[message.id][1]
+                time_str = strftime(f"{'%H h' if time_user.seconds > 3600 else ''}%M minutes",
+                                    gmtime(time_user.seconds))
+                await data.teacher.send(f"**{user}** <@{user.id}> arrived {time_str} late")
                 await message.delete()
                 await user.send("I told the teacher you were late")
 
@@ -231,7 +237,7 @@ class Calling:
         pass
 
     @staticmethod
-    async def file(message, channel):
+    async def file(message, channel, name):
         as_bytes = map(str.encode, message)
-        content = b"\n".join(as_bytes)
-        await channel.send(file=discord.File(BytesIO(content), "presents.txt"))
+        content = b"".join(as_bytes)
+        await channel.send(file=discord.File(BytesIO(content), f"{name}.txt"))

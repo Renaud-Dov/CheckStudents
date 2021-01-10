@@ -48,8 +48,7 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     Send help message  when joining a server
     """
 
-    bot_id = discord.utils.get(guild.roles, name="CheckStudents").id
-    createGuild(guild.id, bot_id)
+    createGuild(guild.id)
     if guild.system_channel is not None:
         await guild.system_channel.send(embed=helpEmbed.HelpMsg())
         await guild.system_channel.send(embed=helpEmbed.TeacherHelp())

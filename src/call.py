@@ -76,7 +76,7 @@ class Calling:
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
         await channel.send(embed=embed)
 
-    async def Call(self, context, args):
+    async def Call(self, context, args: tuple):
         classroom = context.message.role_mentions
         data = readGuild(context.guild.id)
         showAll = '-a' in args
@@ -84,22 +84,27 @@ class Calling:
             await Tools.embedError(context.channel, "Please precise **one** role to call")
         else:
             if Tools.got_the_role(data["teacher"], context.author):
-                self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message.author,
-                                                                                  showAll, data["delay"] if data[
-                                                                                                                "delay"] > 0 else 0)
-                message = returnLanguage(data["language"], "startcall")
+                try:
+                    delay = data["delay"] if data["delay"] > 0 else 0
+                    if '-d' in args:
+                        delay = int(args[args.index('-d')+1])
+                    self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message.author,
+                                                                                      showAll, delay)
+                    message = returnLanguage(data["language"], "startcall")
 
-                embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
-                embed.set_author(name=Tools.name(context.message.author),
-                                 icon_url=context.message.author.avatar_url)
-                embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
-                embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
-                embed.set_footer(text=message[3])
+                    embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
+                    embed.set_author(name=Tools.name(context.message.author),
+                                     icon_url=context.message.author.avatar_url)
+                    embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
+                    embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
+                    embed.set_footer(text=message[3])
 
-                await context.channel.send(embed=embed)
-                await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
-                await context.message.add_reaction("🆗")
-                await context.message.add_reaction("🛑")
+                    await context.channel.send(embed=embed)
+                    await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
+                    await context.message.add_reaction("🆗")
+                    await context.message.add_reaction("🛑")
+                except (ValueError, IndexError):
+                    await Tools.embedError(context.channel, "Invalid Args")
             else:
                 await context.channel.send(
                     "<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")))

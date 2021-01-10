@@ -105,7 +105,7 @@ async def ListRoles(context, value: str):
         if role["users"]:
             message = ""
             for i in role["users"]:
-                message += f"<@&{i}>\n"
+                message += f"<@{i}>\n"
             embed.add_field(name=f"**{value.capitalize()} users :**", value=message)
     await context.channel.send(embed=embed)
 

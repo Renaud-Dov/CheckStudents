@@ -1,7 +1,7 @@
 {
     "changeLanguage": "La langue du bot est maintenant en **français**",
-    "unknownCommand": "Commande inconnue : Commandes envoyées en message privé",
-    "class":["**Classe :**","**__Résumé appel__**"],
+    "unknownCommand": "Commande inconnue : Commandes valides envoyées en message privé",
+    "class":["**Classe :**","**__Résumé de l'appel__**"],
     "sendabsents":["**Par :**","**Serveur :**","**Channel :**",["Voir message","Lien"]],
     "commands": [
         "**Voici la liste des commandes que vous pouvez utiliser\n Par défaut, le préfixe du bot est .Check.**",
@@ -19,8 +19,8 @@
     ],
     "NoStudents": "⚠ **Aucun élève présent** ⚠",
     "endcall": [
-        "**Elèves présents :**\n",
-        "**Elèves non présents :\n**",
+        "**Élèves présents :**\n",
+        "**Élèves absents :\n**",
         "\n ✅ **Tous les élèves sont présents** ✅"
     ],
     "FinishCall": "a fini l'appel des",

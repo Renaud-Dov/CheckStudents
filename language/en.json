@@ -1,11 +1,11 @@
 {
     "changeLanguage": "The language is now set to **English**",
-    "unknownCommand": "Unknown command: I sent you commands list in private message",
+    "unknownCommand": "Unknown command: I sent you the list of available commands list in a private message",
     "class":["**Class:**","**__Attendance summary__**"],
     "sendabsents":["**By:**","**Server:**","**Channel:**",["Show message","Link"]],
     "commands": [
         "**List of the commands you can use with this bot:**",
-        ["call ***@class***","Start the call, *replace by the corresponding class*"],
+        ["call ***@class***","Start the attendance, *replace @class by the corresponding class*"],
         ["add ***@role1 @role2***","Add privileges to one or more roles"],
         ["remove (or rm) ***@role1 @role2***","Remove privileges from one or more roles"],
         ["admin language en|fr|de","Change the bot's language to one of the following languages : English, French or German"],
@@ -15,7 +15,7 @@
         ["admin sys","Enable/Disable the bot's system messages"],
         ["admin DeactivateMP","Enable/Disable private messages"],
         ["For more information","[Click here](https://github.com/Renaud-Dov/CheckStudents)"],
-        ["settings","Return settings values"]
+        ["settings","Return the settings' values for this server"]
     ],
     "NoStudents": "⚠ **No student present** ⚠",
     "endcall": [

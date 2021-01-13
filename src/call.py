@@ -34,14 +34,13 @@ class Calling:
         data = readGuild(guild_id)
         if not self.callList[entry].listStudents:
             embed = discord.Embed(color=discord.Colour.red(),
-                                  title="No students presents, please use 🛑 to cancel the call")
+                                  title="No students present, please use 🛑 to cancel the call")
             embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                              icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
             embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
 
             await channel.send(embed=embed)
         else:
-            self.callList[entry].classroom.members
             nbStudents: int = len(self.callList[entry].classroom.members)
             presentsMessage, absents, listAbsents, listPresents = self.returnPresent(guild_id, self.callList[
                 entry].classroom.members,
@@ -60,10 +59,10 @@ class Calling:
             await self.SendList(reaction.message, entry, [firstMsg, absents], delay, data["mp"])
 
             if data["mp"]:
-                await self.Send_MP_absents(listAbsents, entry, reaction.message, delay)
+                await self.Send_MP_absents(listAbsents, entry, reaction.message, delay, reaction.message.author)
             if listAbsents and self.callList[entry].delay and data["mp"]:
                 await channel.send(
-                    f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to report their late arrival by private message with me")
+                    f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to send me a direct message to report their late arrival")
                 await asyncio.sleep(delay * 60)
                 await self.EndDelay(channel, delay)
             del self.callList[entry]
@@ -85,10 +84,11 @@ class Calling:
         else:
             if Tools.got_the_role(data["teacher"], context.author):
                 try:
+
                     delay = data["delay"] if data["delay"] > 0 else 0
                     if '-d' in args:
                         delay = int(args[args.index('-d')+1])
-                        if delay > 60:
+                        if delay > 60 or delay < 0:
                             raise ValueError
 
                     self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message.author,
@@ -143,11 +143,11 @@ class Calling:
             elif user != botUser:  # pas le bot
                 await reaction.message.remove_reaction(reactionContent, user)
                 await Tools.embedError(user, "You can't stop the call, you do not have teacher privileges!")
-        else:  # other emoji
+        else:  # other emote
             await reaction.message.remove_reaction(reactionContent, user)
-            await Tools.embedError(user, "Do not use another emoji on this message while the call is not finished!")
+            await Tools.embedError(user, "Do not use another emote on this message while the call is not finished!")
 
-    async def Send_MP_absents(self, absents: list, entry: str, message: discord.Message, delay: int):
+    async def Send_MP_absents(self, absents: list, entry: str, message: discord.Message, delay: int, teacher : discord.User):
         """
         Send a mp message to all absents
         """
@@ -162,14 +162,19 @@ class Calling:
         embed.add_field(name=language_msg[3][0], value=f"[{language_msg[3][1]}]({message.jump_url})")
 
         if delay:
-            embed.add_field(name="Time on receipt of the message to report late", value=f"{delay} minutes")
+            pass
+            # embed.add_field(name="Time left", value=f"{delay} minutes")
         for member in absents:
             await member.send(embed=embed)
             if delay:
-                time = datetime.now()
-                message = await member.send("Click to send a message to the teacher that you're late")
-                await message.add_reaction("⏰")
-                self.missing[message.id] = (entry, time)
+                try:
+                    time = datetime.now()
+                    message = await member.send("Click on the emote below to automatically send a late ticket message to the teacher.")
+                    await message.add_reaction("⏰")
+                    self.missing[message.id] = (entry, time)
+                except discord.errors.Forbidden:
+                    await teacher.send(f"Unable to send a late ticket to {member.mention}")
+
 
     async def SendList(self, message: discord.Message, entry, students: list, delay: int, mp: bool):
         """
@@ -179,10 +184,10 @@ class Calling:
         embed = discord.Embed(color=discord.Colour.blue(), title=language_msg[1])
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-        embed.add_field(name=language_msg[0], value=self.callList[entry].classroom.mention)
+        embed.add_field(name=language_msg[0], value=self.callList[entry].classroom.name) #classroom
         embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"), inline=False)
         if delay > 0 and mp:
-            embed.add_field(name="Deadline for late students", value=f"{delay} minutes")
+            embed.add_field(name="Time limit for late students", value=f"{delay} minutes")
         await message.author.send(embed=embed)
 
         for i in students:
@@ -190,7 +195,6 @@ class Calling:
             if len(i) > 2000:
                 await Calling.file(i, message.author, self.callList[entry].classroom.name)
             else:
-
                 await message.author.send(i)
 
     async def LateStudent(self, botUser: discord.ClientUser, user, message: discord.Message,

@@ -21,9 +21,9 @@ async def on_ready():
     print("Bot is ready!")
 
 
-@client.command(aliases=["call"])
-async def Call(context, *args):
-    await CheckClass.Call(context, args)
+@client.command(aliases=["Call, attendance"])
+async def call(context, *args):
+    await CheckClass.StartCall(client, context, args)
 
 
 @client.group()
@@ -61,19 +61,6 @@ async def on_guild_remove(guild):
         removeGuild(guild.id)
     except FileNotFoundError:
         print("FileNotFoundError", guild, guild.id)
-
-
-@client.event
-async def on_reaction_add(reaction: discord.Reaction, user):
-    if isinstance(reaction.message.channel, discord.TextChannel):
-        idMessage = str(reaction.message.id)
-        idGuild = str(reaction.message.guild.id)
-        entry = idGuild + "-" + idMessage
-
-        if CheckClass.check(entry):  # if the message is a calling message
-            await CheckClass.CheckReaction(client.user, reaction, user, entry)
-    elif isinstance(reaction.message.channel, discord.DMChannel) and reaction.message.author == client.user:
-        await CheckClass.LateStudent(client.user, user, reaction.message, reaction)
 
 
 @admin.command(aliases=['Roles', 'list', 'admin', 'admins'])

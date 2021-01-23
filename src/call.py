@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from time import gmtime, strftime
 from src.data import *
 from src.tools import Tools
@@ -7,73 +7,140 @@ from io import BytesIO
 
 
 class Check:
-    def __init__(self, classroom: int, teacher: discord.Member, showAll: bool, delay: int):
-        self.classroom = classroom
-        self.teacher = teacher
+    def __init__(self, classroom: discord.Role, message: discord.Message, showAll: bool, delay: int):
+        self.role = classroom
+        self.message = message
+        self.teacher = message.author
         self.showPresents = showAll
         self.listStudents = list()
         self.delay = delay
 
-    async def AddStudent(self, student: discord.Member):
-        self.listStudents.append(student)
+    async def AddStudents(self, reactions: list):
+        for react in reactions:
+            if str(react.emoji) == "✅":
+                self.listStudents = [user for user in await react.users().flatten() if
+                                     Tools.got_the_role(self.role, user)]
+                break
 
-    @staticmethod
-    async def SplitMessages(msg: str):
-        list
+
+class LateStudent:
+    def __init__(self, teacher: discord.user, student: discord.User):
+        self.teacher: discord.user = teacher
+        self.student: discord.User = student
+
+    async def SendLateMessage(self):
+        await self.teacher.send(f"**{self.student.name}** {self.student.mention} arrived late")
 
 
 class Calling:
     def __init__(self):
         self.callList = dict()
-        self.missing = dict()
 
     def check(self, entry: str) -> bool:
         return entry in self.callList
 
-    async def finishCall(self, channel: discord.TextChannel, entry, guild_id, reaction: discord.Reaction):
-        data = readGuild(guild_id)
-        if not self.callList[entry].listStudents:
+    async def finishCall(self, client, classroom: Check):
+        data = readGuild(classroom.message.guild.id)
+        if not classroom.listStudents:
             embed = discord.Embed(color=discord.Colour.red(),
                                   title="No students present, please use 🛑 to cancel the call")
             embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                              icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
             embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
 
-            await channel.send(embed=embed)
+            await classroom.message.channel.send(embed=embed)
         else:
-            nbStudents: int = len(self.callList[entry].classroom.members)
-            presentsMessage, absents, listAbsents, listPresents = self.returnPresent(guild_id, self.callList[
-                entry].classroom.members,
-                                                                                     self.callList[entry].listStudents)
-            await channel.send(f"{len(listPresents)} students out of {nbStudents} are present")
+            nbStudents = len(classroom.role.members)
+            presentsMessage, absents, listAbsents, listPresents = self.returnPresent(classroom.message.guild.id,
+                                                                                     classroom.role.members,
+                                                                                     classroom.listStudents)
+            await classroom.message.channel.send(f"{len(listPresents)} students out of {nbStudents} are present")
 
             firstMsg = presentsMessage
-            if (self.callList[entry].showPresents or data["showPresents"]) and presentsMessage:
-                await channel.send(firstMsg)
+            if (classroom.showPresents or data["showPresents"]) and presentsMessage:
+                await classroom.message.channel.send(firstMsg)
 
-            await channel.send(absents)
+            await classroom.message.channel.send(absents)
 
-            delay = self.callList[entry].delay if self.callList[entry].delay > 0 and (
-                    nbStudents - len(listPresents)) > 0 else 0
+            delay = classroom.delay if classroom.delay > 0 and (nbStudents - len(listPresents)) > 0 else 0
 
-            await self.SendList(reaction.message, entry, [firstMsg, absents], delay, data["mp"])
+            await self.SendList(classroom.message, classroom.role.name, [firstMsg, absents], delay, data["mp"])
 
             if data["mp"]:
-                await self.Send_MP_absents(listAbsents, entry, reaction.message, delay, reaction.message.author)
-            if listAbsents and self.callList[entry].delay and data["mp"]:
-                await channel.send(
-                    f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to send me a direct message to report their late arrival")
-                await asyncio.sleep(delay * 60)
-                await self.EndDelay(channel, delay)
-            del self.callList[entry]
+                missingStudent = await self.Send_MP_absents(listAbsents, classroom.message, delay, classroom.teacher)
+                if listAbsents and classroom.delay:
+                    await classroom.message.channel.send(
+                        f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to send me a direct message to report their late arrival")
+                    await self.DelayForLateStudents(client, classroom.message.channel, missingStudent, delay)
+
+    @staticmethod
+    async def DelayForLateStudents(client, channel: discord.TextChannel, missing: dict, delay: int):
+
+        def check(reaction, user):
+            return str(reaction.emoji) == "⏰" and reaction.message.id in missing
+
+        for msg, student in missing.items():
+            try:
+                reaction, user = await client.wait_for('reaction_add', timeout=delay * 60, check=check)
+            except asyncio.TimeoutError:
+                pass
+            except Exception as e:
+                print(e)
+            else:
+                await student.teacher.send(f"**{user.name}** {user.mention} arrived late")
+                await reaction.message.delete()
+                await user.send("I told the teacher you were late")
+                del missing[msg]
+
+        if missing.values():
+            embed = discord.Embed(color=discord.Colour.red(),
+                                  title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket.")
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            await channel.send(embed=embed)
+            # await Calling.EndDelay(channel, delay)
 
     @staticmethod
     async def EndDelay(channel: discord.TextChannel, delay: int):
         embed = discord.Embed(color=discord.Colour.red(),
-                              title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket")
+                              title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket.")
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
         await channel.send(embed=embed)
+
+    async def StartCall(self, client: discord.client, context, args: tuple):
+        """
+        Start Attendance
+        """
+        if await self.Call(context, args):  # Attendance successfully started
+            entry = f"{context.guild.id}-{context.message.id}"
+
+            def check(reaction, user):
+                return "{0.guild.id}-{0.id}".format(reaction.message) in self.callList \
+                       and user == self.callList[entry].teacher and str(reaction.emoji) in ("🆗", "🛑")
+
+            try:
+                reaction, user = await client.wait_for('reaction_add', timeout=600, check=check)
+            except asyncio.TimeoutError:  # timeout
+                ClassData: Check = self.callList.pop(entry)
+                await Tools.embedError(context.channel, "Attendance automatically closed.")
+
+                await ClassData.AddStudents(context.message.reactions)
+                await context.message.clear_reactions()
+                await self.finishCall(client, ClassData)
+            else:  #
+                if str(reaction.emoji) == "🆗":
+                    ClassData: Check = self.callList.pop(entry)
+                    await context.channel.send(
+                        f"{user.display_name} :{returnLanguage(readGuild(context.guild.id)['language'], 'FinishCall')} {ClassData.role.name}")
+                    await ClassData.AddStudents(context.message.reactions)
+                    await context.message.clear_reactions()
+                    await self.finishCall(client, ClassData)
+                else:  # 🛑 canceled attendance
+                    await context.channel.send(
+                        returnLanguage(readGuild(context.guild.id)["language"], "cancelCall"))
+                    del self.callList[entry]
+                    await context.message.clear_reactions()
 
     async def Call(self, context, args: tuple):
         classroom = context.message.role_mentions
@@ -81,73 +148,40 @@ class Calling:
         showAll = '-a' in args
         if len(classroom) != 1:
             await Tools.embedError(context.channel, "Please precise **one** role to call")
+        elif Tools.got_the_role(data["teacher"], context.author):
+            try:
+
+                delay = data["delay"] if data["delay"] > 0 else 0
+                if '-d' in args:
+                    delay = int(args[args.index('-d') + 1])
+                    if delay > 60 or delay < 0:
+                        raise ValueError
+
+                self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message,
+                                                                                  showAll, delay)
+                message = returnLanguage(data["language"], "startcall")
+
+                embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
+                embed.set_author(name=Tools.name(context.message.author),
+                                 icon_url=context.message.author.avatar_url)
+                embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
+                embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
+                # embed.add_field()
+                embed.set_footer(text=message[3])
+
+                await context.channel.send(embed=embed)
+                await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
+                await context.message.add_reaction("🆗")
+                await context.message.add_reaction("🛑")
+
+                return True
+            except (ValueError, IndexError):
+                await Tools.embedError(context.channel, "Invalid Args")
         else:
-            if Tools.got_the_role(data["teacher"], context.author):
-                try:
+            await context.channel.send(
+                "<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")))
 
-                    delay = data["delay"] if data["delay"] > 0 else 0
-                    if '-d' in args:
-                        delay = int(args[args.index('-d')+1])
-                        if delay > 60 or delay < 0:
-                            raise ValueError
-
-                    self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message.author,
-                                                                                      showAll, delay)
-                    message = returnLanguage(data["language"], "startcall")
-
-                    embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
-                    embed.set_author(name=Tools.name(context.message.author),
-                                     icon_url=context.message.author.avatar_url)
-                    embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
-                    embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
-                    embed.set_footer(text=message[3])
-
-                    await context.channel.send(embed=embed)
-                    await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
-                    await context.message.add_reaction("🆗")
-                    await context.message.add_reaction("🛑")
-                except (ValueError, IndexError):
-                    await Tools.embedError(context.channel, "Invalid Args")
-            else:
-                await context.channel.send(
-                    "<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")))
-
-    async def CheckReaction(self, botUser: discord.ClientUser, reaction: discord.Reaction, user, entry: str):
-        reactionContent = str(reaction).strip(" ")
-        if reactionContent == "✅":  # si l'utilisateur a coché présent
-            if Tools.got_the_role(self.callList[entry].classroom,
-                                  user):  # si user a le role de la classe correspondante
-                await self.callList[entry].AddStudent(user)  # on le rajoute à la liste d'appel
-            elif user != botUser:
-                await reaction.message.remove_reaction("✅", user)
-                await Tools.embedError(user,
-                                       "You do not have the right to click on ✅, you're not part of this class!")
-
-        elif reactionContent in ("🆗", "🛑"):
-            # Check if user got teacher privileges
-            if self.callList[entry].teacher == user:
-                await reaction.message.clear_reactions()
-
-                if reactionContent == "🆗":
-                    await reaction.message.channel.send(
-                        "<@{}> :{} {}".format(user.id,
-                                              returnLanguage(readGuild(reaction.message.guild.id)["language"],
-                                                             "FinishCall"),
-                                              self.callList[entry].classroom.name))
-                    await self.finishCall(reaction.message.channel, entry, reaction.message.guild.id, reaction)
-                else:
-                    await reaction.message.channel.send(
-                        returnLanguage(readGuild(reaction.message.guild.id)["language"], "cancelCall"))
-                    del self.callList[entry]
-
-            elif user != botUser:  # pas le bot
-                await reaction.message.remove_reaction(reactionContent, user)
-                await Tools.embedError(user, "You can't stop the call, you do not have teacher privileges!")
-        else:  # other emote
-            await reaction.message.remove_reaction(reactionContent, user)
-            await Tools.embedError(user, "Do not use another emote on this message while the call is not finished!")
-
-    async def Send_MP_absents(self, absents: list, entry: str, message: discord.Message, delay: int, teacher : discord.User):
+    async def Send_MP_absents(self, absents: list, message: discord.Message, delay: int, teacher: discord.User):
         """
         Send a mp message to all absents
         """
@@ -160,23 +194,21 @@ class Calling:
         embed.add_field(name=language_msg[2], value=message.guild)
         embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
         embed.add_field(name=language_msg[3][0], value=f"[{language_msg[3][1]}]({message.jump_url})")
-
-        if delay:
-            pass
-            # embed.add_field(name="Time left", value=f"{delay} minutes")
+        missing = {}
         for member in absents:
-            await member.send(embed=embed)
-            if delay:
-                try:
+            try:
+                await member.send(embed=embed)
+                if delay:
                     time = datetime.now()
-                    message = await member.send("Click on the emote below to automatically send a late ticket message to the teacher.")
+                    message = await member.send(
+                        "Click on the emote below to automatically send a late ticket message to the teacher.")
                     await message.add_reaction("⏰")
-                    self.missing[message.id] = (entry, time)
-                except discord.errors.Forbidden:
-                    await teacher.send(f"Unable to send a late ticket to {member.mention}")
+                    missing[message.id] = LateStudent(teacher, member)
+            except discord.errors.Forbidden:
+                await teacher.send(f"Unable to send a late ticket to {member.mention}")
+        return missing
 
-
-    async def SendList(self, message: discord.Message, entry, students: list, delay: int, mp: bool):
+    async def SendList(self, message: discord.Message, className, students: list, delay: int, mp: bool):
         """
         Send the list of absents and presents students to the teacher
         """
@@ -184,7 +216,7 @@ class Calling:
         embed = discord.Embed(color=discord.Colour.blue(), title=language_msg[1])
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-        embed.add_field(name=language_msg[0], value=self.callList[entry].classroom.name) #classroom
+        embed.add_field(name=language_msg[0], value=className)  # classroom
         embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"), inline=False)
         if delay > 0 and mp:
             embed.add_field(name="Time limit for late students", value=f"{delay} minutes")
@@ -193,7 +225,7 @@ class Calling:
         for i in students:
 
             if len(i) > 2000:
-                await Calling.file(i, message.author, self.callList[entry].classroom.name)
+                await Calling.file(i, message.author, className)
             else:
                 await message.author.send(i)
 

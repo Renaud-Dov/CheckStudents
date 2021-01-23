@@ -8,16 +8,16 @@
 To add this bot to your Discord Server :
 [![Click here](https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot)
 
-**Please accept all permissions, or the bot will not respond on your server. Please refer to [this issue](#the-bot-doesnt-respond-to-any-command).**
+**Please accept all permission, or the bot will not respond on your server. Please refer to [this issue](#the-bot-doesnt-respond-to-any-command).**
 >**Note : You need the corresponding privileges to add the bot on a server.**
 
 
 ### Read [CHANGELOG](CHANGELOG.md) here.
-## How it works ?
+## How does it work ?
 
 
 
-For make a call, a teacher (or any other user with an authorized role): `call @class`.
+To start attendance, a teacher (or any other user with an authorised role): `call @class`.
 > By default, if you did not change bot prefix, the command will be `.Check call @class`.
 > Please refer to [prefix page](#change-bot-prefix) for more information.
 
@@ -91,12 +91,12 @@ This functionality is activated by default.
 
 ### Choose the delay for late students
 Late students got ten minutes to click on a DM message to inform their teacher. If you want to change the value, use this command :
->You must be an admin in order to execute this command
+>You must be an admin in order to execute this command.
 > 
 > Command : `admin delay time` replacing time by a positive value.
 > Example : `.Check admin delay 15` will set the delay to 15 minutes.
 > 
-> If you want to deactivate this functionality, put the value to zero : `admin value 0`
+> If you want to deactivate this functionality, put the value to zero : `admin delay 0`
 
 ### Activate/Deactivate the sending of the list of students present
 Use this command if you do not want the bot to send the list of students present.
@@ -105,7 +105,7 @@ Use this command if you do not want the bot to send the list of students present
 > Note: Teachers can override the deactivation using `-a` option in a call after the class. Example : `.Check call @Class -a`
 
 ### Reset the bot
-Reset command will reset admin and teacher list, put default prefix (`.Check`), set language to english, and reset other settings by their default values.
+Reset command will reset admin and teacher list, put default prefix (`.Check`), set language to English, and reset other settings by their default values.
 >You must be an admin, **or the server owner** in order to execute this command
 > 
 > Command : `admin reset`
@@ -116,7 +116,7 @@ Return language, and private and system messages status values.
 
 ## Common Errors
 ### The bot doesn't respond to any command
->If the bot doesn't respond to any command, it might be because you did not accept all permissions. In that case, remove the bot from the server, and invite him again.
+>If the bot doesn't respond to any command, it might be because you did not accept all permission. In that case, remove the bot from the server, and invite him again.
 
 ### Any other issue
 > Please read [CHANGELOG](CHANGELOG.md) or create an issue.

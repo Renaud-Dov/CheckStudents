@@ -1,5 +1,9 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
+###[0.8.1] - 2021-01-23
+### Changed
+* Attendance automatically close after 10 minutes if you forgot to close it.
+* For performance reasons, the client will get users who clicked on ✅ when the attendance is closed.
 ###[0.8.0] - 2021-01-09
 ### Added
 * Absents students got ten minutes (default delay) after call to send a late ticket with the bot.

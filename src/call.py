@@ -24,22 +24,28 @@ class Check:
 
 
 class LateStudent:
-    def __init__(self, teacher: discord.user, student: discord.User):
+    def __init__(self, teacher: discord.user, student: discord.User, message=discord.Message):
         self.teacher: discord.user = teacher
         self.student: discord.User = student
+        self.message = message
+        self.time = datetime.now()
 
     async def SendLateMessage(self):
         await self.teacher.send(f"**{self.student.name}** {self.student.mention} arrived late")
+
+    def DeltaTime(self):
+        return datetime.now() - self.time
 
 
 class Calling:
     def __init__(self):
         self.callList = dict()
+        self.missing = dict()
 
     def check(self, entry: str) -> bool:
         return entry in self.callList
 
-    async def finishCall(self, client, classroom: Check):
+    async def finishCall(self, client: discord.Client, classroom: Check):
         data = readGuild(classroom.message.guild.id)
         if not classroom.listStudents:
             embed = discord.Embed(color=discord.Colour.red(),
@@ -71,37 +77,21 @@ class Calling:
                 if listAbsents and classroom.delay:
                     await classroom.message.channel.send(
                         f"The **{nbStudents - len(listPresents)}** absent have **{delay}** minutes to send me a direct message to report their late arrival")
-                    await self.DelayForLateStudents(client, classroom.message.channel, missingStudent, delay)
+                    self.missing[classroom.message.id] = missingStudent
+                    await self.DelayForLateStudents(client.user,classroom.message.id, classroom.message.channel, delay)
+
+    async def DelayForLateStudents(self, clientUser: discord.ClientUser, classroomMsg: int, channel: discord.TextChannel, delay: int):
+        await asyncio.sleep(delay * 60)
+        if self.missing[classroomMsg]:
+            missing = self.missing.pop(classroomMsg)
+            await Calling.EndDelay(channel, delay)
+            for student in missing.values():
+                await student.message.edit(content=f"The {delay} minutes are elapsed: you can no longer send a late ticket.")
+                await student.message.remove_reaction("⏰", clientUser)
+
 
     @staticmethod
-    async def DelayForLateStudents(client, channel: discord.TextChannel, missing: dict, delay: int):
-
-        def check(reaction, user):
-            return str(reaction.emoji) == "⏰" and reaction.message.id in missing
-
-        for msg, student in missing.items():
-            try:
-                reaction, user = await client.wait_for('reaction_add', timeout=delay * 60, check=check)
-            except asyncio.TimeoutError:
-                pass
-            except Exception as e:
-                print(e)
-            else:
-                await student.teacher.send(f"**{user.name}** {user.mention} arrived late")
-                await reaction.message.delete()
-                await user.send("I told the teacher you were late")
-                del missing[msg]
-
-        if missing.values():
-            embed = discord.Embed(color=discord.Colour.red(),
-                                  title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket.")
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-            await channel.send(embed=embed)
-            # await Calling.EndDelay(channel, delay)
-
-    @staticmethod
-    async def EndDelay(channel: discord.TextChannel, delay: int):
+    async def EndDelay(channel, delay):
         embed = discord.Embed(color=discord.Colour.red(),
                               title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket.")
         embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
@@ -128,7 +118,7 @@ class Calling:
                 await ClassData.AddStudents(context.message.reactions)
                 await context.message.clear_reactions()
                 await self.finishCall(client, ClassData)
-            else:  #
+            else:
                 if str(reaction.emoji) == "🆗":
                     ClassData: Check = self.callList.pop(entry)
                     await context.channel.send(
@@ -146,40 +136,37 @@ class Calling:
         classroom = context.message.role_mentions
         data = readGuild(context.guild.id)
         showAll = '-a' in args
-        if len(classroom) != 1:
-            await Tools.embedError(context.channel, "Please precise **one** role to call")
-        elif Tools.got_the_role(data["teacher"], context.author):
-            try:
+        try:
+            if len(classroom) != 1:
+                await Tools.embedError(context.channel, "Please precise **one** role to call")
+                raise ValueError
 
-                delay = data["delay"] if data["delay"] > 0 else 0
-                if '-d' in args:
-                    delay = int(args[args.index('-d') + 1])
-                    if delay > 60 or delay < 0:
-                        raise ValueError
+            delay = data["delay"] if data["delay"] > 0 else 0
+            if '-d' in args:
+                delay = int(args[args.index('-d') + 1])
+                if delay > 60 or delay < 0:
+                    raise ValueError
 
-                self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message,
-                                                                                  showAll, delay)
-                message = returnLanguage(data["language"], "startcall")
+            self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message,
+                                                                              showAll, delay)
+            message = returnLanguage(data["language"], "startcall")
 
-                embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
-                embed.set_author(name=Tools.name(context.message.author),
-                                 icon_url=context.message.author.avatar_url)
-                embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
-                embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
-                # embed.add_field()
-                embed.set_footer(text=message[3])
+            embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
+            embed.set_author(name=Tools.name(context.message.author),
+                             icon_url=context.message.author.avatar_url)
+            embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
+            embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
+            # embed.add_field()
+            embed.set_footer(text=message[3])
 
-                await context.channel.send(embed=embed)
-                await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
-                await context.message.add_reaction("🆗")
-                await context.message.add_reaction("🛑")
+            await context.channel.send(embed=embed)
+            await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
+            await context.message.add_reaction("🆗")
+            await context.message.add_reaction("🛑")
 
-                return True
-            except (ValueError, IndexError):
-                await Tools.embedError(context.channel, "Invalid Args")
-        else:
-            await context.channel.send(
-                "<@{}> : {}".format(context.author.id, returnLanguage(data["language"], "notTeacher")))
+            return True
+        except (ValueError, IndexError):
+            await Tools.embedError(context.channel, "Invalid Args")
 
     async def Send_MP_absents(self, absents: list, message: discord.Message, delay: int, teacher: discord.User):
         """
@@ -203,7 +190,7 @@ class Calling:
                     message = await member.send(
                         "Click on the emote below to automatically send a late ticket message to the teacher.")
                     await message.add_reaction("⏰")
-                    missing[message.id] = LateStudent(teacher, member)
+                    missing[message.id] = LateStudent(teacher, member, message)
             except discord.errors.Forbidden:
                 await teacher.send(f"Unable to send a late ticket to {member.mention}")
         return missing
@@ -229,21 +216,17 @@ class Calling:
             else:
                 await message.author.send(i)
 
-    async def LateStudent(self, botUser: discord.ClientUser, user, message: discord.Message,
-                          reaction: discord.Reaction):
-        if str(reaction).strip(" ") == "⏰" and user != botUser and message.id in self.missing:
-            if self.missing[message.id][0] in self.callList:
-                data = self.callList[self.missing[message.id][0]]
-                time_user = datetime.now() - self.missing[message.id][1]
-                time_str = strftime(f"{'%H h' if time_user.seconds > 3600 else ''}%M minutes",
-                                    gmtime(time_user.seconds))
-                await data.teacher.send(f"**{user}** <@{user.id}> arrived {time_str} late")
-                await message.delete()
-                await user.send("I told the teacher you were late")
+    async def LateStudent(self, message: discord.Message):
 
-            else:
-                await user.send("It's too late to notify your delay")
-                await message.delete()
+        for attendance, students in self.missing.items():
+            if message.id in students:
+                student: LateStudent = self.missing[attendance].pop(message.id)
+                latetime = student.DeltaTime()
+                time_str = strftime(f"{'%H h' if latetime.seconds > 3600 else ''}%M minutes", gmtime(latetime.seconds))
+                await student.teacher.send(f"**{student.student}** <@{student.student.id}> arrived {time_str} late")
+                await student.student.send("I told the teacher you were late")
+                await student.message.delete()
+                break
 
     @staticmethod
     def returnPresent(guild_id: int, role_list: list, class_list: list):

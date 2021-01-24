@@ -21,9 +21,38 @@ async def on_ready():
     print("Bot is ready!")
 
 
+def is_teacher():
+    async def predicate(context):
+        data = readGuild(context.guild.id)
+        if Tools.got_the_role(data["teacher"], context.author):
+            return True
+        await Tools.embedError(context.channel, returnLanguage(data["language"], "notTeacher"))
+        return False
+
+    return commands.check(predicate)
+
+
+def is_admin():
+    async def predicate(context):
+        data = readGuild(context.guild.id)
+        if Tools.got_the_role(data["admin"], context.author):
+            return True
+        await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+        return False
+
+    return commands.check(predicate)
+
+
 @client.command(aliases=["Call, attendance"])
+@is_teacher()
 async def call(context, *args):
     await CheckClass.StartCall(client, context, args)
+
+
+@client.event
+async def on_reaction_add(reaction, user):
+    if isinstance(reaction.message.channel, discord.DMChannel) and reaction.message.author == client.user and user != client.user and str(reaction.emoji) == "⏰":
+        await CheckClass.LateStudent(reaction.message)
 
 
 @client.group()
@@ -74,7 +103,6 @@ async def roles(context):
 
 
 async def ListRoles(context, value: str):
-
     embed = discord.Embed(color=discord.Colour.orange())
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
@@ -107,26 +135,31 @@ async def add(context):
 
 
 @admin.command(aliases=['del', 'remove'])
+@is_admin()
 async def rm(context):
     await AdminInstance.rmRole(context, "admin")
 
 
 @teacher.command(aliases=['del', 'remove'])
+@is_admin()
 async def rm(context):
     await AdminInstance.rmRole(context, "teacher")
 
 
 @admin.command()
+@is_admin()
 async def prefix(context, arg):
     await AdminInstance.prefix(context, arg)
 
 
 @admin.command(aliases=["lang"])
+@is_admin()
 async def language(context, lang=None):
     await AdminInstance.language(context, lang)
 
 
 @admin.command()
+@is_admin()
 async def delay(context, time=None):
     await AdminInstance.Delay(context, time)
 
@@ -139,6 +172,7 @@ async def on_command_error(context, error):
 
 
 @admin.command()
+@is_admin()
 async def ShowPresents(context):
     await AdminInstance.ShowPresents(context)
 
@@ -149,11 +183,13 @@ async def reset(context):
 
 
 @admin.command(aliases=["sys"])
+@is_admin()
 async def sysMessages(context):
     await AdminInstance.sysMessages(context)
 
 
 @admin.command()
+@is_admin()
 async def DM(context):
     await AdminInstance.DeactivateMP(context)
 

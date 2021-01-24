@@ -8,7 +8,8 @@ class Admin:
         guild = str(context.guild.id)
         data = readGuild(guild)
         a = Tools.got_the_role(data["admin"], context.author)
-        if (data["admin"]["roles"] != [] or data["admin"]["users"] != []) and not Tools.got_the_role(data["admin"], context.author):
+        if (data["admin"]["roles"] != [] or data["admin"]["users"] != []) and not Tools.got_the_role(data["admin"],
+                                                                                                     context.author):
             await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
         else:
             embed = discord.Embed(color=discord.Colour.orange())
@@ -55,82 +56,72 @@ class Admin:
     async def rmRole(context, value):
         guild = str(context.guild.id)
         data = readGuild(guild)
-        if not data["admin"]["users"] and not data["admin"]["roles"]:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "zeroPrivileges"))
-        elif Tools.got_the_role(data["admin"], context.author):
-            embed = discord.Embed(color=discord.Colour.orange())
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
 
-            removed_roles = ""
-            not_removed_roles = ""
+        embed = discord.Embed(color=discord.Colour.orange())
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
 
-            removed_users = ""
-            not_removed_users = ""
+        removed_roles = ""
+        not_removed_roles = ""
 
-            for role in context.message.role_mentions:
-                if role.id in data[value]["roles"]:
-                    removed_roles += role.mention + "\n"
-                    data[value]["roles"].remove(role.id)
-                else:
-                    not_removed_roles += role.mention + "\n"
+        removed_users = ""
+        not_removed_users = ""
 
-            for user in context.message.mentions:
-                if user.id in data[value]["users"]:
-                    removed_users += user.mention + "\n"
-                    data[value]["users"].remove(user.id)
-                else:
-                    not_removed_users += user.mention + "\n"
-
-            if removed_roles == "" and not_removed_roles == "" and removed_users == "" and not_removed_users == "":
-                await Tools.embedError(context.channel, "You need to write role or user in order to use the command")
+        for role in context.message.role_mentions:
+            if role.id in data[value]["roles"]:
+                removed_roles += role.mention + "\n"
+                data[value]["roles"].remove(role.id)
             else:
-                if removed_roles != "":
-                    embed.add_field(name="Removed roles", value=removed_roles)
-                if not_removed_roles != "":
-                    embed.add_field(name=f"Was not an {value} role", value=not_removed_roles)
+                not_removed_roles += role.mention + "\n"
 
-                if removed_users != "":
-                    embed.add_field(name="Removed users", value=removed_users)
-                if not_removed_users != "":
-                    embed.add_field(name=f"Was not an {value} user", value=not_removed_users)
-                editGuild(guild, data)
-                await Admin.AdminCommand(context, embed, "Remove Command")
+        for user in context.message.mentions:
+            if user.id in data[value]["users"]:
+                removed_users += user.mention + "\n"
+                data[value]["users"].remove(user.id)
+            else:
+                not_removed_users += user.mention + "\n"
+
+        if removed_roles == "" and not_removed_roles == "" and removed_users == "" and not_removed_users == "":
+            await Tools.embedError(context.channel, "You need to write role or user in order to use the command")
         else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+            if removed_roles != "":
+                embed.add_field(name="Removed roles", value=removed_roles)
+            if not_removed_roles != "":
+                embed.add_field(name=f"Was not an {value} role", value=not_removed_roles)
+
+            if removed_users != "":
+                embed.add_field(name="Removed users", value=removed_users)
+            if not_removed_users != "":
+                embed.add_field(name=f"Was not an {value} user", value=not_removed_users)
+            editGuild(guild, data)
+            await Admin.AdminCommand(context, embed, "Remove Command")
 
     @staticmethod
     async def prefix(context, arg):
         data = readGuild(context.guild.id)
-        if Tools.got_the_role(data["admin"], context.author):
-            try:
-                set_prefix(context.guild.id, arg)
-                embed = discord.Embed(color=discord.Colour.orange(),
-                                      title=returnLanguage(readGuild(context.guild.id)["language"],
-                                                           "newPrefix") + f"**{arg}**",
-                                      description="You still can use \"`.Check `\"")
-                embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                                 icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-                await Admin.AdminCommand(context, embed)
-            except discord.ext.commands.errors.MissingRequiredArgument:
-                await Tools.embedError(context.channel, "You did not specify a prefix")
-        else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+        try:
+            set_prefix(context.guild.id, arg)
+            embed = discord.Embed(color=discord.Colour.orange(),
+                                  title=returnLanguage(readGuild(context.guild.id)["language"],
+                                                       "newPrefix") + f"**{arg}**",
+                                  description="You still can use \"`.Check `\"")
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            await Admin.AdminCommand(context, embed)
+        except discord.ext.commands.errors.MissingRequiredArgument:
+            await Tools.embedError(context.channel, "You did not specify a prefix")
 
     @staticmethod
     async def language(context, lang=None):
         if lang in ["fr", "en", "de"]:
             data = readGuild(context.guild.id)
-            if Tools.got_the_role(data["admin"], context.author):
-                data["language"] = lang
-                embed = discord.Embed(color=discord.Colour.orange(), title=returnLanguage(lang, "changeLanguage"))
-                embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                                 icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-                await Admin.AdminCommand(context, embed)
-                editGuild(context.guild.id, data)
-            else:
+            data["language"] = lang
+            embed = discord.Embed(color=discord.Colour.orange(), title=returnLanguage(lang, "changeLanguage"))
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            await Admin.AdminCommand(context, embed)
+            editGuild(context.guild.id, data)
 
-                await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
         else:
             await Tools.embedError(context.channel,
                                    "Unknown language:\n**Languages :**\n• English: en\n• French: fr\n• German: de")
@@ -141,26 +132,26 @@ class Admin:
             Activate/Deactivate Show presents students in call summary
         """
         data = readGuild(context.guild.id)
-        if Tools.got_the_role(data["admin"], context.author):
-            if data["showPresents"]:
-                data["showPresents"] = False
-                embed = discord.Embed(color=discord.Color.red(), title="Call summary will only show absents students")
-            else:
-                data["showPresents"] = True
-                embed = discord.Embed(color=discord.Color.red(),
-                                      title="Call summary will show absents and presents students")
-
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-            editGuild(context.guild.id, data)
-            await Admin.AdminCommand(context, embed)
+        if data["showPresents"]:
+            data["showPresents"] = False
+            embed = discord.Embed(color=discord.Color.red(), title="Call summary will only show absents students")
         else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+            data["showPresents"] = True
+            embed = discord.Embed(color=discord.Color.red(),
+                                  title="Call summary will show absents and presents students")
+
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        editGuild(context.guild.id, data)
+        await Admin.AdminCommand(context, embed)
 
     @staticmethod
     async def reset(context):
         data = readGuild(context.guild.id)
-        if Tools.got_the_role(data["admin"], context.author) or context.message.author == context.guild.owner:
+        if not Tools.got_the_role(data["admin"], context.author) and context.message.author != context.guild.owner:
+            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+
+        else:
             data["admin"] = {"roles": [], "users": []}
             data["teacher"] = {"roles": [], "users": []}
             data["language"] = "en"
@@ -181,29 +172,23 @@ class Admin:
 
             await Admin.AdminCommand(context, embed)
 
-        else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
-
     @staticmethod
     async def sysMessages(context):
         """
         Activate/Deactivate system message
         """
         data = readGuild(context.guild.id)
-        if Tools.got_the_role(data["admin"], context.author):
-            if data["sysMessages"]:
-                data["sysMessages"] = False
-                embed = discord.Embed(color=discord.Color.red(), title="System Messages are now disabled")
-            else:
-                data["sysMessages"] = True
-                embed = discord.Embed(color=discord.Color.red(), title="System Messages are now activated")
-
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-            editGuild(context.guild.id, data)
-            await Admin.AdminCommand(context, embed)
+        if data["sysMessages"]:
+            data["sysMessages"] = False
+            embed = discord.Embed(color=discord.Color.red(), title="System Messages are now disabled")
         else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+            data["sysMessages"] = True
+            embed = discord.Embed(color=discord.Color.red(), title="System Messages are now activated")
+
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        editGuild(context.guild.id, data)
+        await Admin.AdminCommand(context, embed)
 
     @staticmethod
     async def AdminCommand(context, embed: discord.Embed, title=None):
@@ -224,37 +209,30 @@ class Admin:
     @staticmethod
     async def DeactivateMP(context):
         data = readGuild(context.guild.id)
-        if Tools.got_the_role(data["admin"], context.author):
-            if data["mp"]:
-                data["mp"] = False
-                embed = discord.Embed(color=discord.Color.red(), title="Private messages are now disabled")
-            else:
-                data["mp"] = True
-                embed = discord.Embed(color=discord.Color.red(), title="Private messages are now activated")
-            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-            editGuild(context.guild.id, data)
-            await Admin.AdminCommand(context, embed)
+        if data["mp"]:
+            data["mp"] = False
+            embed = discord.Embed(color=discord.Color.red(), title="Private messages are now disabled")
         else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+            data["mp"] = True
+            embed = discord.Embed(color=discord.Color.red(), title="Private messages are now activated")
+        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        editGuild(context.guild.id, data)
+        await Admin.AdminCommand(context, embed)
 
     @staticmethod
     async def Delay(context, delay: str):
         data = readGuild(context.guild.id)
-        if Tools.got_the_role(data["admin"], context.author):
 
-            try:
-                delay = int(delay)
-                if delay < 0 or delay > 60:
-                    raise ValueError
-                data["delay"] = delay
-                embed = discord.Embed(color=discord.Color.red(), title=f"New delay : **{delay} minutes**")
-                embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                                 icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-                editGuild(context.guild.id, data)
-                await Admin.AdminCommand(context, embed)
-            except ValueError:
-                await Tools.embedError(context.channel,
-                                       "Value must be between 0 and 60 minutes\nEnter 0 if you do not want to have any delay")
-        else:
-            await Tools.embedError(context.channel, returnLanguage(data["language"], "NoPrivileges"))
+        try:
+            delay = int(delay)
+            if delay < 0 or delay > 60:
+                raise ValueError
+            data["delay"] = delay
+            embed = discord.Embed(color=discord.Color.red(), title=f"New delay : **{delay} minutes**")
+            embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                             icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+            editGuild(context.guild.id, data)
+            await Admin.AdminCommand(context, embed)
+        except ValueError:
+            await Tools.embedError(context.channel, "Value must be between 0 and 60 minutes\nEnter 0 if you do not want to have any delay")

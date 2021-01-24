@@ -224,7 +224,7 @@ class Calling:
                 latetime = student.DeltaTime()
                 time_str = strftime(f"{'%H h' if latetime.seconds > 3600 else ''}%M minutes", gmtime(latetime.seconds))
                 await student.teacher.send(f"**{student.student}** <@{student.student.id}> arrived {time_str} late")
-                await student.student.send("I told the teacher you were late")
+                await student.student.send("I told your teacher you were late")
                 await student.message.delete()
                 break
 

@@ -1,4 +1,5 @@
 if __name__ == "__main__":
+    import discord
     from discord.ext import commands
     from src.data import *
     from src import helpEmbed
@@ -6,6 +7,14 @@ if __name__ == "__main__":
     from src.tools import Tools
     from src.call import Calling
     from src.adminCmd import Admin
+
+    import logging
+
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
 
     CheckClass = Calling()
     token = sys.argv[1]

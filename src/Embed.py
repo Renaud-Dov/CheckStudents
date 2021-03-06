@@ -2,10 +2,9 @@ import discord
 
 
 def AdminHelp():
-    embed = discord.Embed(color=discord.Colour.green(), title="Admin settings subcommands:",
+    embed = CompleteEmbed(color=discord.Colour.green(), title="Admin settings subcommands:",
                           description="You must be an admin in order to execute these commands")
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+
     embed.add_field(name="admin add @role1/@user...", value="Add admin privileges to one or more roles or users")
     embed.add_field(name="admin rm @role1/@user...", value="Remove admin privileges to one or more roles or users")
     embed.add_field(name="admin list", value="Return roles and users that have admin privileges")
@@ -20,10 +19,9 @@ def AdminHelp():
 
 
 def TeacherHelp():
-    embed = discord.Embed(color=discord.Colour.green(), title="Teacher settings subcommands:",
+    embed = CompleteEmbed(color=discord.Colour.green(), title="Teacher settings subcommands:",
                           description="You must be an admin in order to execute these commands")
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+
     embed.add_field(name="teacher add @role1 @role2...", value="Add teacher privileges to one or more roles or users")
     embed.add_field(name="teacher rm @role1 @role2...", value="Remove teacher privileges to one or more roles or users")
     embed.add_field(name="teacher list", value="Return roles and users that have admin privileges")
@@ -31,14 +29,41 @@ def TeacherHelp():
 
 
 def HelpMsg():
-    embed = discord.Embed(color=discord.Colour.green(), title="CheckStudents commands",
+    embed = CompleteEmbed(color=discord.Colour.green(), title="CheckStudents commands",
                           description="Here the list of commands you can use with the bot")
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+
     embed.add_field(name="call @class", value="Start the call, *replace by the corresponding class*", inline=False)
     embed.add_field(name="admin *subcommand*", value="admin roles commands (see admin subcommands)", inline=False)
     embed.add_field(name="teacher *subcommand*", value="teacher role commands (see teacher subcommands)", inline=False)
     embed.add_field(name="settings", value="Return settings values", inline=False)
     embed.add_field(name="admin help", value="Return admin subcommands", inline=False)
     embed.add_field(name="teacher help", value="Return teacher subcommands", inline=False)
+    embed.add_field(name="cal help", value="Return calendar subcommands", inline=False)
+    return embed
+
+
+def CalHelp():
+    embed = CompleteEmbed(color=discord.Colour.green(), title="Calendar settings subcommands:",
+                          description="You must be an admin in order to execute these commands")
+
+    embed.add_field(name="add {ClassLink}",
+                    value="Link the channel to a calendar (Example : `.Check cal add INFOS2E1-1`)")
+    embed.add_field(name="remove", value="Remove the calendar in the channel")
+    embed.add_field(name="list", value="Remove the calendar in the channel")
+    return embed
+
+
+def BasicEmbed(title=None, description=None, color=None):
+    embed = discord.Embed(title=title, description=description, color=color)
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    return embed
+
+
+def CompleteEmbed(title=None, description=None, color=None):
+    embed = discord.Embed(title=title, description=description, color=color)
+    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
+                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+    embed.set_footer(text="By Renaud-Dov DEVERS",
+                     icon_url="https://avatars.githubusercontent.com/u/14821642")
     return embed

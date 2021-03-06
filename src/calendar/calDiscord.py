@@ -48,16 +48,13 @@ class CalCog(commands.Cog):
         calendar = Calendar.Calendar(f"https://Ichronos.net/feed/{classroom_link}.ics")
         events = calendar.getClassOfTomorrow()
 
-        if not events:
-            # await Tools.SendError(channel,
-            #                       f"This calendar doesn't exist (https://Ichronos.net/feed/{classroom_link}.ics)",
-            #                       "This calendar will be auto removed")
-            # self.RemoveCalAuto(channel)
-            return None
-
         embed = discord.Embed(
             title=f"Summary of tomorrow ({(datetime.utcnow() + timedelta(days=1)).strftime('%d/%m/%y')})",
             color=discord.Color.gold())
+        embed.set_footer(text="Powered by iChronos Reloaded", icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/ichronos.jpg")
+        if not events:
+            embed.description = "There is no event for tomorrow"
+
         for event in events:
             if event.name.startswith("SEMAINE"):
                 embed.description = f"Journée en {event.name.lstrip('SEMAINE EN ').casefold()}"
@@ -69,7 +66,6 @@ class CalCog(commands.Cog):
 
                 embed.add_field(name=f"{event.name}{teacher}", value=f"{start} - {end}", inline=False)
         await channel.send(embed=embed)
-
 
     @tasks.loop(hours=24)
     async def SendEventsOfTomorrow(self):
@@ -112,7 +108,7 @@ async def DelCalendar(context: commands.Context):
     await Tools.AdminCommand(context, embed)
 
 
-async def ListCalendar(context: commands.Context,bot):
+async def ListCalendar(context: commands.Context, bot):
     data: dict = Server(context.guild.id).calendar
     embed = discord.Embed(color=discord.Color.green())
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",

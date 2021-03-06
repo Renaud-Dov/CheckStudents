@@ -51,7 +51,7 @@ class CalCog(commands.Cog):
         embed = discord.Embed(
             title=f"Summary of tomorrow ({(datetime.utcnow() + timedelta(days=1)).strftime('%d/%m/%y')})",
             color=discord.Color.gold())
-        embed.set_footer(text="Powered by iChronos Reloaded", icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/ichronos.jpg")
+        embed.set_footer(text="Powered by iChronos Reloaded", icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/ichronos.png")
         if not events:
             embed.description = "There is no event for tomorrow"
 

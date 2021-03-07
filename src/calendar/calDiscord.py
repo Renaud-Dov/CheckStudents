@@ -62,13 +62,16 @@ class CalCog(commands.Cog):
                 embed.add_field(name=f"{events[i].name}", value=str(events[i]), inline=False)
         await channel.send(embed=embed)
 
-    @tasks.loop(hours=24)
+    @tasks.loop(seconds=15)
     async def SendEventsOfTomorrow(self):
         for guild in UpdateGrandtedGuild():
-            data: dict = Server(guild).calendar
-            for channel in data.items():
-                a = self.bot.get_channel(int(channel[0]))
-                await self.SendEvents(a, channel[1])
+            try:
+                data: dict = Server(guild).calendar
+                for channel in data.items():
+                    a = self.bot.get_channel(int(channel[0]))
+                    await self.SendEvents(a, channel[1])
+            except FileNotFoundError as e:
+                print(f"Unable to send events for '{guild}' , the file doesn't not exist")
 
 
 async def AddCalendar(context: commands.Context, arg):

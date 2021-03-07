@@ -24,11 +24,14 @@ if __name__ == "__main__":
     client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
     AdminInstance = Admin()
 
+    calendar = Calendar.CalCog(client)
+
 
 @client.event
 async def on_ready():
     await client.change_presence(activity=discord.Game(name=".Check help"))
     print("Bot is ready!")
+    await calendar.StartCalendar()
 
 
 def is_teacher():
@@ -292,5 +295,5 @@ async def help(context):
     await context.message.author.send(embed=Embed.HelpMsg())
 
 
-client.add_cog(Calendar.CalCog(client))
+client.add_cog(calendar)
 client.run(token)

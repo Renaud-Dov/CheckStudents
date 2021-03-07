@@ -15,7 +15,6 @@ class Admin:
         else:
             embed = Embed.BasicEmbed(color=discord.Colour.orange())
 
-
             added_roles = str()
             already_added_roles = str()
 

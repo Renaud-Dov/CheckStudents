@@ -51,20 +51,15 @@ class CalCog(commands.Cog):
         embed = discord.Embed(
             title=f"Summary of tomorrow ({(datetime.utcnow() + timedelta(days=1)).strftime('%d/%m/%y')})",
             color=discord.Color.gold())
-        embed.set_footer(text="Powered by iChronos Reloaded", icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/ichronos.png")
+        embed.set_footer(text="Powered by iChronos Reloaded",
+                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/ichronos.png")
+        embed.set_author(name=classroom_link, url=f"https://ichronos.net/{classroom_link}/")
         if not events:
             embed.description = "There is no event for tomorrow"
-
-        for event in events:
-            if event.name.startswith("SEMAINE"):
-                embed.description = f"Journée en {event.name.lstrip('SEMAINE EN ').casefold()}"
-            else:
-                # emoji = Data.GetEmoji(event.name.casefold()) if not None else ''
-                start = event.beginTime.strftime("%Hh%M")
-                end = event.endTime.strftime("%Hh%M")
-                teacher = ' with {}'.format(event.teacher) if event.teacher != '' else ''
-
-                embed.add_field(name=f"{event.name}{teacher}", value=f"{start} - {end}", inline=False)
+        else:
+            embed.description = events[0].name
+            for i in range(1, len(events)):
+                embed.add_field(name=f"{events[i].name}", value=str(events[i]), inline=False)
         await channel.send(embed=embed)
 
     @tasks.loop(hours=24)

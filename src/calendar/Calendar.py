@@ -18,6 +18,9 @@ class Event:
                                                             hour=int(time[9:11]),
 
                                                             minute=int(time[11:13]), second=int(time[13:15]))
+        self.name = None
+        self.teacher = None
+        self.room = None
         for event in events_desc:
             if event.startswith("SUMMARY:"):
                 self.name = event.lstrip("SUMMARY").lstrip(":")
@@ -27,7 +30,10 @@ class Event:
                 self.room = event.lstrip("LOCATION:")
 
     def __str__(self):
-        pass
+        time = f"{self.beginTime.strftime('%Hh%M')}-{self.endTime.strftime('%Hh%M')}"
+        teacher = f"\n{self.teacher}" if self.teacher is not None else ""
+        room = f"\n({self.room})" if self.room is not None else ""
+        return time + teacher + room
 
 
 class Calendar:
@@ -60,3 +66,16 @@ class Calendar:
 
     def getClassOfTomorrow(self):
         return self.__GetEventsOfDay(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+
+    def getnplus(self, n: int):
+        return self.__GetEventsOfDay(datetime.datetime.utcnow() + datetime.timedelta(days=n))
+
+
+if __name__ == "__main__":
+    calendar = Calendar("https://ichronos.net/feed/INFOS2E1-1.ics")
+    # 340
+
+    events = calendar.getnplus(2)
+    events = calendar.getnplus(3)
+    events = calendar.getnplus(4)
+    print(1)

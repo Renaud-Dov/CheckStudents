@@ -62,7 +62,7 @@ class CalCog(commands.Cog):
                 embed.add_field(name=f"{events[i].name}", value=str(events[i]), inline=False)
         await channel.send(embed=embed)
 
-    @tasks.loop(seconds=15)
+    @tasks.loop(hours=24)
     async def SendEventsOfTomorrow(self):
         for guild in UpdateGrandtedGuild():
             try:

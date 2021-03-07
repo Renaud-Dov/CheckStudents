@@ -2,6 +2,7 @@ import datetime
 import requests
 import re
 import json
+from urllib import parse
 
 
 class Event:
@@ -39,7 +40,7 @@ class Event:
 class Calendar:
     def UpdateCalendar(self):
         self.Calendar = list()
-        r = requests.get(self.link)
+        r = requests.get(self.link_ics)
         if not r.ok:
             raise Exception("Impossible to get .ics calendar")
 
@@ -49,8 +50,10 @@ class Calendar:
         self.Calendar.sort(key=lambda x: x.beginTime)
 
     def __init__(self, link=None):
+        link = parse.quote(link)
         self.Calendar = list()
-        self.link = link
+        self.link_ics = f"https://Ichronos.net/feed/{link}.ics"
+        self.link = f"https://ichronos.net/{link}/"
         if link is not None:
             self.UpdateCalendar()
 
@@ -72,7 +75,7 @@ class Calendar:
 
 
 if __name__ == "__main__":
-    calendar = Calendar("https://ichronos.net/feed/INFOS2E1-1.ics")
+    calendar = Calendar("INFOS2E1-1")
     # 340
 
     events = calendar.getnplus(2)

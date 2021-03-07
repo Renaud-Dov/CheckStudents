@@ -45,7 +45,7 @@ class CalCog(commands.Cog):
 
     @staticmethod
     async def SendEvents(channel: discord.TextChannel, classroom_link: str):
-        calendar = Calendar.Calendar(f"https://Ichronos.net/feed/{classroom_link}.ics")
+        calendar = Calendar.Calendar(classroom_link)
         events = calendar.getClassOfTomorrow()
 
         embed = discord.Embed(
@@ -53,8 +53,8 @@ class CalCog(commands.Cog):
             color=discord.Color.gold())
         embed.set_footer(text="Powered by iChronos Reloaded",
                          icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/ichronos.png")
-        embed.set_author(name=classroom_link, url=f"https://ichronos.net/{classroom_link}/")
-        if not events:
+        embed.set_author(name=classroom_link, url=calendar.link)
+        if len(events) == 0:
             embed.description = "There is no event for tomorrow"
         else:
             embed.description = events[0].name

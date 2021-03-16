@@ -31,7 +31,8 @@ if __name__ == "__main__":
 async def on_ready():
     await client.change_presence(activity=discord.Game(name=".Check help"))
     print("Bot is ready!")
-    await calendar.StartCalendar()
+    # TODO : REMOVE COMMENT
+    # await calendar.StartCalendar()
 
 
 def is_teacher():
@@ -65,8 +66,8 @@ async def call(context, *args):
 @client.event
 async def on_reaction_add(reaction, user):
     if isinstance(reaction.message.channel,
-                  discord.DMChannel) and reaction.message.author == client.user and user != client.user and str(
-        reaction.emoji) == "⏰":
+                  discord.DMChannel) and reaction.message.author == client.user \
+            and user != client.user and str(reaction.emoji) == "⏰":
         await CheckClass.LateStudent(reaction.message)
 
 
@@ -231,7 +232,9 @@ async def DM(context):
 async def on_command_error(context, error):
     if isinstance(error, commands.errors.CommandNotFound):
         await Tools.SendError(context.channel, "Unknown Command. Use help command")
-    # print(error, context.guild, context.guild.id, context.channel, context.message.jump_url)
+    else:
+        await Tools.SendError(context.channel, str(error))
+# print(error, context.guild, context.guild.id, context.channel, context.message.jump_url)
 
 
 @client.command()

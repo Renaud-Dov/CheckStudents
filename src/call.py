@@ -7,16 +7,18 @@ from io import BytesIO
 
 
 class Check:
-    def __init__(self, classroom: discord.Role, message: discord.Message, showAll: bool, delay: int):
+    def __init__(self, classroom: discord.Role, message: discord.Message, showAll: bool, delay: int,
+                 author: discord.Member):
         self.role = classroom
         self.message = message
-        self.teacher = message.author
+        self.teacher = author
         self.showPresents = showAll
         self.listStudents = list()
         self.delay = delay
 
-    async def AddStudents(self, reactions: list):
-        for react in reactions:
+    async def AddStudents(self, context, messageID):
+        msg = await context.fetch_message(messageID)
+        for react in msg.reactions:
             if str(react.emoji) == "✅":
                 self.listStudents = [user for user in await react.users().flatten() if
                                      Tools.got_the_role(self.role, user)]
@@ -103,35 +105,37 @@ class Calling:
         """
         Start Attendance
         """
-        if await self.Call(context, args):  # Attendance successfully started
-            entry = f"{context.guild.id}-{context.message.id}"
+        Botmessage: discord.Message = await self.Call(context, args)
+        entry = f"{context.guild.id}-{Botmessage.id}"
 
-            def check(reaction, user):
-                return "{0.guild.id}-{0.id}".format(reaction.message) in self.callList \
-                       and user == self.callList[entry].teacher and str(reaction.emoji) in ("🆗", "🛑")
+        def check(reaction, user):
+            a = "{0.guild.id}-{0.id}".format(reaction.message) in self.callList
+            b = (user == self.callList[entry].teacher)
+            return a and b and str(reaction.emoji) in ("🆗", "🛑")
 
-            try:
-                reaction, user = await client.wait_for('reaction_add', timeout=600, check=check)
-            except asyncio.TimeoutError:  # timeout
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=600, check=check)
+        except asyncio.TimeoutError:  # timeout
+            ClassData: Check = self.callList.pop(entry)
+            await Tools.SendError(context.channel, "Attendance automatically closed.")
+
+            await ClassData.AddStudents(context, Botmessage.id)
+            await self.finishCall(client, ClassData)
+        else:
+            if str(reaction.emoji) == "🆗":
                 ClassData: Check = self.callList.pop(entry)
-                await Tools.SendError(context.channel, "Attendance automatically closed.")
+                await context.channel.send(
+                    f"{user.display_name} :{Server(context.guild.id).returnLanguage('FinishCall')} {ClassData.role.name}")
+                await ClassData.AddStudents(context, Botmessage.id)
 
-                await ClassData.AddStudents(context.message.reactions)
-                await context.message.clear_reactions()
                 await self.finishCall(client, ClassData)
-            else:
-                if str(reaction.emoji) == "🆗":
-                    ClassData: Check = self.callList.pop(entry)
-                    await context.channel.send(
-                        f"{user.display_name} :{Server(context.guild.id).returnLanguage('FinishCall')} {ClassData.role.name}")
-                    await ClassData.AddStudents(context.message.reactions)
-                    await context.message.clear_reactions()
-                    await self.finishCall(client, ClassData)
-                else:  # 🛑 canceled attendance
-                    await context.channel.send(
-                        Server(context.guild.id).returnLanguage("cancelCall"))
-                    del self.callList[entry]
-                    await context.message.clear_reactions()
+            else:  # 🛑 canceled attendance
+                await context.channel.send(
+                    Server(context.guild.id).returnLanguage("cancelCall"))
+                del self.callList[entry]
+
+        msg = await context.fetch_message(Botmessage.id)
+        await msg.delete()
 
     async def Call(self, context, args: tuple):
         classroom = context.message.role_mentions
@@ -148,8 +152,6 @@ class Calling:
                 if delay > 60 or delay < 0:
                     raise ValueError
 
-            self.callList[f"{context.guild.id}-{context.message.id}"] = Check(classroom[0], context.message,
-                                                                              showAll, delay)
             message = data.returnLanguage("startcall")
 
             embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
@@ -160,12 +162,15 @@ class Calling:
             # embed.add_field()
             embed.set_footer(text=message[3])
 
-            await context.channel.send(embed=embed)
-            await context.message.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
-            await context.message.add_reaction("🆗")
-            await context.message.add_reaction("🛑")
+            Botmessage = await context.channel.send(embed=embed)
+            await Botmessage.add_reaction("✅")  # on rajoute les réactions ✅ & 🆗
+            await Botmessage.add_reaction("🆗")
+            await Botmessage.add_reaction("🛑")
 
-            return True
+            self.callList[f"{context.guild.id}-{Botmessage.id}"] = Check(classroom[0], Botmessage,
+                                                                         showAll, delay, context.author)
+
+            return Botmessage
         except (ValueError, IndexError):
             await Tools.SendError(context.channel, "Invalid Args")
 
@@ -218,7 +223,6 @@ class Calling:
                 await message.author.send(i)
 
     async def LateStudent(self, message: discord.Message):
-
         for attendance, students in self.missing.items():
             if message.id in students:
                 student: LateStudent = self.missing[attendance].pop(message.id)
@@ -228,6 +232,7 @@ class Calling:
                 await student.student.send("I told your teacher you were late")
                 await student.message.delete()
                 break
+
 
     @staticmethod
     def returnPresent(guild_id: int, role_list: list, class_list: list):

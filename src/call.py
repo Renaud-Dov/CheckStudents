@@ -88,13 +88,13 @@ class Calling:
             await Calling.EndDelay(channel, delay)
             for student in missing.values():
                 await student.message.edit(
-                    content=f"The {delay} minutes are elapsed: you can no longer send a late ticket.")
+                    content=f"The {delay} minute(s) are elapsed: you can no longer send a late ticket.")
                 await student.message.remove_reaction("⏰", clientUser)
 
     @staticmethod
     async def EndDelay(channel, delay):
         embed = Embed.BasicEmbed(color=discord.Colour.red(),
-                              title=f"The {delay} minutes are elapsed: absents can no longer send a late ticket.")
+                              title=f"The {delay} minute(s) are elapsed: absents can no longer send a late ticket.")
         await channel.send(embed=embed)
 
     async def StartCall(self, client: discord.client, context, args: tuple):
@@ -124,14 +124,19 @@ class Calling:
                     f"{user.display_name} :{Server(context.guild.id).returnLanguage('FinishCall')} {ClassData.role.name}")
                 await ClassData.AddStudents(context, Botmessage.id)
 
+                msg = await context.fetch_message(Botmessage.id)
+                await msg.delete()
+
                 await self.finishCall(client, ClassData)
+
+
+
             else:  # 🛑 canceled attendance
                 await context.channel.send(
                     Server(context.guild.id).returnLanguage("cancelCall"))
                 del self.callList[entry]
 
-        msg = await context.fetch_message(Botmessage.id)
-        await msg.delete()
+
 
     async def Call(self, context, args: tuple):
         classroom = context.message.role_mentions

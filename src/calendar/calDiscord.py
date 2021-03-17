@@ -23,10 +23,23 @@ async def IsEpitaServer(context: commands.Context):
 
 class CalCog(commands.Cog):
     def __init__(self, bot):
+        self.started = False
         self.bot: discord.Client = bot
 
-    async def StartCalendar(self):
-        self.SendEventsOfTomorrow.start()
+    @commands.command()
+    @commands.is_owner()
+    async def StartCalendar(self, context):
+        if not self.started:
+            self.started = True
+            await context.channel.send("Agenda activé")
+            self.SendEventsOfTomorrow.start()
+
+    @commands.command()
+    @commands.is_owner()
+    async def StopCalendar(self, context):
+        if self.started:
+            self.started = False
+            self.SendEventsOfTomorrow.cancel()
 
     @commands.command(aliases=["agenda", "calendar"])
     async def Calendar(self, context):

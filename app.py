@@ -1,11 +1,10 @@
 if __name__ == "__main__":
-    import discord
     from discord.ext import commands
     from src.data import *
     from src import Embed
     import sys
     from src.tools import Tools
-    from src.call import Calling
+    from src.Attendance.call import Calling
     from src.adminCmd import Admin
     from src.calendar import calDiscord as Calendar
 

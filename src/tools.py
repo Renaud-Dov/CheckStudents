@@ -50,7 +50,7 @@ class Tools:
         if desc is not None:
             embed.description = desc
         embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
-        embed.set_footer(text="Feel free to open a issue on Github")
+        # embed.set_footer(text="Feel free to open a issue on Github")
         await channel.send(embed=embed)
 
     @staticmethod

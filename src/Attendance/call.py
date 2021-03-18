@@ -94,7 +94,7 @@ class Calling:
     @staticmethod
     async def EndDelay(channel, delay):
         embed = Embed.BasicEmbed(color=discord.Colour.red(),
-                              title=f"The {delay} minute(s) are elapsed: absents can no longer send a late ticket.")
+                                 title=f"The {delay} minute(s) are elapsed: absents can no longer send a late ticket.")
         await channel.send(embed=embed)
 
     async def StartCall(self, client: discord.client, context, args: tuple):
@@ -102,41 +102,42 @@ class Calling:
         Start Attendance
         """
         Botmessage: discord.Message = await self.Call(context, args)
-        entry = f"{context.guild.id}-{Botmessage.id}"
 
-        def check(reaction, user):
-            a = "{0.guild.id}-{0.id}".format(reaction.message) in self.callList
-            b = (user == self.callList[entry].teacher)
-            return a and b and str(reaction.emoji) in ("🆗", "🛑")
+        if Botmessage is not None:
+            entry = f"{context.guild.id}-{Botmessage.id}"
 
-        try:
-            reaction, user = await client.wait_for('reaction_add', timeout=600, check=check)
-        except asyncio.TimeoutError:  # timeout
-            ClassData: Check = self.callList.pop(entry)
-            await Tools.SendError(context.channel, "Attendance automatically closed.")
+            def check(reaction, user):
+                return "{0.guild.id}-{0.id}".format(reaction.message) in self.callList and \
+                       (user == self.callList[entry].teacher) and str(reaction.emoji) in ("🆗", "🛑")
 
-            await ClassData.AddStudents(context, Botmessage.id)
-            await self.finishCall(client, ClassData)
-        else:
-            if str(reaction.emoji) == "🆗":
+            try:
+                reaction, user = await client.wait_for('reaction_add', timeout=600, check=check)
+            except asyncio.TimeoutError:  # timeout
                 ClassData: Check = self.callList.pop(entry)
-                await context.channel.send(
-                    f"{user.display_name} :{Server(context.guild.id).returnLanguage('FinishCall')} {ClassData.role.name}")
+                await Tools.SendError(context.channel, "Attendance automatically closed.")
+
                 await ClassData.AddStudents(context, Botmessage.id)
 
                 msg = await context.fetch_message(Botmessage.id)
                 await msg.delete()
 
                 await self.finishCall(client, ClassData)
+            else:
+                if str(reaction.emoji) == "🆗":
+                    ClassData: Check = self.callList.pop(entry)
+                    await context.channel.send(
+                        f"{user.display_name} :{Server(context.guild.id).returnLanguage('FinishCall')} {ClassData.role.name}")
+                    await ClassData.AddStudents(context, Botmessage.id)
 
+                    msg = await context.fetch_message(Botmessage.id)
+                    await msg.delete()
 
+                    await self.finishCall(client, ClassData)
 
-            else:  # 🛑 canceled attendance
-                await context.channel.send(
-                    Server(context.guild.id).returnLanguage("cancelCall"))
-                del self.callList[entry]
-
-
+                else:  # 🛑 canceled attendance
+                    await context.channel.send(
+                        Server(context.guild.id).returnLanguage("cancelCall"))
+                    del self.callList[entry]
 
     async def Call(self, context, args: tuple):
         classroom = context.message.role_mentions

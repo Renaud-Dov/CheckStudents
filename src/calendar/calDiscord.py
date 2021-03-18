@@ -40,6 +40,7 @@ class CalCog(commands.Cog):
         if self.started:
             self.started = False
             self.SendEventsOfTomorrow.cancel()
+            await context.channel.send("Agenda stoppé")
 
     @commands.command(aliases=["agenda", "calendar"])
     async def Calendar(self, context):

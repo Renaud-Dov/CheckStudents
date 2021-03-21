@@ -116,6 +116,10 @@ class CalCog(commands.Cog):
 
         embed = Embed.BasicEmbed(color=discord.Color.red(),
                                  title=f"Added {class_link} calendar for {context.channel} channel")
+
+        if s not in data.calendar:
+            data.calendar[s] = []
+
         data.calendar[s].append(class_link)
         data.Save_Settings()
         await Tools.AdminCommand(context, embed)

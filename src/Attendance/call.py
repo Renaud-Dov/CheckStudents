@@ -28,7 +28,7 @@ class Check:
 
 class LateStudent:
     def __init__(self, teacher: discord.user, student: discord.User, message=discord.Message):
-        self.teacher: discord.user = teacher
+        self.teacher: discord.User = teacher
         self.student: discord.User = student
         self.message = message
         self.time = datetime.now()
@@ -119,18 +119,24 @@ class Calling:
                 await ClassData.AddStudents(context, Botmessage.id)
 
                 msg = await context.fetch_message(Botmessage.id)
-                await msg.delete()
+                try:
+                    await msg.clear_reactions()
+                except:
+                    await msg.delete()
 
                 await self.finishCall(client, ClassData)
             else:
+                msg = await context.fetch_message(Botmessage.id)
                 if str(reaction.emoji) == "🆗":
                     ClassData: Check = self.callList.pop(entry)
                     await context.channel.send(
                         f"{user.display_name} :{Server(context.guild.id).returnLanguage('FinishCall')} {ClassData.role.name}")
                     await ClassData.AddStudents(context, Botmessage.id)
 
-                    msg = await context.fetch_message(Botmessage.id)
-                    await msg.delete()
+                    try:
+                        await msg.clear_reactions()
+                    except:
+                        await msg.delete()
 
                     await self.finishCall(client, ClassData)
 
@@ -139,6 +145,11 @@ class Calling:
                         Server(context.guild.id).returnLanguage("cancelCall"))
                     del self.callList[entry]
 
+                    try:
+                        await msg.clear_reactions()
+                    except:
+                        await msg.delete()
+
     async def Call(self, context, args: tuple):
         classroom = context.message.role_mentions
         data = Server(context.guild.id)
@@ -146,7 +157,7 @@ class Calling:
         try:
             if len(classroom) != 1:
                 await Tools.SendError(context.channel, "Please precise **one** role to call")
-                raise ValueError
+                return None
 
             delay = data.delay if data.delay > 0 else 0
             if '-d' in args:
@@ -161,6 +172,7 @@ class Calling:
                              icon_url=context.message.author.avatar_url)
             embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
             embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
+            embed.add_field(name="Number of students in this class", value=str(len(classroom[0].members)))
             # embed.add_field()
             embed.set_footer(text=message[3])
 

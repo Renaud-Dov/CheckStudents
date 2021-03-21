@@ -1,13 +1,35 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
-## [0.9.0] - 2021-03-07
+## [0.9.1] - 2021-03-21
+### Added
+* Extensions (calendar, admin, teacher) can be loaded or unloaded
+  > Command : `load {module} | unload {module} | reload {module}`
+  > 
+  > Example : `.Check load src.roles.admin`
+### Changed
+* Call embed will show how many students got the role.
+
+* You can now add as many calendars as you want for your channel.
+> The remove calendar command now need the class_link argument
+> 
+> Example : `.Check cal remove INFOS2E1-1`
+
+## [0.9.0] - 2021-03-18
 ### Added
 * Added calendar (for Epita servers only)
+  >The bot send calendar around 19H (UTC time)
+  > 
+  > Use `cal add {calendar}` using CHRONOS calendar label
+  > 
+  > `cal remove {calendar}`
+  > 
+  > `cal list`
+
 ### Changed
-
+* Some files and functions have been moved to get a cleaner code.
 ### Fixed
-
-
+For some servers using a high level of moderation, the bot was unable to finish the attendance because he was 
+using some restricted permission. Now the bot will add the emojis on his message and delete it after the attendance.
 ## [0.8.1] - 2021-01-23
 ### Changed
 * Attendance automatically close after 10 minutes if you forgot to close it.

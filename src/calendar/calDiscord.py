@@ -21,12 +21,29 @@ async def IsEpitaServer(context: commands.Context):
         raise Exec.NotEpitaServ(context)
 
 
+def setup(bot: commands.Bot):
+    bot.add_cog(CalCog(bot))
+
+
 class CalCog(commands.Cog):
     def __init__(self, bot):
         self.started = False
         self.bot: discord.Client = bot
 
-    @commands.command()
+    @commands.group()
+    async def cal(self, context):
+        await IsEpitaServer(context)
+        if context.invoked_subcommand is None:
+            embed = Embed.CalHelp()
+            embed.add_field(name="cal help", value="Show this message")
+            await context.channel.send(embed=embed)
+
+    @cal.command(aliases=["commands,command"])
+    async def help(self, context):
+        await context.message.author.send("Here the list of subcommand you can use with *cal*",
+                                          embed=Embed.CalHelp())
+
+    @cal.command()
     @commands.is_owner()
     async def StartCalendar(self, context):
         if not self.started:
@@ -34,7 +51,7 @@ class CalCog(commands.Cog):
             await context.channel.send("Agenda activé")
             self.SendEventsOfTomorrow.start()
 
-    @commands.command()
+    @cal.command()
     @commands.is_owner()
     async def StopCalendar(self, context):
         if self.started:
@@ -42,14 +59,15 @@ class CalCog(commands.Cog):
             self.SendEventsOfTomorrow.cancel()
             await context.channel.send("Agenda stoppé")
 
-    @commands.command(aliases=["agenda", "calendar"])
+    @cal.command(aliases=["agenda", "calendar"])
     async def Calendar(self, context):
         await IsEpitaServer(context)
         data = Server(context.guild.id).calendar
         if str(context.channel.id) not in data:
             await Tools.SendError(context.channel, "There is no calendar set for this channel.")
             return None
-        await self.SendEvents(context.channel, data[str(context.channel.id)])
+        for cal in data[str(context.channel.id)]:
+            await self.SendEvents(context.channel, cal)
 
     @staticmethod
     def RemoveCalAuto(channel: discord.TextChannel):
@@ -83,49 +101,52 @@ class CalCog(commands.Cog):
                 data: dict = Server(guild).calendar
                 for channel in data.items():
                     a = self.bot.get_channel(int(channel[0]))
-                    await self.SendEvents(a, channel[1])
+                    for cal in channel[1]:
+                        await self.SendEvents(a, cal)
             except FileNotFoundError as e:
-                print(f"Unable to send events for '{guild}' , the file doesn't not exist")
+                print(f"Unable to send events for '{guild}' , the file doesn't not exist",e)
 
+    @cal.command(name="add")
+    async def AddCalendar(self, context: commands.Context, class_link):
+        data = Server(context.guild.id)
+        s = str(context.channel.id)
+        if s in data.calendar and class_link in data.calendar[s]:
+            await Tools.SendError(context.channel, "Calendar already added")
+            return None
 
-async def AddCalendar(context: commands.Context, arg):
-    data = Server(context.guild.id)
-    if str(context.channel.id) in data.calendar:
-        await Tools.SendError(context.channel, "Calendar already added")
-        return None
+        embed = Embed.BasicEmbed(color=discord.Color.red(),
+                                 title=f"Added {class_link} calendar for {context.channel} channel")
+        data.calendar[s].append(class_link)
+        data.Save_Settings()
+        await Tools.AdminCommand(context, embed)
+        await CalCog.SendEvents(context.channel, class_link)
 
-    embed = discord.Embed(color=discord.Color.red(), title=f"Added {arg} calendar for {context.channel} channel")
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    data.calendar[context.channel.id] = arg
-    data.Save_Settings()
-    await Tools.AdminCommand(context, embed)
-    await CalCog.SendEvents(context.channel, data.calendar[context.channel.id])
+    @cal.command(name="remove", aliases=["del,rm"])
+    async def DelCalendar(self, context: commands.Context, class_link: str):
+        data = Server(context.guild.id)
 
+        s = str(context.channel.id)
+        if s not in data.calendar or class_link not in data.calendar[s]:
+            await Tools.SendError(context.channel, "Unknown calendar")
+            return None
 
-async def DelCalendar(context: commands.Context):
-    data = Server(context.guild.id)
+        data.calendar[s].remove(class_link)
 
-    if str(context.channel.id) not in data.calendar:
-        await Tools.SendError(context.channel, "Unknown calendar")
-        return None
+        if not data.calendar[s]:
+            data.calendar.pop(s)
 
-    cal = data.calendar.pop(str(context.channel.id))
-    data.Save_Settings()
+        data.Save_Settings()
 
-    embed = discord.Embed(color=discord.Color.red(), title=f"Removed {cal} calendar from {context.channel} channel")
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        embed = Embed.BasicEmbed(color=discord.Color.red(),
+                                 title=f"Removed {class_link} calendar from {context.channel} channel")
 
-    await Tools.AdminCommand(context, embed)
+        await Tools.AdminCommand(context, embed)
 
+    @cal.command(name="list")
+    async def ListCalendar(self, context: commands.Context):
+        data: dict = Server(context.guild.id).calendar
+        embed = Embed.BasicEmbed(color=discord.Color.green())
+        for calendar in data.items():
+            embed.add_field(name=self.bot.get_channel(int(calendar[0])), value='\n'.join(calendar[1]))
 
-async def ListCalendar(context: commands.Context, bot):
-    data: dict = Server(context.guild.id).calendar
-    embed = discord.Embed(color=discord.Color.green())
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    for calendar in data.items():
-        embed.add_field(name=bot.get_channel(int(calendar[0])), value=calendar[1])
-
-    await context.channel.send(embed=embed)
+        await context.channel.send(embed=embed)

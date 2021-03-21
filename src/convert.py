@@ -1,6 +1,8 @@
 import json
 import glob
+"""
 
+"""
 for file in glob.glob("./database/*json"):
     if file != "epita.serv.json":
         with open(file, 'r') as outfile:

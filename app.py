@@ -12,7 +12,7 @@ if __name__ == "__main__":
     import logging
 
     logger = logging.getLogger('discord')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
     handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(handler)
@@ -80,7 +80,8 @@ async def on_command_error(context, error):
         await Tools.SendError(context.channel, "Missing argument", desc=str(error))
     else:
         await Tools.SendError(context.channel, str(error))
-
+        logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")
+        raise error
 
 # print(error, context.guild, context.guild.id, context.channel, context.message.jump_url)
 

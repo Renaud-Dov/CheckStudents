@@ -85,17 +85,13 @@ class Calling:
         await asyncio.sleep(delay * 60)
         if self.missing[classroomMsg]:
             missing = self.missing.pop(classroomMsg)
-            await Calling.EndDelay(channel, delay)
+            await channel.send(embed=Embed.BasicEmbed(
+                title=f"The {delay} minute(s) are elapsed: absents can no longer send a late ticket.",
+                color=discord.Color.red))
             for student in missing.values():
                 await student.message.edit(
                     content=f"The {delay} minute(s) are elapsed: you can no longer send a late ticket.")
                 await student.message.remove_reaction("⏰", clientUser)
-
-    @staticmethod
-    async def EndDelay(channel, delay):
-        embed = Embed.BasicEmbed(color=discord.Colour.red(),
-                                 title=f"The {delay} minute(s) are elapsed: absents can no longer send a late ticket.")
-        await channel.send(embed=embed)
 
     async def StartCall(self, client: discord.client, context, args: tuple):
         """
@@ -107,8 +103,13 @@ class Calling:
             entry = f"{context.guild.id}-{Botmessage.id}"
 
             def check(reaction, user):
-                return "{0.guild.id}-{0.id}".format(reaction.message) in self.callList and \
-                       (user == self.callList[entry].teacher) and str(reaction.emoji) in ("🆗", "🛑")
+
+                try:
+                    return "{0.guild.id}-{0.id}".format(reaction.message) in self.callList and \
+                           (user == self.callList[entry].teacher) and str(reaction.emoji) in ("🆗", "🛑")
+                except AttributeError:
+                    # print(reaction, user)
+                    return False
 
             try:
                 reaction, user = await client.wait_for('reaction_add', timeout=600, check=check)
@@ -186,7 +187,7 @@ class Calling:
 
             return Botmessage
         except (ValueError, IndexError):
-            await Tools.SendError(context.channel, "Invalid Args")
+            raise Exception("Invalid Args")
 
     async def Send_MP_absents(self, absents: list, message: discord.Message, delay: int, teacher: discord.Member):
         """

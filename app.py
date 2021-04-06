@@ -5,8 +5,6 @@ if __name__ == "__main__":
     import sys
     from src.tools import Tools
     from src.Attendance.call import Calling
-    from src.roles import admin
-    from src.calendar import calDiscord as Calendar
     from src.roles.teacher import is_teacher
 
     import logging

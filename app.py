@@ -71,17 +71,15 @@ async def on_guild_remove(guild):
 #######################################################
 
 @client.event
-async def on_command_error(context, error):
+async def on_command_error(context: commands.Context, error):
     if isinstance(error, commands.errors.CommandNotFound):
         await Tools.SendError(context.channel, "Unknown Command. Use help command")
     elif isinstance(error, commands.errors.MissingRequiredArgument):
         await Tools.SendError(context.channel, "Missing argument", desc=str(error))
     else:
-        await Tools.SendError(context.channel, str(error))
+        await Tools.SendError(context.channel, "An error occurred", str(error))
         logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")
         raise error
-
-# print(error, context.guild, context.guild.id, context.channel, context.message.jump_url)
 
 
 @client.command()

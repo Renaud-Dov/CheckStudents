@@ -87,7 +87,7 @@ class Calling:
             missing = self.missing.pop(classroomMsg)
             await channel.send(embed=Embed.BasicEmbed(
                 title=f"The {delay} minute(s) are elapsed: absents can no longer send a late ticket.",
-                color=discord.Color.red))
+                color=discord.Color.red()))
             for student in missing.values():
                 await student.message.edit(
                     content=f"The {delay} minute(s) are elapsed: you can no longer send a late ticket.")

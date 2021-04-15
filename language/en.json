@@ -21,7 +21,7 @@
     "endcall": [
         "**Present students:**\n",
         "**Missing students:\n**",
-        "\n ✅ **Every students are present** ✅"
+        "\n ✅ **All students are present** ✅"
     ],
     "FinishCall": "finished the attendance of",
     "cancelCall": "⚠ **Canceled the attendance** ⚠",

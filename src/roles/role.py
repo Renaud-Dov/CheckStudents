@@ -34,7 +34,7 @@ async def addRole(context, value):
     a = Tools.got_the_role(server.admin, context.author)
     if (server.admin["roles"] != [] or server.admin["users"] != []) and not Tools.got_the_role(server.admin,
                                                                                                context.author):
-        await Tools.SendError(context.channel, server.returnLanguage("NoPrivileges"))
+        await Tools.SendError(context.channel, server.GetLanguage().NoPrivileges)
     else:
         embed = Embed.BasicEmbed(color=discord.Colour.orange())
 

@@ -12,7 +12,7 @@ def is_teacher():
         data = Server(context.guild.id)
         if Tools.got_the_role(data.teacher, context.author):
             return True
-        await Tools.SendError(context.channel, data.returnLanguage("notTeacher"))
+        await Tools.SendError(context.channel, data.GetLanguage().NoPrivileges)
         return False
 
     return commands.check(predicate)

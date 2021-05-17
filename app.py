@@ -76,6 +76,8 @@ async def on_command_error(context: commands.Context, error):
         await Tools.SendError(context.channel, "Unknown Command. Use help command")
     elif isinstance(error, commands.errors.MissingRequiredArgument):
         await Tools.SendError(context.channel, "Missing argument", desc=str(error))
+    elif isinstance(error,commands.errors.CheckFailure):
+        pass
     else:
         await Tools.SendError(context.channel, "An error occurred", str(error))
         logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")

@@ -10,7 +10,7 @@ def is_admin():
         data = Server(context.guild.id)
         if Tools.got_the_role(data.admin, context.author):
             return True
-        await Tools.SendError(context.channel, data.returnLanguage("NoPrivileges"))
+        await Tools.SendError(context.channel, data.GetLanguage().NoPrivileges)
         return False
 
     return commands.check(predicate)
@@ -57,7 +57,7 @@ class Admin(commands.Cog):
         try:
             data.prefix = arg
             embed = Embed.BasicEmbed(color=discord.Colour.orange(),
-                                     title=data.returnLanguage("newPrefix") + f"**{arg}**",
+                                     title=data.GetLanguage().newPrefix + f"**{arg}**",
                                      description="You still can use \"`.Check `\"")
             await Tools.AdminCommand(context, embed)
 
@@ -75,7 +75,7 @@ class Admin(commands.Cog):
 
         data = Server(context.guild.id)
         data.language = lang
-        embed = Embed.BasicEmbed(color=discord.Colour.orange(), title=data.returnLanguage("changeLanguage"))
+        embed = Embed.BasicEmbed(color=discord.Colour.orange(), title=data.GetLanguage().changeLanguage)
 
         await Tools.AdminCommand(context, embed)
         data.Save_Settings()
@@ -101,7 +101,7 @@ class Admin(commands.Cog):
     async def Reset(self, context):
         data = Server(context.guild.id)
         if not Tools.got_the_role(data.admin, context.author) and context.message.author != context.guild.owner:
-            await Tools.SendError(context.channel, data.returnLanguage("NoPrivileges"))
+            await Tools.SendError(context.channel, data.GetLanguage().NoPrivileges)
             return None
 
         data.Reset()

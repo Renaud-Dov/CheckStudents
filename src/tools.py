@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from src.data import *
+from src import Embed
 
 
 class Tools:
@@ -45,13 +46,12 @@ class Tools:
 
     @staticmethod
     async def SendError(channel, message: str, desc: str = None):
-        embed = discord.Embed(color=discord.Color.red(), title=message)
-        embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                         icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
+        embed = Embed.BasicEmbed(color=discord.Color.red(), title=message)
         # embed.add_field(name="Permission Denied",value=message)
         if desc is not None:
             embed.description = desc
         embed.set_thumbnail(url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/remove.png")
+        # embed.set_footer(text="Feel free to open a issue on Github")
         await channel.send(embed=embed)
 
     @staticmethod

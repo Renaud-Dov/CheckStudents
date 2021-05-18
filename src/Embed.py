@@ -35,6 +35,7 @@ def HelpMsg():
     embed.add_field(name="call @class", value="Start the call, *replace by the corresponding class*", inline=False)
     embed.add_field(name="admin *subcommand*", value="admin roles commands (see admin subcommands)", inline=False)
     embed.add_field(name="teacher *subcommand*", value="teacher role commands (see teacher subcommands)", inline=False)
+    embed.add_field(name="cal *subcommand*", value="cal role commands (see cal subcommands)", inline=False)
     embed.add_field(name="settings", value="Return settings values", inline=False)
     embed.add_field(name="admin help", value="Return admin subcommands", inline=False)
     embed.add_field(name="teacher help", value="Return teacher subcommands", inline=False)
@@ -48,7 +49,7 @@ def CalHelp():
 
     embed.add_field(name="add {ClassLink}",
                     value="Link the channel to a calendar (Example : `.Check cal add INFOS2E1-1`)")
-    embed.add_field(name="remove", value="Remove the calendar in the channel")
+    embed.add_field(name="remove {ClassLink}", value="Remove the calendar in the channel")
     embed.add_field(name="list", value="Remove the calendar in the channel")
     return embed
 

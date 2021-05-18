@@ -1,18 +1,16 @@
 if __name__ == "__main__":
-    import discord
     from discord.ext import commands
     from src.data import *
     from src import Embed
     import sys
     from src.tools import Tools
-    from src.call import Calling
-    from src.adminCmd import Admin
-    from src.calendar import calDiscord as Calendar
+    from src.Attendance.call import Calling
+    from src.roles.teacher import is_teacher
 
     import logging
 
     logger = logging.getLogger('discord')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
     handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(handler)
@@ -22,38 +20,16 @@ if __name__ == "__main__":
     intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
                               guild_reactions=True)
     client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
-    AdminInstance = Admin()
-
-    calendar = Calendar.CalCog(client)
 
 
 @client.event
 async def on_ready():
     await client.change_presence(activity=discord.Game(name=".Check help"))
     print("Bot is ready!")
-    await calendar.StartCalendar()
-
-
-def is_teacher():
-    async def predicate(context):
-        data = Server(context.guild.id)
-        if Tools.got_the_role(data.teacher, context.author):
-            return True
-        await Tools.SendError(context.channel, data.returnLanguage("notTeacher"))
-        return False
-
-    return commands.check(predicate)
-
-
-def is_admin():
-    async def predicate(context):
-        data = Server(context.guild.id)
-        if Tools.got_the_role(data.admin, context.author):
-            return True
-        await Tools.SendError(context.channel, data.returnLanguage("NoPrivileges"))
-        return False
-
-    return commands.check(predicate)
+    # TODO : REMOVE COMMENT
+    client.load_extension("src.calendar.calDiscord")
+    client.load_extension("src.roles.admin")
+    client.load_extension("src.roles.teacher")
 
 
 @client.command(aliases=["Call, attendance"])
@@ -65,34 +41,9 @@ async def call(context, *args):
 @client.event
 async def on_reaction_add(reaction, user):
     if isinstance(reaction.message.channel,
-                  discord.DMChannel) and reaction.message.author == client.user and user != client.user and str(
-        reaction.emoji) == "⏰":
+                  discord.DMChannel) and reaction.message.author == client.user \
+            and user != client.user and str(reaction.emoji) == "⏰":
         await CheckClass.LateStudent(reaction.message)
-
-
-@client.group()
-async def admin(context):
-    if context.invoked_subcommand is None:
-        embed = Embed.AdminHelp()
-        embed.add_field(name="admin help", value="Show this message")
-        await context.channel.send(embed=embed)
-
-
-@client.group()
-async def teacher(context):
-    if context.invoked_subcommand is None:
-        embed = Embed.TeacherHelp()
-        embed.add_field(name="teacher help", value="Show this message")
-        await context.channel.send(embed=embed)
-
-
-@client.group()
-async def cal(context):
-    await Calendar.IsEpitaServer(context)
-    if context.invoked_subcommand is None:
-        embed = Embed.CalHelp()
-        embed.add_field(name="cal help", value="Show this message")
-        await context.channel.send(embed=embed)
 
 
 @client.event
@@ -116,128 +67,27 @@ async def on_guild_remove(guild):
         print("FileNotFoundError", guild, guild.id)
 
 
-@admin.command(aliases=['Roles', 'list', 'admin', 'admins'])
-async def roles(context):
-    await ListRoles(context, "admin")
-
-
-@teacher.command(aliases=['Roles', 'list', 'admin', 'admins'])
-async def roles(context):
-    await ListRoles(context, "teacher")
-
-
-async def ListRoles(context, value: str):
-    embed = discord.Embed(color=discord.Colour.orange())
-    embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
-                     icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-
-    if value == "teacher":
-        role = Server(context.guild.id).teacher
-    elif value == "admin":
-        role = Server(context.guild.id).admin
-
-    if not role["roles"] and not role["users"]:
-        embed.add_field(name=f"**{value} :**", value=f"There is no {value} yet")
-    else:
-        if role["roles"]:
-            message = ""
-            for i in role["roles"]:
-                message += f"<@&{i}>\n"
-            embed.add_field(name=f"**{value.capitalize()} roles :**", value=message)
-
-        if role["users"]:
-            message = ""
-            for i in role["users"]:
-                message += f"<@{i}>\n"
-            embed.add_field(name=f"**{value.capitalize()} users :**", value=message)
-    await context.channel.send(embed=embed)
-
-
-#######################################################
-##  Admin/Teacher role gestion
-#######################################################
-@admin.command()
-async def add(context):
-    await AdminInstance.addRole(context, "admin")
-
-
-@teacher.command()
-async def add(context):
-    await AdminInstance.addRole(context, "teacher")
-
-
-@admin.command(aliases=['del', 'remove'])
-@is_admin()
-async def rm(context):
-    await AdminInstance.rmRole(context, "admin")
-
-
-@teacher.command(aliases=['del', 'remove'])
-@is_admin()
-async def rm(context):
-    await AdminInstance.rmRole(context, "teacher")
-
-
-#######################################################
-##  Admin subcommands
-#######################################################
-
-
-@admin.command()
-@is_admin()
-async def prefix(context, arg):
-    await AdminInstance.prefix(context, arg)
-
-
-@admin.command(aliases=["lang"])
-@is_admin()
-async def language(context, lang=None):
-    await AdminInstance.language(context, lang)
-
-
-@admin.command()
-@is_admin()
-async def delay(context, time=None):
-    await AdminInstance.Delay(context, time)
-
-
-@admin.command()
-@is_admin()
-async def ShowPresents(context):
-    await AdminInstance.ShowPresents(context)
-
-
-@admin.command()
-async def reset(context):
-    await AdminInstance.Reset(context)
-
-
-@admin.command(aliases=["sys"])
-@is_admin()
-async def sysMessages(context):
-    await AdminInstance.sysMessages(context)
-
-
-@admin.command()
-@is_admin()
-async def DM(context):
-    await AdminInstance.DeactivateMP(context)
-
-
 #######################################################
 #######################################################
 
 @client.event
-async def on_command_error(context, error):
+async def on_command_error(context: commands.Context, error):
     if isinstance(error, commands.errors.CommandNotFound):
         await Tools.SendError(context.channel, "Unknown Command. Use help command")
-    # print(error, context.guild, context.guild.id, context.channel, context.message.jump_url)
+    elif isinstance(error, commands.errors.MissingRequiredArgument):
+        await Tools.SendError(context.channel, "Missing argument", desc=str(error))
+    elif isinstance(error,commands.errors.CheckFailure):
+        pass
+    else:
+        await Tools.SendError(context.channel, "An error occurred", str(error))
+        logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")
+        raise error
 
 
 @client.command()
 async def settings(context):
     data = Server(context.guild.id)
-    embed = Embed.CompleteEmbed(color=discord.Colour.orange(), title="Current settings")
+    embed = Embed.BasicEmbed(color=discord.Colour.orange(), title="Current settings")
 
     embed.add_field(name="• System Messages", value=str(data.sysMessages), inline=False)
     embed.add_field(name="• Private Messages", value=str(data.mp), inline=False)
@@ -249,45 +99,52 @@ async def settings(context):
     await context.channel.send(embed=embed)
 
 
-#######################################################
-##  Calendar commands
-#######################################################
-@cal.command()
-@is_admin()
-async def add(context: commands.Context, arg):
-    await Calendar.AddCalendar(context, arg)
+@client.command(hidden=True)
+@commands.is_owner()
+async def load(context, *, module: str):
+    """Loads a module."""
+    try:
+        client.load_extension(module)
+    except Exception as e:
+        print(f"Error on load {module}.", e)
+        await context.channel.send(f"Error on load **{module}**.")
+    else:
+        print(f"successfully loaded {module}.")
+        await context.channel.send(f"successfully loaded **{module}**.")
 
 
-@cal.command()
-@is_admin()
-async def remove(context: commands.Context):
-    await Calendar.DelCalendar(context)
+@client.command()
+@commands.is_owner()
+async def unload(context, module: str):
+    """Unloads a module."""
+    try:
+        client.unload_extension(module)
+    except Exception as e:
+        print(f"Error on unload {module}.", e)
+        await context.channel.send(f"Error on unload **{module}**.")
+    else:
+        print(f"successfully unloaded {module}.")
+        await context.channel.send(f"successfully unloaded **{module}**.")
 
 
-@cal.command()
-async def list(context: commands.Context):
-    await Calendar.ListCalendar(context, client)
+@client.command()
+@commands.is_owner()
+async def reload(context, module: str):
+    """Reloads a module."""
+    try:
+        client.reload_extension(module)
+    except Exception as e:
+        print(f"Error on reload {module}.", e)
+        # await self.bot.say('{}: {}'.format(type(e).__name__, e))
+        await context.channel.send(f"Error on reload **{module}**.")
+    else:
+        print(f"successfully reloaded {module}.")
+        await context.channel.send(f"successfully reloaded **{module}**.")
 
 
 #######################################################
 ##  Help commands
 #######################################################
-@teacher.command(aliases=["commands,command"])
-async def help(context):
-    await context.message.author.send("Here the list of subcommand you can use with *teacher*",
-                                      embed=Embed.TeacherHelp())
-
-
-@admin.command(aliases=["commands,command"])
-async def help(context):
-    await context.message.author.send("Here the list of subcommand you can use with *admin*",
-                                      embed=Embed.AdminHelp())
-
-
-@cal.command(aliases=["commands,command"])
-async def help(context):
-    await context.message.author.send("Here the list of subcommand you can use with *cal*",
-                                      embed=Embed.CalHelp())
 
 
 @client.command(aliases=["commands,command"])
@@ -295,5 +152,4 @@ async def help(context):
     await context.message.author.send(embed=Embed.HelpMsg())
 
 
-client.add_cog(calendar)
 client.run(token)

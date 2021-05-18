@@ -114,6 +114,12 @@ Reset command will reset admin and teacher list, put default prefix (`.Check`), 
 Return language, and private and system messages status values.
 > Command : `admin settings`
 
+## Calendar
+> Note that this functionality is only available for EPITA servers.
+
+
+### [Check for more information here](/src/calendar/CALENDAR.md)
+
 ## Common Errors
 ### The bot doesn't respond to any command
 >If the bot doesn't respond to any command, it might be because you did not accept all permission. In that case, remove the bot from the server, and invite him again.

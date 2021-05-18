@@ -2,6 +2,9 @@ import json
 import discord
 import os
 
+from language.fr import French
+from language.en import English
+
 
 class Server:
     def __init__(self, guild_id: int):
@@ -28,10 +31,11 @@ class Server:
         with open("database/{}.json".format(self.guild), "w") as outfile:
             json.dump(self.__toDict(), outfile)
 
-    def returnLanguage(self, stat):
-        with open('language/{}.json'.format(self.language)) as outfile:
-            var = json.load(outfile)
-        return var[stat]
+    def GetLanguage(self):
+        if self.language == "en":
+            return English
+        if self.language == "fr":
+            return French
 
     def Reset(self):
         self.language = "en"

@@ -1,5 +1,9 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
+## [0.9.2] - 2021-05-18
+### Changed
+* Changed language architecture system.
+
 ## [0.9.1] - 2021-03-21
 ### Added
 * Extensions (calendar, admin, teacher) can be loaded or unloaded

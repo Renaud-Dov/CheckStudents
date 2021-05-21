@@ -75,8 +75,9 @@ class Calling:
             if data.mp:
                 missing_student = await self.Send_MP_absents(list_absents, classroom.message, delay, classroom.teacher)
                 if list_absents and classroom.delay:
+                    diff = nb_students - len(list_presents)
                     await classroom.message.channel.send(
-                        f"The **{nb_students - len(list_presents)}** absent have **{delay}** minutes to send me a direct message to report their late arrival")
+                        f"The **{diff}** absent{'s' if diff > 1 else ''} have **{delay}** minutes to send me a direct message to report their late arrival")
                     self.missing[classroom.message.id] = missing_student
                     await self.DelayForLateStudents(client.user, classroom.message.id, classroom.message.channel, delay)
 

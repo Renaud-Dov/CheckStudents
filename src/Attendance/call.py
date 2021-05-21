@@ -71,7 +71,7 @@ class Calling:
             delay = classroom.delay if classroom.delay > 0 and (nb_students - len(list_presents)) > 0 else 0
 
             await self.SendList(classroom, first_msg, len(list_presents), nb_students, absents, delay, data.mp)
-
+            await self.SendEasterEgg(classroom, list_presents, list_absents)
             if data.mp:
                 missing_student = await self.Send_MP_absents(list_absents, classroom.message, delay, classroom.teacher)
                 if list_absents and classroom.delay:
@@ -285,3 +285,23 @@ class Calling:
         as_bytes = map(str.encode, message)
         content = b"".join(as_bytes)
         await channel.send(file=discord.File(BytesIO(content), f"{name}.txt"))
+
+    @staticmethod
+    async def SendEasterEgg(classroom: Check, list_presents: list, list_absents: list):
+        bryan = False
+        brian = False
+        for absent in list_absents:
+            if absent.id == 429918691161931786:
+                bryan = True
+            elif absent.id == 368720219671232512:
+                brian = True
+
+            if brian and bryan:
+                break
+
+        if brian and bryan:
+            await classroom.message.channel.send("**Guess who absent again ?**")
+        elif brian:
+            await classroom.message.channel.send("**Brian is the kitchen... again**")
+        elif bryan:
+            await classroom.message.channel.send("**Bryan is the kitchen... again**")

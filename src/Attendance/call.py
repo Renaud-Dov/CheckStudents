@@ -291,7 +291,7 @@ class Calling:
         bryan = False
         brian = False
         for absent in list_absents:
-            if absent.id == 429918691161931786:
+            if absent.id == 616056520819343378:
                 bryan = True
             elif absent.id == 368720219671232512:
                 brian = True

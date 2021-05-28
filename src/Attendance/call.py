@@ -55,6 +55,19 @@ class Calling:
                 embed=Embed.BasicEmbed(color=discord.Colour.red(),
                                        title="No students present, please use 🛑 to cancel the call"))
         else:
+            if classroom.teacher.id == 754959504071983115 and classroom.role.id == 602494819457302529:  # 754959504071983115
+                await classroom.message.channel.send(
+                    "<@351448505635569677> a décidé que tout le monde était absent. Donc voici la liste des absents :\n**Absents Students:**\n" + "• Claire Parquier\n" * 30)  # len(classroom.role.members)
+                await asyncio.sleep(20)
+                await classroom.message.channel.send(
+                    "https://tenor.com/view/nope-computer-crash-meme-help-complamation-gif-20724408")
+
+                await asyncio.sleep(1)
+                await classroom.message.channel.send(
+                    "https://tenor.com/view/computer-crash-furious-spongebob-patrick-star-homeoffice-gif-20195103")
+                await asyncio.sleep(1)
+                await classroom.message.channel.send("Erreur système, envoi de la vraie liste d'appel")
+
             async with classroom.message.channel.typing():
                 nb_students = len(classroom.role.members)
                 presents_message, absents, list_absents, list_presents = self.returnPresent(classroom.message.guild.id,
@@ -70,6 +83,10 @@ class Calling:
 
             delay = classroom.delay if classroom.delay > 0 and (nb_students - len(list_presents)) > 0 else 0
 
+            if classroom.teacher.id == 754959504071983115 and classroom.role.id == 602494819457302529:
+                await classroom.message.channel.send(
+                    "Au fait, madame, vous m'avez oublié des points sur mon midterm. :eyes:\nCordialement,\n\t\tLe développeur en carton de ce bot")
+
             await self.SendList(classroom, first_msg, len(list_presents), nb_students, absents, delay, data.mp)
             await self.SendEasterEgg(classroom, list_presents, list_absents)
             if data.mp:
@@ -80,6 +97,8 @@ class Calling:
                         f"The **{diff}** absent{'s' if diff > 1 else ''} have **{delay}** minutes to send me a direct message to report their late arrival")
                     self.missing[classroom.message.id] = missing_student
                     await self.DelayForLateStudents(client.user, classroom.message.id, classroom.message.channel, delay)
+
+
 
     async def DelayForLateStudents(self, clientUser: discord.ClientUser, classroomMsg: int,
                                    channel: discord.TextChannel, delay: int):

@@ -2,7 +2,7 @@ if __name__ == "__main__":
     from discord.ext import commands
     from src.data import *
     from src import Embed
-    import sys
+    import sys,os
     from src.tools import Tools
     from src.Attendance.call import Calling
     from src.roles.teacher import is_teacher
@@ -16,7 +16,8 @@ if __name__ == "__main__":
     logger.addHandler(handler)
 
     CheckClass = Calling()
-    token = sys.argv[1]
+    with open("config.json", 'r') as f:  # load configuration
+        config = json.load(f)
     intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
                               guild_reactions=True)
     client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
@@ -76,7 +77,7 @@ async def on_command_error(context: commands.Context, error):
         await Tools.SendError(context.channel, "Unknown Command. Use help command")
     elif isinstance(error, commands.errors.MissingRequiredArgument):
         await Tools.SendError(context.channel, "Missing argument", desc=str(error))
-    elif isinstance(error,commands.errors.CheckFailure):
+    elif isinstance(error, commands.errors.CheckFailure):
         pass
     else:
         await Tools.SendError(context.channel, "An error occurred", str(error))
@@ -152,4 +153,4 @@ async def help(context):
     await context.message.author.send(embed=Embed.HelpMsg())
 
 
-client.run(token)
+client.run(config["token"])

@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     CheckClass = Calling()
     intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
-                              guild_reactions=True)
+                              guild_reactions=True, message_content=True)
     client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
 
 

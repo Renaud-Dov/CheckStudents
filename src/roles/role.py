@@ -36,7 +36,7 @@ async def addRole(context, value):
                                                                                                context.author):
         await Tools.SendError(context.channel, server.GetLanguage().NoPrivileges)
     else:
-        embed = Embed.BasicEmbed(color=discord.Colour.orange())
+        embed = Embed.BasicEmbed(title="Add teacher Command", color=discord.Colour.orange())
 
         added_roles = str()
         already_added_roles = str()
@@ -78,13 +78,13 @@ async def addRole(context, value):
                 embed.add_field(name="Users already added", value=already_added_user)
 
             server.Save_Settings()
-            await Tools.AdminCommand(context, embed, "Add teacher Command")
+            await context.channel.send(embed=embed)
 
 
 async def rmRole(context, value):
     server = Server(context.guild.id)
 
-    embed = Embed.BasicEmbed(color=discord.Colour.orange())
+    embed = Embed.BasicEmbed(title="Remove Command", color=discord.Colour.orange())
 
     removed_roles = ""
     not_removed_roles = ""
@@ -124,4 +124,4 @@ async def rmRole(context, value):
         if not_removed_users != "":
             embed.add_field(name=f"Was not an {value} user", value=not_removed_users)
         server.Save_Settings()
-        await Tools.AdminCommand(context, embed, "Remove Command")
+        await context.channel.send(embed=embed)

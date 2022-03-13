@@ -122,7 +122,7 @@ class CalCog(commands.Cog):
 
         data.calendar[s].append(class_link)
         data.Save_Settings()
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
         await CalCog.SendEvents(context.channel, class_link)
 
     @cal.command(name="remove", aliases=["del,rm"])
@@ -144,7 +144,7 @@ class CalCog(commands.Cog):
         embed = Embed.BasicEmbed(color=discord.Color.red(),
                                  title=f"Removed {class_link} calendar from {context.channel} channel")
 
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
 
     @cal.command(name="list")
     async def ListCalendar(self, context: commands.Context):

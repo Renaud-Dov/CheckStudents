@@ -59,7 +59,7 @@ class Admin(commands.Cog):
             embed = Embed.BasicEmbed(color=discord.Colour.orange(),
                                      title=data.GetLanguage().newPrefix + f"**{arg}**",
                                      description="You still can use \"`.Check `\"")
-            await Tools.AdminCommand(context, embed)
+            await context.channel.send(embed=embed)
 
             data.Save_Settings()
         except commands.errors.MissingRequiredArgument:
@@ -77,7 +77,7 @@ class Admin(commands.Cog):
         data.language = lang
         embed = Embed.BasicEmbed(color=discord.Colour.orange(), title=data.GetLanguage().changeLanguage)
 
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
         data.Save_Settings()
 
     @admin.command()
@@ -94,7 +94,7 @@ class Admin(commands.Cog):
         data.showPresents = not data.showPresents
 
         data.Save_Settings()
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
 
     @admin.command()
     @is_admin()
@@ -113,7 +113,7 @@ class Admin(commands.Cog):
                                        "Private Messages :** Activated\nDelay for for late students after a call : "
                                        "10 minutes")
 
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
 
     @admin.command(aliases=["sys"])
     @is_admin()
@@ -129,7 +129,7 @@ class Admin(commands.Cog):
         data.sysMessages = not data.sysMessages
         data.Save_Settings()
 
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
 
     @admin.command()
     @is_admin()
@@ -141,7 +141,7 @@ class Admin(commands.Cog):
         data.mp = not data.mp
         data.Save_Settings()
 
-        await Tools.AdminCommand(context, embed)
+        await context.channel.send(embed=embed)
 
     @admin.command()
     @is_admin()
@@ -157,7 +157,7 @@ class Admin(commands.Cog):
             embed = Embed.BasicEmbed(color=discord.Color.red(), title=f"New delay : **{delay} minutes**")
 
             data.Save_Settings()
-            await Tools.AdminCommand(context, embed)
+            await context.channel.send(embed=embed)
         except ValueError:
             await Tools.SendError(context.channel,
                                   "Value must be between 0 and 60 minutes\nEnter 0 if you do not want to have any delay")

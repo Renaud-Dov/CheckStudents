@@ -2,7 +2,7 @@ if __name__ == "__main__":
     from discord.ext import commands
     from src.data import *
     from src import Embed
-    import sys,os
+    import sys, os
     from src.tools import Tools
     from src.Attendance.call import Calling
     from src.roles.teacher import is_teacher
@@ -16,8 +16,6 @@ if __name__ == "__main__":
     logger.addHandler(handler)
 
     CheckClass = Calling()
-    with open("config.json", 'r') as f:  # load configuration
-        config = json.load(f)
     intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, dm_messages=True,
                               guild_reactions=True)
     client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
@@ -153,4 +151,4 @@ async def help(context):
     await context.message.author.send(embed=Embed.HelpMsg())
 
 
-client.run(config["token"])
+client.run(os.environ.get("DISCORD_TOKEN"))

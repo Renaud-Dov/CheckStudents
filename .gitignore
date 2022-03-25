@@ -1,6 +1,6 @@
 src/test.py
 guild.json
 .idea
-/__pycache__
+__pycache__/
 /database
 *log

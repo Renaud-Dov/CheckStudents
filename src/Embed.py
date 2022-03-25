@@ -43,16 +43,6 @@ def HelpMsg():
     return embed
 
 
-def CalHelp():
-    embed = CompleteEmbed(color=discord.Colour.green(), title="Calendar settings subcommands:",
-                          description="You must be an admin in order to execute these commands")
-
-    embed.add_field(name="add {ClassLink}",
-                    value="Link the channel to a calendar (Example : `.Check cal add INFOS2E1-1`)")
-    embed.add_field(name="remove {ClassLink}", value="Remove the calendar in the channel")
-    embed.add_field(name="list", value="Remove the calendar in the channel")
-    return embed
-
 
 def BasicEmbed(title=None, description=None, color=None):
     embed = discord.Embed(title=title, description=description, color=color)
@@ -65,6 +55,6 @@ def CompleteEmbed(title=None, description=None, color=None):
     embed = discord.Embed(title=title, description=description, color=color)
     embed.set_author(name="CheckStudents", url="https://github.com/Renaud-Dov/CheckStudents",
                      icon_url="https://raw.githubusercontent.com/Renaud-Dov/CheckStudents/master/img/logo.png")
-    embed.set_footer(text="By Renaud-Dov DEVERS",
+    embed.set_footer(text="Made with ❤️ by BugBear",
                      icon_url="https://avatars.githubusercontent.com/u/14821642")
     return embed

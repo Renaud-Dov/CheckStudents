@@ -169,7 +169,7 @@ class Calling:
 
             embed = discord.Embed(color=discord.Colour.green(), title=message[0], description=message[1])
             embed.set_author(name=Tools.name(context.message.author),
-                             icon_url=context.message.author.avatar_url)
+                             icon_url=context.message.author.avatar.url)
             embed.add_field(name=f"**__{message[2]}__**", value=classroom[0].mention)
             embed.add_field(name="Date", value=date.today().strftime("%d/%m/%Y"))
             embed.add_field(name="Number of students in this class", value=str(len(classroom[0].members)))
@@ -195,7 +195,7 @@ class Calling:
         language_msg = Server(message.guild.id).GetLanguage().sendAbsents
 
         embed = discord.Embed(color=discord.Colour.red(), title="Absence")
-        embed.set_author(name=Tools.name(teacher), icon_url=teacher.avatar_url)
+        embed.set_author(name=Tools.name(teacher), icon_url=teacher.avatar.url)
         embed.add_field(name=language_msg[0], value=Tools.name(teacher))
         embed.add_field(name=language_msg[1], value=message.guild)
         embed.add_field(name=language_msg[2], value=message.channel)

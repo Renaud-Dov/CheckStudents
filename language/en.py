@@ -1,8 +1,6 @@
 class English:
     changeLanguage = "The language is now set to **English**"
     unknownCommand = "Unknown command: I sent you the list of available commands list in a private message"
-    classMsg = ["**Class:**", "**__Attendance summary__**"]
-    sendAbsents = ["**By:**", "**Server:**", "**Channel:**", ["Show message", "Link"]]
     commands = [
         "**List of the commands you can use with this bot:**",
         ["call ***@class***", "Start the attendance, *replace @class by the corresponding class*"],
@@ -35,8 +33,6 @@ class English:
     notAdmin = "is not admin"
     newAdmin = ["New Admin :","role already added","not a valid role"]
     rolenotValid = "Invalid role : For more information : `.Check help`"
-    startcall = ["Start of the attendance:","**Students: Click on ✅ to notify you present.\nTeacher: Click on 🆗 to validate the call or 🛑 to cancel it.**","Class called:","Need help ? Use the help command"]
-    newPrefix = "New Prefix: "
 
 
 

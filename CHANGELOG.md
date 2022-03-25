@@ -1,5 +1,8 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
+## [0.9.3] - 2022-03-25
+## Changed
+* Added message_content intent to prevent discord block in end April 2022
 ## [0.9.2] - 2021-05-18
 ### Changed
 * Changed language architecture system.

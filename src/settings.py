@@ -1,24 +1,30 @@
-from typing import Union, List
+from typing import Union, List, Optional
 
 import discord
-from discord import app_commands
+from discord import app_commands, ui
+from discord.app_commands import Choice
+from discord.utils import MISSING
 
 from src import Embed
 from src.data import Server
 from src.tools import Tools
 
 
-def is_admin():
-    async def predicate(interaction: discord.Interaction):
-        data = Server(interaction.guild_id)
-        if Tools.has_permission(data.admin, interaction.user) \
-                or interaction.guild.owner_id == interaction.user.id:
-            return True
-        await Tools.SendError(interaction, "You are not an admin or the server owner, you can't do that.",
-                              ephemeral=True)
-        return False
+# def is_admin():
+#     async def predicate(interaction: discord.Interaction):
+#         data = Server(interaction.guild_id)
+#         if Tools.has_permission(data.admin, interaction.user) \
+#                 or interaction.guild.owner_id == interaction.user.id:
+#             return True
+#         await Tools.SendError(interaction, "You are not an admin or the server owner, you can't do that.",
+#                               ephemeral=True)
+#         return False
+#
+#     return app_commands.check(predicate)
 
-    return app_commands.check(predicate)
+def is_admin(interaction: discord.Interaction):
+    data = Server(interaction.guild_id)
+    return Tools.has_permission(data.admin, interaction.user) or interaction.guild.owner_id == interaction.user.id
 
 
 class Settings(app_commands.Group):
@@ -27,17 +33,7 @@ class Settings(app_commands.Group):
     def __init__(self):
         super().__init__()
 
-    @staticmethod
-    async def completeBool(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-        permissions = ["true", "false"]
-        return [app_commands.Choice(name=permission, value=permission) for permission in permissions if current.lower()]
-
-    @staticmethod
-    async def complete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-        permissions = ["teacher", "admin"]
-        return [app_commands.Choice(name=permission, value=permission) for permission in permissions if current.lower()]
-
-    @is_admin()
+    # @is_admin()
     @app_commands.command(name='add', description='Add teacher/admin access to a user or role')
     @app_commands.describe(category="Category of permission")
     @app_commands.describe(role="Role or User to add")
@@ -68,7 +64,7 @@ class Settings(app_commands.Group):
         server.Save_Settings()
         await interaction.response.send_message(embed=embed)
 
-    @is_admin()
+    # @is_admin()
     @app_commands.command(name='remove', description='Remove teacher/admin access to a user or role')
     @app_commands.describe(category="Category of permission")
     @app_commands.describe(role="Role or User to remove")
@@ -98,7 +94,7 @@ class Settings(app_commands.Group):
         server.Save_Settings()
         await interaction.response.send_message(embed=embed)
 
-    @is_admin()
+    # @is_admin()
     @app_commands.command(name='list', description='List all users and roles with teacher/admin access')
     @app_commands.describe(category="Category of permission")
     # @app_commands.autocomplete(category=complete)
@@ -118,40 +114,60 @@ class Settings(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="get", description="See actual settings")
-    async def settings(self, interaction: discord.Interaction):
-        data = Server(interaction.guild.id)
-        embed = Embed.BasicEmbed(color=discord.Colour.orange(), title="Current settings")
 
-        embed.add_field(name="• System Messages", value=str(data.sysMessages), inline=False)
-        embed.add_field(name="• Private Messages", value=str(data.mp), inline=False)
-        embed.add_field(name="• Show present students after call", value=str(data.showPresents), inline=False)
-        embed.add_field(name="• Delay in minutes", value=str(data.delay), inline=False)
+def SettingsEmbed(interaction: discord.Interaction):
+    data = Server(interaction.guild_id)
+    embed = Embed.BasicEmbed(color=discord.Colour.orange(), title="Settings")
 
-        await interaction.response.send_message(embed=embed)
+    embed.add_field(name="• Private Messages",
+                    value="Private messages are now " + (
+                        "enable. A message will be sent to evry absent students." if
+                        data.mp else "disable. No message will be sent to absent students."),
+                    inline=False)
+    embed.add_field(name="• Show present students after call",
+                    value="Present students message is now" + ("enabled" if data.showPresents else "disable"),
+                    inline=False)
+    embed.add_field(name="• Delay (in minutes)", value=str(data.delay), inline=False)
+    embed.add_field(name="• Number of admins", value=str(data.sum_admin), inline=False)
+    embed.add_field(name="• Number of teachers", value=str(data.sum_teacher), inline=False)
 
-    @is_admin()
-    @app_commands.command(name="present", description="Show present students")
-    @app_commands.describe(value="Do you want to show present students?")
-    # @app_commands.autocomplete(value=completeBool)
-    async def ShowPresents(self, interaction: discord.Interaction, value: str):
-        data = Server(interaction.guild.id)
-        value = bool(value)
+    return embed
 
-        embed = Embed.BasicEmbed(color=discord.Color.red(),
-                                 title="Call summary will only show absents students" if value
-                                 else "Call summary will show absents and presents students")
 
-        data.showPresents = value
+class Home(discord.ui.View):
+    def __init__(self, interaction: discord.Interaction):
+        super().__init__()
+        self.interaction = interaction
 
-        data.Save_Settings()
-        await interaction.response.send_message(embed=embed)
+    @discord.ui.button(label="Edit settings", style=discord.ButtonStyle.blurple, emoji="📝")
+    async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not is_admin(interaction):
+            embed = Embed.BasicEmbed(
+                title="You don't have permission to do that. You need admin permission or to be the admin owner.",
+                color=discord.Colour.red())
+            await self.interaction.edit_original_message(
+                embed=embed,
+                view=Done(self.interaction, Home(self.interaction), SettingsEmbed(interaction)))
+            await interaction.response.defer()
+        else:
+            await interaction.response.defer()
+            await self.interaction.edit_original_message(view=Edit(self.interaction))
 
-    @is_admin()
-    @app_commands.command(description="Reset all settings")
-    async def reset(self, interaction: discord.Interaction):
-        data = Server(interaction.guild.id)
 
+class Edit(discord.ui.View):
+
+    def __init__(self, interaction: discord.Interaction):
+        super().__init__()
+        self.interaction = interaction
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, emoji="⬅")
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.interaction.edit_original_message(view=Home(self.interaction))
+        await interaction.response.defer()
+
+    @discord.ui.button(label="Reset all settings", style=discord.ButtonStyle.green)
+    async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
+        data = Server(interaction.guild_id)
         data.Reset()
         data.Save_Settings()
 
@@ -161,50 +177,155 @@ class Settings(app_commands.Group):
                                        "Private Messages :** Activated\nDelay for for late students after a call : "
                                        "10 minutes")
 
-        await interaction.response.send_message(embed=embed)
+        await self.interaction.edit_original_message(embed=embed,
+                                                     view=Done(self.interaction, Edit(self.interaction),
+                                                               SettingsEmbed(interaction)))
+        await interaction.response.defer()
 
-    @is_admin()
-    @app_commands.command(description="Activate/Deactivate system message")
-    @app_commands.describe(value="Do you want to activate system messages?")
-    # @app_commands.autocomplete(value=completeBool)
-    async def system(self, context, value: str):
-        """
-        Activate/Deactivate system message
-        """
-        data = Server(context.guild.id)
-        value = bool(value)
+    @discord.ui.button(label="Set Delay", style=discord.ButtonStyle.green)
+    async def setDelay(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(SetDelay(self.interaction))
 
-        embed = Embed.BasicEmbed(color=discord.Color.orange(),
-                                 title="System Messages are now disabled" if value
-                                 else "System Messages are now activated")
-
-        data.sysMessages = value
+    @discord.ui.button(label="Activate/Deactivate system messages", style=discord.ButtonStyle.green)
+    async def system(self, interaction: discord.Interaction, button: discord.ui.Button):
+        data = Server(interaction.guild.id)
+        embed = Embed.BasicEmbed(color=discord.Color.red(),
+                                 title="Private messages are now disabled" if data.mp
+                                 else "Private messages are now enabled")
+        data.mp = not data.mp
         data.Save_Settings()
 
-        await context.channel.send(embed=embed)
+        await self.interaction.edit_original_message(embed=embed,
+                                                     view=Done(self.interaction, Edit(self.interaction),
+                                                               SettingsEmbed(interaction)))
+        await interaction.response.defer()
 
-    @is_admin()
-    @app_commands.command(description="Activate/Deactivate private messages")
-    @app_commands.describe(value="Do you want to activate private messages?")
-    # @app_commands.autocomplete(value=completeBool)
-    async def mp(self, interaction: discord.Interaction, value: str):
-        data = Server(interaction.guild.id)
-        value = bool(value)
+    @discord.ui.button(label="Activate/Deactivate presents students", style=discord.ButtonStyle.green)
+    async def presents(self, interaction: discord.Interaction, button: discord.ui.Button):
+        data = Server(interaction.guild_id)
         embed = Embed.BasicEmbed(color=discord.Color.red(),
                                  title="Private messages are now disabled" if data.showPresents
-                                 else "Private messages are now disabled")
-        data.mp = value
+                                 else "Private messages are now enabled")
+        data.showPresents = not data.showPresents
         data.Save_Settings()
 
-        await interaction.response.send_message(embed=embed)
+        await self.interaction.edit_original_message(embed=embed, view=Done(self.interaction, Edit(self.interaction),
+                                                                            SettingsEmbed(interaction)))
+        await interaction.response.defer()
 
-    @is_admin()
-    @app_commands.command(description="Set delay (in minutes). Default is 10 minutes")
-    async def delay(self, context, delay: app_commands.Range[int, 0, 60] = 10):
-        data = Server(context.guild.id)
+    @discord.ui.button(label="Admin Access", style=discord.ButtonStyle.blurple, emoji="🔑")
+    async def admin(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = Embed.BasicEmbed(color=discord.Color.orange(),
+                                 title="**__Admin Access:__**\n",
+                                 description="For the moment, new admin panel is still under development. Please use these commands instead.")
+        embed.add_field(name="add", value="/settings add admin @role", inline=False)
+        embed.add_field(name="remove", value="/settings remove admin @role", inline=False)
+        embed.add_field(name="list", value="/settings list admin", inline=False)
 
-        data.delay = delay
-        embed = Embed.BasicEmbed(color=discord.Color.red(), title=f"New delay : **{delay} minutes**")
+        await self.interaction.edit_original_message(embed=embed,
+                                                     view=Done(self.interaction, Edit(self.interaction),
+                                                               SettingsEmbed(interaction)))
+        await interaction.response.defer()
 
-        data.Save_Settings()
-        await context.channel.send(embed=embed)
+    @discord.ui.button(label="Teacher Access", style=discord.ButtonStyle.blurple, emoji="🎓")
+    async def teacher(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = Embed.BasicEmbed(color=discord.Color.orange(),
+                                 title="**__Teacher Access:__**\n",
+                                 description="For the moment, new teacher panel is still under development. Please use these commands instead.")
+        embed.add_field(name="add", value="/settings add teacher @role", inline=False)
+        embed.add_field(name="remove", value="/settings remove teacher @role", inline=False)
+        embed.add_field(name="list", value="/settings list teacher", inline=False)
+
+        await self.interaction.edit_original_message(embed=embed,
+                                                     view=Done(self.interaction, Edit(self.interaction),
+                                                               SettingsEmbed(interaction)))
+        await interaction.response.defer()
+
+
+class Done(discord.ui.View):
+    def __init__(self, interaction: discord.Interaction, next_view: discord.ui.View,
+                 next_embed: Optional[discord.Embed] = MISSING):
+        super().__init__()
+        self.next_view = next_view
+        self.next_embed = next_embed
+        self.interaction = interaction
+
+    @discord.ui.button(label="OK", style=discord.ButtonStyle.blurple, emoji="✅")
+    async def ok(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.interaction.edit_original_message(view=self.next_view, embed=self.next_embed)
+        await interaction.response.defer()
+
+
+class PermPanel(discord.ui.View):
+
+    def __init__(self, category: str):
+        """
+        :param category: The category of the permissions (admin or teacher)
+        """
+        super().__init__()
+        self.category = category
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple, emoji="⬅")
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.edit_original_message(view=Edit(), embed=SettingsEmbed(interaction))
+
+    @discord.ui.button(label="Add", style=discord.ButtonStyle.green, emoji="➕")
+    async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+
+    @discord.ui.button(label="Remove", style=discord.ButtonStyle.red, emoji="➖")
+    async def remove(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+
+    @discord.ui.button(label="List", style=discord.ButtonStyle.blurple, emoji="📋")
+    async def list(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = Embed.BasicEmbed(title=f"{self.category} list", color=discord.Colour.orange())
+
+        if self.category == "admin":
+            perms = Server(interaction.guild_id).admin
+        else:  # category == "teacher"
+            perms = Server(interaction.guild_id).teacher
+        if not perms["users"] and not perms["roles"]:
+            embed.description = f"No {self.category} set."
+        if perms["roles"]:
+            embed.add_field(name="Roles", value="\n".join([f"<@&{role}>" for role in perms["roles"]]))
+        if perms["users"]:
+            embed.add_field(name="Users", value="\n".join([f"<@{user}>" for user in perms["users"]]))
+
+        await interaction.channel.send(embed=embed, view=Done(Edit(), SettingsEmbed(interaction)))
+
+
+class SetDelay(ui.Modal, title='Set Delay'):
+    value = ui.TextInput(label='Delay (in minutes between 0 and 60 min)', default="10", style=discord.TextStyle.short,
+                         required=True)
+
+    def __init__(self, interaction: discord.Interaction):
+        super().__init__()
+        self.interaction = interaction
+
+    async def on_submit(self, interaction: discord.Interaction):
+        data = Server(interaction.guild_id)
+        # if value is a number between 0 and 60
+        if self.value.value.isdigit():
+            value = int(self.value.value)
+            if 0 <= value <= 60:
+
+                data.delay = value
+                data.Save_Settings()
+                embed = Embed.BasicEmbed(color=discord.Color.red(), title=f"Value set to {value} minute(s)")
+                await self.interaction.edit_original_message(embed=embed,
+                                                             view=Done(self.interaction, Edit(self.interaction),
+                                                                       SettingsEmbed(interaction)))
+                await interaction.response.defer()
+            else:
+                embed = Embed.BasicEmbed(color=discord.Color.red(), title="Value must be between 0 and 60")
+                await self.interaction.edit_original_message(embed=embed,
+                                                             view=Done(self.interaction, Edit(self.interaction),
+                                                                       SettingsEmbed(interaction)))
+                await interaction.response.defer()
+        else:
+            embed = Embed.BasicEmbed(color=discord.Color.red(), title="Value must be a integer.")
+            await self.interaction.edit_original_message(embed=embed,
+                                                         view=Done(self.interaction, Edit(self.interaction),
+                                                                   SettingsEmbed(interaction)))
+            await interaction.response.defer()

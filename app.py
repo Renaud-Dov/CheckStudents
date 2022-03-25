@@ -1,4 +1,5 @@
-from src.settings import Settings
+from src import Embed
+from src.settings import Settings, Home, SettingsEmbed
 
 if __name__ == "__main__":
     from discord import app_commands
@@ -49,6 +50,12 @@ async def call(interaction: discord.Interaction, role: discord.Role, delay: app_
         await CheckClass.StartCall(interaction, role, delay)
 
 
+@tree.command(name="panel", description="Setting panel")
+async def settings(interaction: discord.Interaction):
+    embed = SettingsEmbed(interaction)
+    view = Home(interaction)
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
 
 @client.event
 async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
@@ -56,7 +63,7 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     Send help message  when joining a server
     """
 
-    Create_Guild(guild.id)
+    Server(guild.id)
     await tree.sync(guild=guild)
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,
                                                            name=f"{len(client.guilds)} servers"))
@@ -83,7 +90,7 @@ async def on_guild_remove(guild):
 #         pass
 #     else:
 #         await Tools.SendError(context.channel, "An error occurred", str(error))
-#         logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")
+#         logger.error(f"{context.guild}-{context.channel} ({context.message.a  uthor}):{error}")
 #         raise error
 
 

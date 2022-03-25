@@ -8,17 +8,20 @@ class Server:
         self.guild = guild_id
         if guild_id is None:
             raise ValueError("Guild ID is None")
-        with open('database/{}.json'.format(self.guild), 'r') as outfile:
-            var = json.load(outfile)
-        self.delay: int = var["delay"]
-        self.mp: bool = var["mp"]
-        self.sysMessages: bool = var["sysMessages"]
-        self.showPresents: bool = var["showPresents"]
-        self.admin: dict = var["admin"]
-        self.teacher: dict = var["teacher"]
+        try:
+            with open('database/{}.json'.format(self.guild), 'r') as outfile:
+                var = json.load(outfile)
+            self.delay: int = var["delay"]
+            self.mp: bool = var["mp"]
+            self.showPresents: bool = var["showPresents"]
+            self.admin: dict = var["admin"]
+            self.teacher: dict = var["teacher"]
+        except FileNotFoundError:
+            self.Reset()
+            self.Save_Settings()
 
     def __toDict(self):
-        return {"mp": self.mp, "sysMessages": self.sysMessages, "showPresents": self.showPresents, "delay": self.delay,
+        return {"mp": self.mp, "showPresents": self.showPresents, "delay": self.delay,
                 "admin": self.admin, "teacher": self.teacher}
 
     def Save_Settings(self):
@@ -28,17 +31,17 @@ class Server:
     def Reset(self):
         self.delay = 10
         self.mp = True
-        self.sysMessages = True
         self.showPresents = True
         self.admin = {"roles": [], "users": []}
         self.teacher = {"roles": [], "users": []}
 
+    @property
+    def sum_admin(self):
+        return len(self.admin["roles"]) + len(self.admin["users"])
+    @property
+    def sum_teacher(self):
+        return len(self.teacher["roles"]) + len(self.teacher["users"])
 
-def Create_Guild(guild_id):
-    with open("database/{}.json".format(guild_id), "x") as outfile:
-        json.dump(
-            {"mp": True, "sysMessages": True, "showPresents": True, "delay": 10, "admin": {"roles": [], "users": []},
-             "teacher": {"roles": [], "users": []}}, outfile)
 
 
 def Remove_Guild(guild_id):

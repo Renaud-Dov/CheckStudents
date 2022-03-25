@@ -19,10 +19,9 @@ class Check:
 
     async def AddStudents(self, context, messageID):
         msg = await context.fetch_message(messageID)
-        for react in msg.reactions:
-            if str(react.emoji) == "✅":
-                self.listStudents = [user for user in await react.users().flatten() if
-                                     Tools.got_the_role(self.role, user)]
+        for reaction in msg.reactions:
+            if str(reaction.emoji) == "✅":
+                self.listStudents = [user async for user in reaction.users() if Tools.got_the_role(self.role, user)]
                 break
 
 

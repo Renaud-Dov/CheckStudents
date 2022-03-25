@@ -21,30 +21,33 @@ To start attendance, a teacher (or any other user with an authorised role): `cal
 > By default, if you did not change bot prefix, the command will be `.Check call @class`.
 > Please refer to [prefix page](#change-bot-prefix) for more information.
 
-![startcall](img/startcall.png)
+![image](https://user-images.githubusercontent.com/14821642/160124605-42bc1be6-f5c5-4f66-ae90-3727cf87a094.png)
+
 
 Emojis will appear below your message, the students belonging to the `@class` role would be able to click on the ✅ to notify their presence.
 The teacher, or anyone with privileges, can end the call by clicking 🆗 or cancel with 🛑.
 
-![cantnotify](img/cantnotify.png)
+![image](https://user-images.githubusercontent.com/14821642/160124665-945f096c-e58f-49d4-a38b-4c7105a88e12.png)
 
 Note : Users can only notify their presence if they are part of the group (External students will not be counted)
 Also, someone who does not have privileges cannot close the call.
 
-![noright](img/noright.png)
+![image](https://user-images.githubusercontent.com/14821642/160124714-45836521-c371-4ce8-9524-c170f12dadc2.png)
 
 
 Once the call is finished, the bot will return the list of present and missing students and send the list to the teacher in private message.
 
-![finishcall](img/endcall.png)
+![image](https://user-images.githubusercontent.com/14821642/160124752-3f91d26a-0bb4-4152-8381-69d7d46894fc.png)
 
 The teacher who started the call will get a copy of the call in private message:
 
-![CallSumarry](img/summary.png)
+![image](https://user-images.githubusercontent.com/14821642/160124803-7714fa1b-68e3-46d7-ab7e-2c9e29dde285.png)
+
 
 Every absent student will get an absence notification in private message, like this:
 
-![absence](img/absence.png)
+![image](https://user-images.githubusercontent.com/14821642/160124860-19b5f0da-5c90-4e20-a4f6-d609bb0ba5d1.png)
+
 ## Add/Remove privileges to a role
 
 >Only a user with admin privileges can add/remove roles.
@@ -114,11 +117,6 @@ Reset command will reset admin and teacher list, put default prefix (`.Check`), 
 Return language, and private and system messages status values.
 > Command : `admin settings`
 
-## Calendar
-> Note that this functionality is only available for EPITA servers.
-
-
-### [Check for more information here](/src/calendar/CALENDAR.md)
 
 ## Common Errors
 ### The bot doesn't respond to any command

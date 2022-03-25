@@ -25,8 +25,6 @@ if __name__ == "__main__":
 async def on_ready():
     await client.change_presence(activity=discord.Game(name=".Check help"))
     print("Bot is ready!")
-    # TODO : REMOVE COMMENT
-    client.load_extension("src.calendar.calDiscord")
     client.load_extension("src.roles.admin")
     client.load_extension("src.roles.teacher")
 

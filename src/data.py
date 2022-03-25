@@ -20,12 +20,11 @@ class Server:
         self.showPresents: bool = var["showPresents"]
         self.admin: dict = var["admin"]
         self.teacher: dict = var["teacher"]
-        self.calendar: dict = var["calendar"]
 
     def __toDict(self):
         return {"prefix": self.prefix, "language": self.language, "mp": self.mp,
                 "sysMessages": self.sysMessages, "showPresents": self.showPresents, "delay": self.delay,
-                "admin": self.admin, "teacher": self.teacher, "calendar": self.calendar}
+                "admin": self.admin, "teacher": self.teacher}
 
     def Save_Settings(self):
         with open("database/{}.json".format(self.guild), "w") as outfile:
@@ -46,7 +45,6 @@ class Server:
         self.showPresents = True
         self.admin = {"roles": [], "users": []}
         self.teacher = {"roles": [], "users": []}
-        self.calendar = dict()
 
 
 def Create_Guild(guild_id):
@@ -54,7 +52,7 @@ def Create_Guild(guild_id):
         json.dump(
             {"prefix": ".Check ", "language": "en", "mp": True,
              "sysMessages": True, "showPresents": True, "delay": 10,
-             "admin": {"roles": [], "users": []}, "teacher": {"roles": [], "users": []}, "calendar": {}}, outfile)
+             "admin": {"roles": [], "users": []}, "teacher": {"roles": [], "users": []}}, outfile)
 
 
 def Remove_Guild(guild_id):

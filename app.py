@@ -25,8 +25,23 @@ if __name__ == "__main__":
 async def on_ready():
     await client.change_presence(activity=discord.Game(name=".Check help"))
     print("Bot is ready!")
-    client.load_extension("src.roles.admin")
-    client.load_extension("src.roles.teacher")
+
+
+@client.event
+async def on_message(message):
+    if not message.content.startswith(".Check"):
+        return
+    embed = Embed.CompleteEmbed(title="CheckStudents v1.0.0 is now available!",
+                                description="Update the bot to the latest version and use the power of slash commands")
+    embed.set_image(
+        url="https://user-images.githubusercontent.com/14821642/160217288-46ea127e-2b27-487f-897f-61afd807331a.png")
+    view = discord.ui.View()
+    view.add_item(discord.ui.Button(style=discord.ButtonStyle.green, label=f"Update now", emoji="🚀",
+                                    url=f"https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=2048&scope=applications.commands%20bot",
+                                    ))
+    view.add_item(discord.ui.Button(style=discord.ButtonStyle.green, label=f"Changelog", emoji="📝",
+                                    url=f"https://github.com/Renaud-Dov/CheckStudents/blob/master/CHANGELOG.md"))
+    await message.reply(embed=embed, view=view)
 
 
 @client.command(aliases=["Call, attendance"])
@@ -67,18 +82,18 @@ async def on_guild_remove(guild):
 #######################################################
 #######################################################
 
-@client.event
-async def on_command_error(context: commands.Context, error):
-    if isinstance(error, commands.errors.CommandNotFound):
-        await Tools.SendError(context.channel, "Unknown Command. Use help command")
-    elif isinstance(error, commands.errors.MissingRequiredArgument):
-        await Tools.SendError(context.channel, "Missing argument", desc=str(error))
-    elif isinstance(error, commands.errors.CheckFailure):
-        pass
-    else:
-        await Tools.SendError(context.channel, "An error occurred", str(error))
-        logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")
-        raise error
+# @client.event
+# async def on_command_error(context: commands.Context, error):
+#     if isinstance(error, commands.errors.CommandNotFound):
+#         await Tools.SendError(context.channel, "Unknown Command. Use help command")
+#     elif isinstance(error, commands.errors.MissingRequiredArgument):
+#         await Tools.SendError(context.channel, "Missing argument", desc=str(error))
+#     elif isinstance(error, commands.errors.CheckFailure):
+#         pass
+#     else:
+#         await Tools.SendError(context.channel, "An error occurred", str(error))
+#         logger.error(f"{context.guild}-{context.channel} ({context.message.author}):{error}")
+#         raise error
 
 
 @client.command()
@@ -101,7 +116,7 @@ async def settings(context):
 async def load(context, *, module: str):
     """Loads a module."""
     try:
-        client.load_extension(module)
+        await client.load_extension(module)
     except Exception as e:
         print(f"Error on load {module}.", e)
         await context.channel.send(f"Error on load **{module}**.")
@@ -115,7 +130,7 @@ async def load(context, *, module: str):
 async def unload(context, module: str):
     """Unloads a module."""
     try:
-        client.unload_extension(module)
+        await client.unload_extension(module)
     except Exception as e:
         print(f"Error on unload {module}.", e)
         await context.channel.send(f"Error on unload **{module}**.")
@@ -129,7 +144,7 @@ async def unload(context, module: str):
 async def reload(context, module: str):
     """Reloads a module."""
     try:
-        client.reload_extension(module)
+        await client.reload_extension(module)
     except Exception as e:
         print(f"Error on reload {module}.", e)
         # await self.bot.say('{}: {}'.format(type(e).__name__, e))

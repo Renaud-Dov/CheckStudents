@@ -1,11 +1,34 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
+
+## [1.0.0] - 2022-03-25
+### Changed
+- Commands now use slash commands instead of the old method.
+- Attendances now use button instead of reactions.
+  > Parameters are now passed as real parameters in discord slash commands.
+- Admin and Teacher subcomands are under `/settings` command.
+  >* `/settings add admin @role` - Admin add subcommand.
+  >* `/settings add teacher @role` - Teacher add subcommand.
+  >* `/settings remove admin @role` - Admin remove subcommand.
+  >* `/settings remove teacher @role` - Teacher remove subcommand.
+  >* `/settings list admins` - Admin list subcommand.
+  >* `/settings list teachers` - Teacher list subcommand.
+- `.Check settings` command is now `/settings get`
+- Other admin commands (such as setting the delay, reset the bot or mp and show present message) are now under a `/panel` command.
+
+### Removed
+- Removed language choice.
+- Removed calendar subcommands because it is useless and not working anymore due to the new calendar system.
+- Removed argument `-a` in `/call` command.
+
 ## [0.9.3] - 2022-03-25
 ## Changed
 * Added message_content intent to prevent discord block in end April 2022
+
 ## [0.9.2] - 2021-05-18
 ### Changed
 * Changed language architecture system.
+* 
 
 ## [0.9.1] - 2021-03-21
 ### Added

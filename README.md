@@ -5,37 +5,36 @@
 # CheckStudents
 
 ## Installation
+
 To add this bot to your Discord Server :
-[![Click here](https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=760157065997320192&permissions=92224&scope=bot)
+[![Click here](https://img.shields.io/badge/-Add%20the%20bot-blue?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=790559693390872596&permissions=2048&scope=applications.commands%20bot)
 
-**Please accept all permission, or the bot will not respond on your server. Please refer to [this issue](#the-bot-doesnt-respond-to-any-command).**
->**Note : You need the corresponding privileges to add the bot on a server.**
-
+**Please accept all permission, or the bot will not respond on your server. Please refer
+to [this issue](#the-bot-doesnt-respond-to-any-command).**
+> **Note : You need the corresponding privileges to add the bot on a server.**
 
 ### Read [CHANGELOG](CHANGELOG.md) here.
+
 ## How does it work ?
 
-
-
-To start attendance, a teacher (or any other user with an authorised role): `call @class`.
-> By default, if you did not change bot prefix, the command will be `.Check call @class`.
-> Please refer to [prefix page](#change-bot-prefix) for more information.
+To start attendance, a teacher (or any other user with an authorised role): `/call @role`.
 
 ![image](https://user-images.githubusercontent.com/14821642/160124605-42bc1be6-f5c5-4f66-ae90-3727cf87a094.png)
 
-
-Emojis will appear below your message, the students belonging to the `@class` role would be able to click on the ✅ to notify their presence.
-The teacher, or anyone with privileges, can end the call by clicking 🆗 or cancel with 🛑.
+Buttons will appear below your message, the students belonging to the `@class` role would be able to click on
+the `I'm present` to notify their presence. The teacher, or anyone with privileges, can end the call by clicking
+on `Finish attendance` or cancel with `Cancel attendance`.
 
 ![image](https://user-images.githubusercontent.com/14821642/160124665-945f096c-e58f-49d4-a38b-4c7105a88e12.png)
 
-Note : Users can only notify their presence if they are part of the group (External students will not be counted)
-Also, someone who does not have privileges cannot close the call.
+Note : Users can only notify their presence if they are part of the group (External students of a class will not be
+counted)
+Also, only the teacher who started the call can close it.
 
 ![image](https://user-images.githubusercontent.com/14821642/160124714-45836521-c371-4ce8-9524-c170f12dadc2.png)
 
-
-Once the call is finished, the bot will return the list of present and missing students and send the list to the teacher in private message.
+Once the call is finished, the bot will return the list of present and missing students and send the list to the teacher
+in private message.
 
 ![image](https://user-images.githubusercontent.com/14821642/160124752-3f91d26a-0bb4-4152-8381-69d7d46894fc.png)
 
@@ -43,87 +42,69 @@ The teacher who started the call will get a copy of the call in private message:
 
 ![image](https://user-images.githubusercontent.com/14821642/160124803-7714fa1b-68e3-46d7-ab7e-2c9e29dde285.png)
 
-
 Every absent student will get an absence notification in private message, like this:
 
 ![image](https://user-images.githubusercontent.com/14821642/160124860-19b5f0da-5c90-4e20-a4f6-d609bb0ba5d1.png)
 
-## Add/Remove privileges to a role
+## Add/Remove permission to a role
 
->Only a user with admin privileges can add/remove roles.
+> Only a user with admin privileges **or the server owner** can add/remove roles.
 
 * Teacher:
-    * Add: `teacher add @role1 @role2,...` 
-    * Remove: `teacher remove @role1 @role2,...`
+    * Add: `/settings add teacher @role`
+    * Remove: `/settings remove teacher @role`
 * Admin:
-    * Add: `admin add @role1 @role2,...` 
-    * Remove: `admin remove @role1 @role2,...`
->Note: You can add / remove as many roles as you want at the same time.
+    * Add: `/settings add admin @role`
+    * Remove: `/settings remove admin @role`
+
+> Note: You can add / remove only one role per command.
 
 Note that the admin rights will not be checked if no admin has been registered beforehand.
 
-**To see the list of admins or teachers, use command `admin list` or `teacher list`**
+**To see the list of admins or teachers, use command `/settings list admin` or `/settings list teacher`**
 
+> Note: Permission gestion will be inside the panel control in the future.
 
-## Other commands
-### Change bot prefix
-If you want to change bot prefix, use command `admin prefix` followed by the new prefix. Default prefix is "`.Check `"
->You still can use `.Check ` even if you changed the prefix.
-> 
->You must be an admin in order to execute this command.
-### Translation
+### Panel
 
-You can also use the bot in different languages (French, English and German only for the moment)
-The language is applied to the whole server.
-If you want to add another language, please check the [json prototype](language/en.json)  and pull-request your translation!
->You must be an admin in order to execute this command
-> 
-> Command : `admin language fr|en|de`
-### Activate/Deactivate bot system messages
-If you have a system messages on your server and wants the bot to send a message when someone has changed bot settings, you can activate this functionality. This functionality is activated by default.
->You must be an admin in order to execute this command
-> 
-> Command : `admin sys`
+In the panel control, you can read actual settings of the bot in the server.
 
-### Activate/Deactivate bot private messages
-When a student is marked absent, he will receive 
-This functionality is activated by default.
->You must be an admin in order to execute this command
-> 
-> Command : `admin DeactivateMP`
+You can change it if you click on the `Edit` button.
+> Note: You must be an admin **or the server owner** to edit the settings.
 
-### Choose the delay for late students
-Late students got ten minutes to click on a DM message to inform their teacher. If you want to change the value, use this command :
->You must be an admin in order to execute this command.
-> 
-> Command : `admin delay time` replacing time by a positive value.
-> Example : `.Check admin delay 15` will set the delay to 15 minutes.
-> 
-> If you want to deactivate this functionality, put the value to zero : `admin delay 0`
+Let's see the settings of the bot in the server :
+
+#### Activate/Deactivate bot private messages
+
+When a student is marked absent, he will receive a ticket in private message to notify him, and the possibility to
+inform the teacher when he's back.
+> This functionality is activated by default.
+
+#### Choose the delay for late students
+
+Late students got 10 minutes by default to click on a DM message to inform their teacher.
 
 ### Activate/Deactivate the sending of the list of students present
-Use this command if you do not want the bot to send the list of students present.
 
-> Command : `admin showPresents`
-> Note: Teachers can override the deactivation using `-a` option in a call after the class. Example : `.Check call @Class -a`
+Use this command if you do not want the bot to send the list of students present, and get a shorter list of students.
+> This functionality is activated by default.
 
 ### Reset the bot
-Reset command will reset admin and teacher list, put default prefix (`.Check`), set language to English, and reset other settings by their default values.
->You must be an admin, **or the server owner** in order to execute this command
-> 
-> Command : `admin reset`
 
-### Get current settings
-Return language, and private and system messages status values.
-> Command : `admin settings`
+Reset command will reset admin and teacher list, set language to English, and reset other
+settings by their default values.
 
 
 ## Common Errors
+
 ### The bot doesn't respond to any command
->If the bot doesn't respond to any command, it might be because you did not accept all permission. In that case, remove the bot from the server, and invite him again.
+
+> If the bot doesn't respond to any command, it might be because you did not accept all permission. In that case, remove the bot from the server, and invite him again.
 
 ### Any other issue
+
 > Please read [CHANGELOG](CHANGELOG.md) or create an issue.
 
 ##### This repository use [Discord.py](https://github.com/Rapptz/discord.py) library from [Rapptz](https://github.com/Rapptz)
+
 ###### Icons made by [Freepik](http://www.freepik.com/) from [Flaticon](https://www.flaticon.com/)

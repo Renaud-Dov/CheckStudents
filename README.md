@@ -19,13 +19,14 @@ to [this issue](#the-bot-doesnt-respond-to-any-command).**
 
 To start attendance, a teacher (or any other user with an authorised role): `/call @role`.
 
-![image](https://user-images.githubusercontent.com/14821642/160124605-42bc1be6-f5c5-4f66-ae90-3727cf87a094.png)
+![image](https://user-images.githubusercontent.com/14821642/160217238-a2615018-30b5-4621-8337-80b54807046f.png)
+
 
 Buttons will appear below your message, the students belonging to the `@class` role would be able to click on
 the `I'm present` to notify their presence. The teacher, or anyone with privileges, can end the call by clicking
 on `Finish attendance` or cancel with `Cancel attendance`.
 
-![image](https://user-images.githubusercontent.com/14821642/160124665-945f096c-e58f-49d4-a38b-4c7105a88e12.png)
+![image](https://user-images.githubusercontent.com/14821642/160217288-46ea127e-2b27-487f-897f-61afd807331a.png)
 
 Note : Users can only notify their presence if they are part of the group (External students of a class will not be
 counted)
@@ -35,8 +36,6 @@ Also, only the teacher who started the call can close it.
 
 Once the call is finished, the bot will return the list of present and missing students and send the list to the teacher
 in private message.
-
-![image](https://user-images.githubusercontent.com/14821642/160124752-3f91d26a-0bb4-4152-8381-69d7d46894fc.png)
 
 The teacher who started the call will get a copy of the call in private message:
 
@@ -71,6 +70,9 @@ In the panel control, you can read actual settings of the bot in the server.
 
 You can change it if you click on the `Edit` button.
 > Note: You must be an admin **or the server owner** to edit the settings.
+
+![image](https://user-images.githubusercontent.com/14821642/160217389-5fa35577-5e3b-4578-abf7-01674c4f5d2c.png)
+
 
 Let's see the settings of the bot in the server :
 

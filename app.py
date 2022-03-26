@@ -30,6 +30,8 @@ async def on_ready():
     await client.change_presence(
         activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(client.guilds)} servers"))
 
+    await tree.sync(guild=discord.Object(id=760808606672093184))
+
 
 @tree.command(guild=discord.Object(id=760808606672093184), name="update", description="Update commands")
 async def updateCommands(interaction: discord.Interaction):
@@ -57,6 +59,16 @@ async def settings(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 
+@tree.command(name="report", description="Report a bug or a suggestion", guild=discord.Object(id=760808606672093184))
+async def report(interaction: discord.Interaction):
+    view = discord.ui.View()
+    view.add_item(discord.ui.Button(label="Open issue on Github", style=discord.ButtonStyle.blurple, emoji="🔗",
+                                        url="https://github.com/Renaud-Dov/CheckStudents/issues/new"))
+    embed = Embed.CompleteEmbed("Report", "Report a bug or a suggestion",color=discord.Color.purple())
+    embed.set_image(url="https://bugbear.fr/static/media/checkstudents.ef817ec01ea5e0b50887.jpg")
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
+
 @client.event
 async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     """
@@ -64,7 +76,7 @@ async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
     """
 
     Server(guild.id)
-    await tree.sync(guild=guild)
+    await tree.sync()
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,
                                                            name=f"{len(client.guilds)} servers"))
 

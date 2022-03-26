@@ -59,7 +59,7 @@ async def settings(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 
-@tree.command(name="report", description="Report a bug or a suggestion", guild=discord.Object(id=760808606672093184))
+@tree.command(name="report", description="Report a bug or a suggestion")
 async def report(interaction: discord.Interaction):
     view = discord.ui.View()
     view.add_item(discord.ui.Button(label="Open issue on Github", style=discord.ButtonStyle.blurple, emoji="🔗",

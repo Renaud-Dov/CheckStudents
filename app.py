@@ -49,7 +49,7 @@ def updateEmbed() -> [discord.Embed, discord.ui.View]:
 async def call(context, *args):
     embed, view = updateEmbed()
     embed.add_field(name="Command call", value="Now replaced by /call @role")
-    await context.message.author.send(embed=embed, view=view)
+    await context.message.reply(embed=embed, view=view)
 
 
 #######################################################
@@ -73,14 +73,14 @@ async def call(context, *args):
 async def settings(context):
     embed, view = updateEmbed()
     embed.add_field(name="Command settings", value="Now replaced by /panel")
-    await context.message.author.send(embed=embed, view=view)
+    await context.message.reply(embed=embed, view=view)
 
 
 @client.command()
 async def admin(context):
     embed, view = updateEmbed()
     embed.add_field(name="Command admin", value="Now replaced by /panel")
-    await context.message.author.send(embed=embed, view=view)
+    await context.message.reply(embed=embed, view=view)
 
 
 #######################################################
@@ -90,6 +90,8 @@ async def admin(context):
 
 @client.command(aliases=["commands,command"])
 async def help(context):
+    embed, view = updateEmbed()
+    await context.message.reply(embed=embed, view=view)
     await context.message.author.send(embed=Embed.HelpMsg())
 
 

@@ -1,3 +1,5 @@
+import discord.ui
+
 if __name__ == "__main__":
     from discord.ext import commands
     from src.data import *
@@ -23,60 +25,31 @@ if __name__ == "__main__":
 
 @client.event
 async def on_ready():
-    await client.change_presence(activity=discord.Game(name=".Check help"))
     print("Bot is ready!")
 
 
-@client.event
-async def on_message(message):
-    if not message.content.startswith(".Check"):
-        return
+def updateEmbed() -> [discord.Embed, discord.ui.View]:
     embed = Embed.CompleteEmbed(title="CheckStudents v1.0.0 is now available!",
-                                description="Update the bot to the latest version and use the power of slash commands")
+                                description="**You may need to kick the bot and invite it again to the server to "
+                                            "update completely the bot.**")
     embed.set_image(
         url="https://user-images.githubusercontent.com/14821642/160217288-46ea127e-2b27-487f-897f-61afd807331a.png")
+
     view = discord.ui.View()
     view.add_item(discord.ui.Button(style=discord.ButtonStyle.green, label=f"Update now", emoji="🚀",
                                     url=f"https://discord.com/oauth2/authorize?client_id=760157065997320192&permissions=2048&scope=applications.commands%20bot",
                                     ))
     view.add_item(discord.ui.Button(style=discord.ButtonStyle.green, label=f"Changelog", emoji="📝",
                                     url=f"https://github.com/Renaud-Dov/CheckStudents/blob/master/CHANGELOG.md"))
-    await message.reply(embed=embed, view=view)
+
+    return embed, view
 
 
 @client.command(aliases=["Call, attendance"])
-@is_teacher()
 async def call(context, *args):
-    await CheckClass.StartCall(client, context, args)
-
-
-@client.event
-async def on_reaction_add(reaction, user):
-    if isinstance(reaction.message.channel,
-                  discord.DMChannel) and reaction.message.author == client.user \
-            and user != client.user and str(reaction.emoji) == "⏰":
-        await CheckClass.LateStudent(reaction.message)
-
-
-@client.event
-async def on_guild_join(guild: discord.Guild):  # readGuild(message.guild.id)
-    """
-    Send help message  when joining a server
-    """
-
-    Create_Guild(guild.id)
-    if guild.system_channel is not None:
-        await guild.system_channel.send(embed=Embed.HelpMsg())
-        await guild.system_channel.send(embed=Embed.TeacherHelp())
-        await guild.system_channel.send(embed=Embed.AdminHelp())
-
-
-@client.event
-async def on_guild_remove(guild):
-    try:
-        Remove_Guild(guild.id)
-    except FileNotFoundError:
-        print("FileNotFoundError", guild, guild.id)
+    embed, view = updateEmbed()
+    embed.add_field(name="Command call", value="Now replaced by /call @role")
+    await context.message.author.send(embed=embed, view=view)
 
 
 #######################################################
@@ -98,60 +71,16 @@ async def on_guild_remove(guild):
 
 @client.command()
 async def settings(context):
-    data = Server(context.guild.id)
-    embed = Embed.BasicEmbed(color=discord.Colour.orange(), title="Current settings")
-
-    embed.add_field(name="• System Messages", value=str(data.sysMessages), inline=False)
-    embed.add_field(name="• Private Messages", value=str(data.mp), inline=False)
-    embed.add_field(name="• Show present students after call", value=str(data.showPresents), inline=False)
-    embed.add_field(name="• Language", value=str(data.language), inline=False)
-    embed.add_field(name="• Prefix", value=str(data.prefix), inline=False)
-    embed.add_field(name="• Delay in minutes", value=str(data.delay), inline=False)
-
-    await context.channel.send(embed=embed)
-
-
-@client.command(hidden=True)
-@commands.is_owner()
-async def load(context, *, module: str):
-    """Loads a module."""
-    try:
-        await client.load_extension(module)
-    except Exception as e:
-        print(f"Error on load {module}.", e)
-        await context.channel.send(f"Error on load **{module}**.")
-    else:
-        print(f"successfully loaded {module}.")
-        await context.channel.send(f"successfully loaded **{module}**.")
+    embed, view = updateEmbed()
+    embed.add_field(name="Command settings", value="Now replaced by /panel")
+    await context.message.author.send(embed=embed, view=view)
 
 
 @client.command()
-@commands.is_owner()
-async def unload(context, module: str):
-    """Unloads a module."""
-    try:
-        await client.unload_extension(module)
-    except Exception as e:
-        print(f"Error on unload {module}.", e)
-        await context.channel.send(f"Error on unload **{module}**.")
-    else:
-        print(f"successfully unloaded {module}.")
-        await context.channel.send(f"successfully unloaded **{module}**.")
-
-
-@client.command()
-@commands.is_owner()
-async def reload(context, module: str):
-    """Reloads a module."""
-    try:
-        await client.reload_extension(module)
-    except Exception as e:
-        print(f"Error on reload {module}.", e)
-        # await self.bot.say('{}: {}'.format(type(e).__name__, e))
-        await context.channel.send(f"Error on reload **{module}**.")
-    else:
-        print(f"successfully reloaded {module}.")
-        await context.channel.send(f"successfully reloaded **{module}**.")
+async def admin(context):
+    embed, view = updateEmbed()
+    embed.add_field(name="Command admin", value="Now replaced by /panel")
+    await context.message.author.send(embed=embed, view=view)
 
 
 #######################################################

@@ -1,2 +1,2 @@
 requests
-git+https://github.com/Rapptz/discord.py.git@master
+discord.py~=2.0

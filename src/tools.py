@@ -1,7 +1,5 @@
 from typing import Union
 
-import discord
-from discord.ext import commands
 from src.data import *
 from src import Embed
 

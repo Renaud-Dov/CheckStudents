@@ -1,14 +1,11 @@
 from datetime import datetime
-from time import gmtime, strftime
 from typing import List, Dict, Optional
 
-import discord
 from discord import Member, Message
 
 from src.data import *
 from src.tools import Tools
-import asyncio
-from io import BytesIO
+
 from src import Embed
 
 
@@ -16,13 +13,9 @@ class Check:
     def __init__(self, interaction: discord.Interaction, role: discord.Role, delay: int):
         self.interaction = interaction
         self.role = role
-        self.message: Optional[discord.InteractionMessage] = None
         self.teacher = interaction.user
         self.students: List[Member] = list()
         self.delay = delay
-
-    async def set_message(self):
-        self.message = await self.interaction.original_message()
 
 
 class Calling:
@@ -42,14 +35,17 @@ class Calling:
         nb_students = len(check.role.members)
         nb_presents = len(presents)
         nb_absents = len(absents)
-        await interaction.response.defer()
+        try:
+            await interaction.response.defer()
+        except:
+            pass
 
-        await check.interaction.channel.send(content=f"{nb_presents} students out of {nb_students} are present")
+        await check.interaction.followup.send(content=f"{nb_presents} students out of {nb_students} are present")
 
         if data.showPresents and presents_message:
-            await check.interaction.channel.send(presents_message)
+            await check.interaction.followup.send(content=presents_message)
 
-        await check.interaction.channel.send(absents_message)
+        await check.interaction.followup.send(content=absents_message)
 
         delay = check.delay if check.delay > 0 and nb_absents > 0 else 0
 
@@ -85,11 +81,10 @@ class Calling:
         # embed.add_field()
         embed.set_footer(text="Need help ? Use the help command")
 
-        view = ButtonView(interaction, self)
+        check = Check(interaction, role, delay)
+        self.calls[interaction.id] = check
+        view = ButtonView(interaction, check, self)
         await interaction.response.send_message(embed=embed, view=view)
-        self.calls[interaction.id] = Check(interaction, role, delay)
-        await self.calls[interaction.id].set_message()
-        view.check = self.calls[interaction.id]
 
     @staticmethod
     async def Send_Absents(check: Check, absents: list, delay: int):
@@ -103,7 +98,6 @@ class Calling:
         embed.add_field(name="**Server:**", value=check.interaction.guild)
         embed.add_field(name="**Channel:**", value=check.interaction.channel)
         embed.add_field(name="Date", value=f"<t:{int(datetime.timestamp(datetime.now()))}:R>")
-        embed.add_field(name="Show message", value=f"[{'Link'}]({check.message.jump_url})")
         for member in absents:
             try:
                 await member.send(embed=embed)
@@ -115,6 +109,8 @@ class Calling:
                     view.message = message
 
             except discord.errors.Forbidden:
+                await check.teacher.send(f"Unable to send a late ticket to {member.mention}")
+            except discord.errors.HTTPException:
                 await check.teacher.send(f"Unable to send a late ticket to {member.mention}")
 
     async def Send_Teacher(self, check: Check, present_message: str, absents_message: str, nb_presents, nb_absents,
@@ -131,21 +127,10 @@ class Calling:
         embed.add_field(name="Absents ⚠", value=nb_absents)
 
         if delay > 0 and mp:
-            embed.add_field(name="Time limit for late students", value=f"{delay} minutes", inline=False)
+            embed.add_field(name="Time limit for late students", value=f"{delay / 60} minutes", inline=False)
         await check.teacher.send(embed=embed)
         await check.teacher.send(present_message)
         await check.teacher.send(absents_message)
-
-    # async def LateStudent(self, message: discord.Message):
-    #     for attendance, students in self.missing.items():
-    #         if message.id in students:
-    #             student: LateStudent = self.missing[attendance].pop(message.id)
-    #             latetime = student.DeltaTime()
-    #             time_str = strftime(f"{'%H h' if latetime.seconds > 3600 else ''}%M minutes", gmtime(latetime.seconds))
-    #             await student.teacher.send(f"**{student.student}** <@{student.student.id}> arrived {time_str} late")
-    #             await student.student.send("I told your teacher you were late")
-    #             await student.message.delete()
-    #             break
 
     @staticmethod
     def ProcessStudents(role_list: List[Member], class_list: List[Member]):
@@ -183,9 +168,9 @@ class Calling:
 
 
 class ButtonView(discord.ui.View):
-    def __init__(self, interaction: discord.Interaction, calling: Calling):
+    def __init__(self, interaction: discord.Interaction, check: Check, calling: Calling):
         super().__init__(timeout=600)
-        self.check = None
+        self.check = check
         self.interaction = interaction
         self.calling = calling
 
@@ -208,7 +193,7 @@ class ButtonView(discord.ui.View):
         else:
             await self.calling.finish(self.check, interaction)
             self.stop()
-            await self.check.interaction.edit_original_message(view=None)
+            await self.check.interaction.edit_original_response(view=None)
 
     @discord.ui.button(label='Cancel attendance', style=discord.ButtonStyle.red, emoji="🛑")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -217,12 +202,12 @@ class ButtonView(discord.ui.View):
         else:
             await self.calling.cancel(self.check, interaction)
             self.stop()
-            await self.check.interaction.edit_original_message(view=None)
+            await self.check.interaction.edit_original_response(view=None)
 
     async def on_timeout(self):
         await self.calling.cancel(self.check, self.interaction)
         self.clear_items()
-        await self.check.interaction.edit_original_message(view=None)
+        await self.check.interaction.edit_original_response(view=None)
 
 
 class LateStudentsView(discord.ui.View):

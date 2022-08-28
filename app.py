@@ -1,11 +1,10 @@
 from src import Embed
-from src.settings import Settings, Home, SettingsEmbed
+from src.settings import SettingsEmbed, Edit
 
 if __name__ == "__main__":
     from discord import app_commands
     from src.data import *
     import os
-    from src.tools import Tools
     from src.call import Calling
     # from src.roles.teacher import is_teacher
 
@@ -44,27 +43,22 @@ async def updateCommands(interaction: discord.Interaction):
 @app_commands.describe(role="Which role you want to check the attendance")
 @app_commands.describe(delay="Time for absent to be counted as late 0-60 (If 0, no late)")
 async def call(interaction: discord.Interaction, role: discord.Role, delay: app_commands.Range[int, 0, 60] = 10):
-    data = Server(interaction.guild_id)
     delay *= 60
-    if not Tools.has_permission(data.teacher, interaction.user):
-        await Tools.SendError(interaction, "You don't have teacher role")
-    else:
-        await CheckClass.StartCall(interaction, role, delay)
+    await CheckClass.StartCall(interaction, role, delay)
 
 
 @tree.command(name="panel", description="Setting panel")
 async def settings(interaction: discord.Interaction):
     embed = SettingsEmbed(interaction)
-    view = Home(interaction)
-    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+    await interaction.response.send_message(embed=embed, view=Edit(interaction), ephemeral=True)
 
 
 @tree.command(name="report", description="Report a bug or a suggestion")
 async def report(interaction: discord.Interaction):
     view = discord.ui.View()
     view.add_item(discord.ui.Button(label="Open issue on Github", style=discord.ButtonStyle.blurple, emoji="🔗",
-                                        url="https://github.com/Renaud-Dov/CheckStudents/issues/new"))
-    embed = Embed.CompleteEmbed("Report", "Report a bug or a suggestion",color=discord.Color.purple())
+                                    url="https://github.com/Renaud-Dov/CheckStudents/issues/new"))
+    embed = Embed.CompleteEmbed("Report", "Report a bug or a suggestion", color=discord.Color.purple())
     embed.set_image(url="https://bugbear.fr/static/media/checkstudents.ef817ec01ea5e0b50887.jpg")
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
@@ -87,6 +81,8 @@ async def on_guild_remove(guild):
         Remove_Guild(guild.id)
     except FileNotFoundError:
         print("FileNotFoundError", guild, guild.id)
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,
+                                                           name=f"{len(client.guilds)} servers"))
 
 
 #######################################################
@@ -106,5 +102,4 @@ async def on_guild_remove(guild):
 #         raise error
 
 
-tree.add_command(Settings())
 client.run(os.environ.get("DISCORD_TOKEN"))

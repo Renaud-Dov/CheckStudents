@@ -45,33 +45,22 @@ Every absent student will get an absence notification in private message, like t
 
 ![image](https://user-images.githubusercontent.com/14821642/160124860-19b5f0da-5c90-4e20-a4f6-d609bb0ba5d1.png)
 
-## Add/Remove permission to a role
 
-> Only a user with admin privileges **or the server owner** can add/remove roles.
+### Access to commands
+> Since 1.1.0, CheckStudents use directly Discord Permission
 
-* Teacher:
-    * Add: `/settings add teacher @role`
-    * Remove: `/settings remove teacher @role`
-* Admin:
-    * Add: `/settings add admin @role`
-    * Remove: `/settings remove admin @role`
+In Server Settings > Integtations > Bots and Apps > CheckStudents
+<img width="690" alt="image" src="https://user-images.githubusercontent.com/14821642/187078389-c092b819-c667-482e-a75c-05efcf76a94a.png">
 
-> Note: You can add / remove only one role per command.
+##### From there you can directly set permissions to users and roles for each command
+<img width="691" alt="image" src="https://user-images.githubusercontent.com/14821642/187078642-d8616d5b-3892-4a94-9aa4-3ddd32d5b971.png">
 
-Note that the admin rights will not be checked if no admin has been registered beforehand.
 
-**To see the list of admins or teachers, use command `/settings list admin` or `/settings list teacher`**
-
-> Note: Permission gestion will be inside the panel control in the future.
 
 ### Panel
 
 In the panel control, you can read actual settings of the bot in the server.
-
-You can change it if you click on the `Edit` button.
-> Note: You must be an admin **or the server owner** to edit the settings.
-
-![image](https://user-images.githubusercontent.com/14821642/160217389-5fa35577-5e3b-4578-abf7-01674c4f5d2c.png)
+<img width="490" alt="image" src="https://user-images.githubusercontent.com/14821642/160217389-5fa35577-5e3b-4578-abf7-01674c4f5d2c.png">
 
 
 Let's see the settings of the bot in the server :

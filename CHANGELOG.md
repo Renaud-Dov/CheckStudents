@@ -1,6 +1,10 @@
 # Version Changelog 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2022-08-28
+### Removed
+- All admin and teacher subcommands and fake roles have been removed. Please use instead discords permissions for each slash commands (see [Access to commands](README.md#access-to-commands))
+
 ## [1.0.0] - 2022-03-25
 ### Changed
 - Commands now use slash commands instead of the old method.
